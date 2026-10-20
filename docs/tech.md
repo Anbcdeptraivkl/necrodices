@@ -24,6 +24,12 @@ python tools\gen_placeholders.py      :: create MISSING placeholder PNGs (--only
 python tools\validate_art.py          :: ART_SPEC §9.3 checks
 python tools\layout_mockup.py         :: ART_SPEC §6 wireframes -> docs/mockups/
 python tools\skills_index.py --write  :: regenerate the skill index in AGENTS.md
+tools\ui_test.cmd                     :: UI smoke tests in the real game (autoloads): flows driven by buttons
+tools\screenshot.cmd encounter captures\x.png   :: capture a preset (scenes/dev/capture.gd PRESETS)
+tools\balance_sim.cmd --mode=baseline --trials=20000   :: Appendix A regression (§5.6)
+tools\balance_sim.cmd --mode=runs --trials=1000        :: Appendix B bot: reach / win / deaths by rule
+tools\export_web.cmd                  :: Web release → build\web + build\rattle_and_roll_web.zip (needs 4.6.3 templates)
+python tools\art\<units|enemies_dice|icons|scenery|howto>.py [--only id] [--preview out.png]   :: final art generators
 "%GODOT_EXE%" --path . --resolution 1600x900 res://scenes/dev/display_probe.tscn  :: print scale / canvas for a window size
 ```
 
@@ -32,7 +38,7 @@ First run on a fresh clone: `"%GODOT_EXE%" --headless --path . --import` (tools\
 ## Folders
 
 ```
-autoload/   Display, Events, Settings, Audio, Game (preload-free)
+autoload/   Display, Settings, Audio, Game (preload-free; no global event bus, D-A11)
 core/       pure rules (RefCounted), headless-tested
 scenes/     boot, title, night_map, encounter, shop, end, overlays, dev
 ui/         components + theme
@@ -40,6 +46,6 @@ fx/         presentation queue, combat player, horde renderer, shaders
 data/       content JSON (GAME_SPEC §9)
 assets/     art per ART_SPEC §11 (manifest.json is generated)
 tools/      python + cmd tooling, balance_sim.gd
-tests/      _run.gd, _suite.gd, test_*.gd
+tests/      _run.gd, _suite.gd, test_*.gd (headless core), ui/ui_runner.tscn (in-game UI flows)
 docs/       plan, tech notes
 ```

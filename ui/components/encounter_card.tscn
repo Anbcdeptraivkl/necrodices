@@ -1,0 +1,111 @@
+[gd_scene load_steps=2 format=3]
+
+[ext_resource type="Script" path="res://ui/components/encounter_card.gd" id="1"]
+
+[node name="EncounterCard" type="PanelContainer"]
+custom_minimum_size = Vector2(152, 192)
+theme_type_variation = &"CardPanel"
+script = ExtResource("1")
+
+[node name="VBox" type="VBoxContainer" parent="."]
+layout_mode = 2
+mouse_filter = 2
+theme_override_constants/separation = 3
+
+[node name="Stand" type="Control" parent="VBox"]
+custom_minimum_size = Vector2(0, 42)
+layout_mode = 2
+mouse_filter = 2
+
+[node name="PedestalTop" type="ColorRect" parent="VBox/Stand"]
+layout_mode = 1
+anchors_preset = 5
+anchor_left = 0.5
+anchor_right = 0.5
+offset_left = -24.0
+offset_top = 34.0
+offset_right = 24.0
+offset_bottom = 35.0
+mouse_filter = 2
+color = Color(0.341176, 0.270588, 0.466667, 1)
+
+[node name="Pedestal" type="ColorRect" parent="VBox/Stand"]
+layout_mode = 1
+anchors_preset = 5
+anchor_left = 0.5
+anchor_right = 0.5
+offset_left = -24.0
+offset_top = 35.0
+offset_right = 24.0
+offset_bottom = 40.0
+mouse_filter = 2
+color = Color(0.231373, 0.172549, 0.333333, 1)
+
+[node name="Enemy" type="TextureRect" parent="VBox/Stand"]
+unique_name_in_owner = true
+layout_mode = 1
+anchors_preset = 5
+anchor_left = 0.5
+anchor_right = 0.5
+offset_left = -16.0
+offset_top = 6.0
+offset_right = 16.0
+offset_bottom = 38.0
+mouse_filter = 2
+
+[node name="Name" type="Label" parent="VBox"]
+unique_name_in_owner = true
+layout_mode = 2
+horizontal_alignment = 1
+autowrap_mode = 3
+
+[node name="Role" type="Label" parent="VBox"]
+unique_name_in_owner = true
+layout_mode = 2
+theme_type_variation = &"MutedLabel"
+horizontal_alignment = 1
+
+[node name="Hp" type="Label" parent="VBox"]
+unique_name_in_owner = true
+layout_mode = 2
+theme_type_variation = &"BodyLabel"
+horizontal_alignment = 1
+
+[node name="RuleChip" type="PanelContainer" parent="VBox"]
+layout_mode = 2
+mouse_filter = 2
+theme_type_variation = &"ChipPanel"
+
+[node name="Rule" type="Label" parent="VBox/RuleChip"]
+unique_name_in_owner = true
+custom_minimum_size = Vector2(136, 0)
+layout_mode = 2
+theme_type_variation = &"RuleLabel"
+horizontal_alignment = 1
+autowrap_mode = 3
+
+[node name="Current" type="Panel" parent="."]
+unique_name_in_owner = true
+visible = false
+layout_mode = 2
+mouse_filter = 2
+theme_type_variation = &"CurrentBorder"
+
+[node name="StampHolder" type="Control" parent="."]
+layout_mode = 2
+mouse_filter = 2
+
+[node name="Stamp" type="TextureRect" parent="StampHolder"]
+unique_name_in_owner = true
+visible = false
+layout_mode = 1
+anchors_preset = 8
+anchor_left = 0.5
+anchor_top = 0.5
+anchor_right = 0.5
+anchor_bottom = 0.5
+offset_left = -32.0
+offset_top = -10.0
+offset_right = 32.0
+offset_bottom = 10.0
+mouse_filter = 2

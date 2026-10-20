@@ -106,4 +106,7 @@ git config core.hooksPath .githooks
   named with `--only` or with `--force`, and only on the user's request. Modified art files in
   the working tree are the designer's work — never revert, regenerate or "clean" them.
 - Before handing over: `python tools/check_data.py`, `python tools/validate_art.py`,
-  `tools\test.cmd`.
+  `tools\test.cmd`, `tools\ui_test.cmd`; for a visible change also `tools\screenshot.cmd <preset>`
+  and look at the PNG.
+- Final art is code-generated in `tools/art/*.py` (hand-placed grids via `pixelgrid.py`); a generator
+  only rewrites the ids it is asked for and never writes unchanged files.

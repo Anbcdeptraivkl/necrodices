@@ -22,6 +22,8 @@ var curve := {}
 var strings := {}
 ## Canonical recipe key ("BONE+METAL") -> unit id; WISP keys included.
 var recipes := {}
+## Unit ids in table order (§6.2); WILD ties resolve to the lower index.
+var unit_order: PackedStringArray = []
 var errors: PackedStringArray = []
 
 
@@ -32,6 +34,7 @@ func load_all(dir: String = "res://data") -> bool:
 	if not errors.is_empty():
 		return false
 	units = _index(raw["units"]["units"], "units")
+	unit_order = PackedStringArray(units.keys())
 	relics = _index(raw["relics"]["relics"], "relics")
 	consumables = _index(raw["consumables"]["consumables"], "consumables")
 	equipment = _index(raw["equipment"]["equipment"], "equipment")
@@ -42,6 +45,7 @@ func load_all(dir: String = "res://data") -> bool:
 	strings = raw["strings_en"]
 	_build_recipes()
 	_validate_recipes()
+	errors.append_array(RulesRegistry.validate(self))
 	return errors.is_empty()
 
 
@@ -49,6 +53,27 @@ static func recipe_key(elements: Array) -> String:
 	var sorted: Array = elements.duplicate()
 	sorted.sort_custom(func(a: String, b: String) -> bool: return ELEMENTS.find(a) < ELEMENTS.find(b))
 	return "+".join(PackedStringArray(sorted))
+
+
+## Power / Count of a unit at a level (§4.7): base + growth × (level − 1).
+func unit_stats(unit_id: String, level: int) -> Vector2:
+	var row: Dictionary = units[unit_id]
+	var steps := maxi(0, level - 1)
+	return Vector2(row["base_p"] + row["grow_p"] * steps, row["base_c"] + row["grow_c"] * steps)
+
+
+func unit_tier(unit_id: String) -> String:
+	return units[unit_id]["tier"]
+
+
+## Units whose recipe contains `element` (once per unit), plus WISP — the Tome rule (§4.7).
+func tome_targets(element: String) -> PackedStringArray:
+	var out: PackedStringArray = []
+	for id in unit_order:
+		var row: Dictionary = units[id]
+		if row.get("fallback", false) or (row["recipe"] as Array).has(element):
+			out.append(id)
+	return out
 
 
 func text(key: String) -> String:

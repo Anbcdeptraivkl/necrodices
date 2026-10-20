@@ -1,6 +1,8 @@
 # Implementation Plan — Rattle & Roll (NecroDices)
 
-Status: **2026-10-20 — M0 done (landscape 480×270)**; landscape layouts approved; M1 next.
+Status: **2026-10-20 — M0–M7 implemented** (full game loop, final code-generated art, audio,
+balance tuned by sim). Open: Web export needs the 4.6.3 templates, itch.io page, human
+playtest, real-device performance check — see §10.
 Sources: [GAME_SPEC.md](../GAME_SPEC.md) (rules, normative), [ART_SPEC.md](../ART_SPEC.md)
 (look and layout, normative), [DECISIONS.md](../DECISIONS.md) (deviations / resolved ambiguity).
 This plan says **what gets built, in which order, by which class, and how we know it works**.
@@ -325,3 +327,27 @@ once M2 lands (separate files: `fx/` vs `scenes/overlays/`).
 | 2026-10-20 | M0: repo + remote, skills (reused 6 from necwarband/necdrawmancer, added 4), agent guide, project.godot, autoloads, boot, data JSON + checker, art pipeline + 169 placeholders (`ART OK`), test runner (8 cases green), Title renders at 270×480 (movie-maker capture). Appendix A baseline reproduced in Python. |
 | 2026-10-20 | Display switched to `keep` + integer + DisplayFit (D-A08, probe-verified); Fusion Pixel font (D-R05); 13 cases green. |
 | 2026-10-20 | Switched to landscape 480×270 + itch.io-first (D-A09, D-A10): settings, DisplayFit (both axes, ≤ 640×300), 640×300 backgrounds, Title relayout, ART_SPEC §6 rewritten with wireframes; 12 cases green. |
+| 2026-10-20 | M1–M7: core rules + tests, all screens and overlays, presentation / horde, final art (4 generator modules), audio, save / settings / tutorial / how-to, content fixtures, balance tuning, web export preset. 56 core cases + 6 UI flows green. |
+
+---
+
+## 10. Status by milestone (2026-10-20)
+
+| M | State | Evidence | Left |
+| --- | --- | --- | --- |
+| M0 | ✅ | Boots to Title at 480×270 integer scale; `ART OK`, `DATA OK` | — |
+| M1 | ✅ | `test_scorer` §5.5 fixtures 2520 / 2450 / 1620; `test_recipes` 21 pairs, 4 + 52 triples, WILD; `test_encounter`; determinism test; Appendix A in GDScript over 20k trials: mean 1579, median 1513, p10 928, p90 2340, 5.2 groups (spec ±5% ✓); `test_sim` regression | — |
+| M2 | ✅ | Encounter screen per ART §6.2; `ui_test` drives roll → select → BIND → ATTACK through the real buttons; projected == final over 30 seeds (`test_encounter`) | Human playtest of one encounter (not run yet) |
+| M3 | ✅ | Night Map, cash-out, Shop (buy / buy & use / sell / reroll / equipment), consumables + Dice Inspector, Game Over / Victory; cash-out lines tested; full runs played by the bot | — |
+| M4 | ✅ | `test_content`: every relic (25, with / without), consumable (18), equipment (8), boss rule (5); relic drag-reorder (TopBar drag & drop → `RunFlow.reorder_relic`) | — |
+| M5 | ✅ (desktop) | PresentationQueue + CombatPlayer (timeline compressed to 6 s, ×1/×2/×4, tap-skip), HordeRenderer (pool 260, §11.1 curve, tiers, LEGION), enemy flash / dissolve / Enraged shader, juice with reduce-motion, final art (units, enemies, dice, icons, backgrounds, VFX, logo), procedural SFX + 2 music loops | Frame-time check on a mid-range laptop browser and an Android browser (needs the Web build) |
+| M6 | ✅ | Atomic run save at encounter start + after every shop command (D-G03), Continue routes on the saved phase (`ui_test continue_restores_shop` = identical state), Settings overlay, 5 coach marks, How to Play (4 pages, images captured from the game), Run Info recipe book | — |
+| M7 | ◐ | Balance: Appendix B bot 1,000 runs → 55.7% reach Night 4, 0.2% win (D-G02); Web release exported with the 4.6.3 templates (`build/rattle_and_roll_web.zip`, 10 MB, 9 files, `index.html` at the root); local smoke test in a browser: Title → New Run → Night Map → Encounter, no console errors | Upload to a draft itch.io page (embed 960×540 + fullscreen), browser QA matrix, human playtest |
+
+### Next steps (in order)
+
+1. ~~Install the 4.6.3 export templates, export, local smoke test~~ (done 2026-10-20).
+2. Human playtest (game-design-review procedure step 5): one full run, note the memorable moment,
+   friction, and whether Bell Ringer / Inquisitor HP still feels fair.
+3. Draft itch.io page; QA in Chrome / Firefox / Edge / Safari; check audio unlock and saves in the iframe.
+4. Performance check of `horde` preset in a browser; MultiMesh only if < 55 fps.

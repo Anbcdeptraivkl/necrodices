@@ -66,6 +66,11 @@ func _run() -> void:
 	for file in picked:
 		var name := file.trim_prefix("test_").trim_suffix(".gd")
 		var script: GDScript = load(DIR.path_join(file))
+		if script == null or not script.can_instantiate():
+			# A parse error must fail the run, not crash it (a runtime error under --script never quits).
+			failed.append("%s.<parse error>" % name)
+			print("FAIL %s.<parse error>" % name)
+			continue
 		var suite: TestSuite = script.new()
 		suite.tree = self
 		var only: Array = filters.get(name, [])

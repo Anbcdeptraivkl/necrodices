@@ -111,7 +111,7 @@ MINIS = ["bone", "fire", "ice", "leaf", "volt", "metal"]  # + mini_wisp_mask
 MODIFIERS = {"sharp": "R1", "swarm": "L2", "hex": "N5", "gold": "G1"}
 STAT_ICONS = {
     "coin": "G1", "power": "I1", "count": "R1", "reroll": "M1", "summon": "F2",
-    "hp": "R1", "lock": "M1", "info": "I1", "book": "B1",
+    "hp": "R1", "lock": "M1", "info": "I1", "book": "B1", "gear": "M1",
 }
 UI_FILES = [
     # (name, w, h, nine-slice margin or None)

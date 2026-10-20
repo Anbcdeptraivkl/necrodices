@@ -1,24 +1,90 @@
-[gd_resource type="Theme" load_steps=11 format=3]
+[gd_resource type="Theme" load_steps=37 format=3]
 
-[ext_resource type="FontFile" path="res://assets/fonts/fusion_pixel/fusion_pixel_8px.otf" id="0_font"]
-[ext_resource type="Texture2D" path="res://assets/ui/btn_primary_normal.png" id="1_pn"]
-[ext_resource type="Texture2D" path="res://assets/ui/btn_primary_pressed.png" id="2_pp"]
-[ext_resource type="Texture2D" path="res://assets/ui/btn_primary_disabled.png" id="3_pd"]
-[ext_resource type="Texture2D" path="res://assets/ui/panel_dark.png" id="4_panel"]
+[ext_resource type="FontFile" path="res://assets/fonts/fusion_pixel/fusion_pixel_8px.otf" id="f8"]
+[ext_resource type="FontFile" path="res://assets/fonts/fusion_pixel/fusion_pixel_12px.otf" id="f12"]
+[ext_resource type="Texture2D" path="res://assets/ui/btn_primary_normal.png" id="pn"]
+[ext_resource type="Texture2D" path="res://assets/ui/btn_primary_pressed.png" id="pp"]
+[ext_resource type="Texture2D" path="res://assets/ui/btn_primary_disabled.png" id="pd"]
+[ext_resource type="Texture2D" path="res://assets/ui/btn_secondary_normal.png" id="sn"]
+[ext_resource type="Texture2D" path="res://assets/ui/btn_secondary_pressed.png" id="sp"]
+[ext_resource type="Texture2D" path="res://assets/ui/btn_secondary_disabled.png" id="sd"]
+[ext_resource type="Texture2D" path="res://assets/ui/panel_dark.png" id="panel_dark"]
+[ext_resource type="Texture2D" path="res://assets/ui/panel_card.png" id="panel_card"]
+[ext_resource type="Texture2D" path="res://assets/ui/panel_tooltip.png" id="panel_tooltip"]
+[ext_resource type="Texture2D" path="res://assets/ui/chip.png" id="chip"]
+[ext_resource type="Texture2D" path="res://assets/ui/power_box.png" id="power_box"]
+[ext_resource type="Texture2D" path="res://assets/ui/count_box.png" id="count_box"]
 
-[sub_resource type="StyleBoxTexture" id="btn_normal"]
-texture = ExtResource("1_pn")
+[sub_resource type="StyleBoxTexture" id="p_normal"]
+texture = ExtResource("pn")
 texture_margin_left = 6.0
 texture_margin_top = 6.0
 texture_margin_right = 6.0
 texture_margin_bottom = 6.0
-content_margin_left = 4.0
+content_margin_left = 3.0
 content_margin_top = 2.0
-content_margin_right = 4.0
+content_margin_right = 3.0
 content_margin_bottom = 3.0
 
-[sub_resource type="StyleBoxTexture" id="btn_pressed"]
-texture = ExtResource("2_pp")
+[sub_resource type="StyleBoxTexture" id="p_pressed"]
+texture = ExtResource("pp")
+texture_margin_left = 6.0
+texture_margin_top = 6.0
+texture_margin_right = 6.0
+texture_margin_bottom = 6.0
+content_margin_left = 3.0
+content_margin_top = 3.0
+content_margin_right = 3.0
+content_margin_bottom = 2.0
+
+[sub_resource type="StyleBoxTexture" id="p_disabled"]
+texture = ExtResource("pd")
+texture_margin_left = 6.0
+texture_margin_top = 6.0
+texture_margin_right = 6.0
+texture_margin_bottom = 6.0
+content_margin_left = 3.0
+content_margin_top = 2.0
+content_margin_right = 3.0
+content_margin_bottom = 3.0
+
+[sub_resource type="StyleBoxTexture" id="s_normal"]
+texture = ExtResource("sn")
+texture_margin_left = 6.0
+texture_margin_top = 6.0
+texture_margin_right = 6.0
+texture_margin_bottom = 6.0
+content_margin_left = 3.0
+content_margin_top = 2.0
+content_margin_right = 3.0
+content_margin_bottom = 3.0
+
+[sub_resource type="StyleBoxTexture" id="s_pressed"]
+texture = ExtResource("sp")
+texture_margin_left = 6.0
+texture_margin_top = 6.0
+texture_margin_right = 6.0
+texture_margin_bottom = 6.0
+content_margin_left = 3.0
+content_margin_top = 3.0
+content_margin_right = 3.0
+content_margin_bottom = 2.0
+
+[sub_resource type="StyleBoxTexture" id="s_disabled"]
+texture = ExtResource("sd")
+texture_margin_left = 6.0
+texture_margin_top = 6.0
+texture_margin_right = 6.0
+texture_margin_bottom = 6.0
+content_margin_left = 3.0
+content_margin_top = 2.0
+content_margin_right = 3.0
+content_margin_bottom = 3.0
+
+[sub_resource type="StyleBoxEmpty" id="empty"]
+
+[sub_resource type="StyleBoxTexture" id="panel_dark_box"]
+texture = ExtResource("panel_dark")
 texture_margin_left = 6.0
 texture_margin_top = 6.0
 texture_margin_right = 6.0
@@ -26,23 +92,10 @@ texture_margin_bottom = 6.0
 content_margin_left = 4.0
 content_margin_top = 3.0
 content_margin_right = 4.0
-content_margin_bottom = 2.0
-
-[sub_resource type="StyleBoxTexture" id="btn_disabled"]
-texture = ExtResource("3_pd")
-texture_margin_left = 6.0
-texture_margin_top = 6.0
-texture_margin_right = 6.0
-texture_margin_bottom = 6.0
-content_margin_left = 4.0
-content_margin_top = 2.0
-content_margin_right = 4.0
 content_margin_bottom = 3.0
 
-[sub_resource type="StyleBoxEmpty" id="btn_focus"]
-
-[sub_resource type="StyleBoxTexture" id="panel"]
-texture = ExtResource("4_panel")
+[sub_resource type="StyleBoxTexture" id="panel_card_box"]
+texture = ExtResource("panel_card")
 texture_margin_left = 6.0
 texture_margin_top = 6.0
 texture_margin_right = 6.0
@@ -52,18 +105,128 @@ content_margin_top = 4.0
 content_margin_right = 4.0
 content_margin_bottom = 4.0
 
+[sub_resource type="StyleBoxTexture" id="panel_tooltip_box"]
+texture = ExtResource("panel_tooltip")
+texture_margin_left = 4.0
+texture_margin_top = 4.0
+texture_margin_right = 4.0
+texture_margin_bottom = 4.0
+content_margin_left = 4.0
+content_margin_top = 3.0
+content_margin_right = 4.0
+content_margin_bottom = 3.0
+
+[sub_resource type="StyleBoxTexture" id="chip_box"]
+texture = ExtResource("chip")
+texture_margin_left = 4.0
+texture_margin_top = 4.0
+texture_margin_right = 4.0
+texture_margin_bottom = 4.0
+content_margin_left = 2.0
+content_margin_top = 2.0
+content_margin_right = 2.0
+content_margin_bottom = 2.0
+
+[sub_resource type="StyleBoxTexture" id="power_box_s"]
+texture = ExtResource("power_box")
+texture_margin_left = 4.0
+texture_margin_top = 4.0
+texture_margin_right = 4.0
+texture_margin_bottom = 4.0
+content_margin_left = 2.0
+content_margin_top = 0.0
+content_margin_right = 2.0
+content_margin_bottom = 1.0
+
+[sub_resource type="StyleBoxTexture" id="count_box_s"]
+texture = ExtResource("count_box")
+texture_margin_left = 4.0
+texture_margin_top = 4.0
+texture_margin_right = 4.0
+texture_margin_bottom = 4.0
+content_margin_left = 2.0
+content_margin_top = 0.0
+content_margin_right = 2.0
+content_margin_bottom = 1.0
+
+[sub_resource type="StyleBoxFlat" id="current_border"]
+draw_center = false
+border_width_left = 1
+border_width_top = 1
+border_width_right = 1
+border_width_bottom = 1
+border_color = Color(1, 0.878431, 0.4, 1)
+anti_aliasing = false
+
+[sub_resource type="StyleBoxFlat" id="dim"]
+bg_color = Color(0.0509804, 0.0392157, 0.0784314, 0.7)
+anti_aliasing = false
+
 [resource]
-default_font = ExtResource("0_font")
+default_font = ExtResource("f8")
 default_font_size = 8
 Button/colors/font_color = Color(0.0509804, 0.0392157, 0.0784314, 1)
 Button/colors/font_hover_color = Color(0.0509804, 0.0392157, 0.0784314, 1)
 Button/colors/font_pressed_color = Color(0.0509804, 0.0392157, 0.0784314, 1)
 Button/colors/font_focus_color = Color(0.0509804, 0.0392157, 0.0784314, 1)
+Button/colors/font_hover_pressed_color = Color(0.0509804, 0.0392157, 0.0784314, 1)
 Button/colors/font_disabled_color = Color(0.341176, 0.270588, 0.466667, 1)
-Button/styles/normal = SubResource("btn_normal")
-Button/styles/hover = SubResource("btn_normal")
-Button/styles/pressed = SubResource("btn_pressed")
-Button/styles/disabled = SubResource("btn_disabled")
-Button/styles/focus = SubResource("btn_focus")
+Button/constants/h_separation = 2
+Button/styles/normal = SubResource("p_normal")
+Button/styles/hover = SubResource("p_normal")
+Button/styles/pressed = SubResource("p_pressed")
+Button/styles/hover_pressed = SubResource("p_pressed")
+Button/styles/disabled = SubResource("p_disabled")
+Button/styles/focus = SubResource("empty")
+SecondaryButton/base_type = &"Button"
+SecondaryButton/colors/font_color = Color(0.956863, 0.937255, 0.894118, 1)
+SecondaryButton/colors/font_hover_color = Color(0.956863, 0.937255, 0.894118, 1)
+SecondaryButton/colors/font_pressed_color = Color(0.956863, 0.937255, 0.894118, 1)
+SecondaryButton/colors/font_focus_color = Color(0.956863, 0.937255, 0.894118, 1)
+SecondaryButton/colors/font_hover_pressed_color = Color(0.956863, 0.937255, 0.894118, 1)
+SecondaryButton/colors/font_disabled_color = Color(0.341176, 0.270588, 0.466667, 1)
+SecondaryButton/styles/normal = SubResource("s_normal")
+SecondaryButton/styles/hover = SubResource("s_normal")
+SecondaryButton/styles/pressed = SubResource("s_pressed")
+SecondaryButton/styles/hover_pressed = SubResource("s_pressed")
+SecondaryButton/styles/disabled = SubResource("s_disabled")
+SecondaryButton/styles/focus = SubResource("empty")
+FlatButton/base_type = &"Button"
+FlatButton/styles/normal = SubResource("empty")
+FlatButton/styles/hover = SubResource("empty")
+FlatButton/styles/pressed = SubResource("empty")
+FlatButton/styles/hover_pressed = SubResource("empty")
+FlatButton/styles/disabled = SubResource("empty")
+FlatButton/styles/focus = SubResource("empty")
 Label/colors/font_color = Color(0.956863, 0.937255, 0.894118, 1)
-PanelContainer/styles/panel = SubResource("panel")
+Label/constants/line_spacing = 1
+BodyLabel/base_type = &"Label"
+BodyLabel/colors/font_color = Color(0.768627, 0.729412, 0.847059, 1)
+MutedLabel/base_type = &"Label"
+MutedLabel/colors/font_color = Color(0.521569, 0.466667, 0.639216, 1)
+GoldLabel/base_type = &"Label"
+GoldLabel/colors/font_color = Color(1, 0.878431, 0.4, 1)
+RuleLabel/base_type = &"Label"
+RuleLabel/colors/font_color = Color(1, 0.784314, 0.352941, 1)
+NumberLabel/base_type = &"Label"
+NumberLabel/fonts/font = ExtResource("f12")
+NumberLabel/font_sizes/font_size = 12
+TitleLabel/base_type = &"Label"
+TitleLabel/fonts/font = ExtResource("f12")
+TitleLabel/font_sizes/font_size = 12
+TitleLabel/colors/font_color = Color(1, 0.784314, 0.352941, 1)
+PanelContainer/styles/panel = SubResource("panel_dark_box")
+CardPanel/base_type = &"PanelContainer"
+CardPanel/styles/panel = SubResource("panel_card_box")
+TooltipPanel/base_type = &"PanelContainer"
+TooltipPanel/styles/panel = SubResource("panel_tooltip_box")
+ChipPanel/base_type = &"PanelContainer"
+ChipPanel/styles/panel = SubResource("chip_box")
+PowerBox/base_type = &"PanelContainer"
+PowerBox/styles/panel = SubResource("power_box_s")
+CountBox/base_type = &"PanelContainer"
+CountBox/styles/panel = SubResource("count_box_s")
+DimPanel/base_type = &"Panel"
+DimPanel/styles/panel = SubResource("dim")
+CurrentBorder/base_type = &"Panel"
+CurrentBorder/styles/panel = SubResource("current_border")

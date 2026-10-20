@@ -68,6 +68,15 @@ change can break while working; the whole suite (with a re-import) before handin
 after touching shared code. Under `--script`, autoload names are not globals — see the trap
 table.
 
+## UI tests in the real game
+
+Screens use autoloads, which are not globals under `--script`, so UI flows run as a scene
+(`godot --headless --path . res://tests/ui/ui_runner.tscn`). The runner must outlive
+`change_scene_*`: on `_ready` it adds a placeholder node, makes it `current_scene`, and
+`reparent`s itself to the root. Drive screens through their own controls
+(`button.pressed.emit()`, a component's signal), never by calling model commands directly —
+that is what catches a button wired to the wrong command. Point the save store at a test dir.
+
 ## Routing
 
 - Sandbox scenes, presets as data rows, and the screenshot runner → [references/sandbox-and-screenshots.md](references/sandbox-and-screenshots.md)

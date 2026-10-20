@@ -46,6 +46,17 @@ layer placement is `godot-architecture`; whether a tuning change is the right ne
 10. **Debug overrides are explicit run flags** (HP ×0.01, infinite money, force shop item),
     set from a debug menu or sandbox preset, saved nowhere, and never read by content code.
 
+## Balance loop that converges
+
+1. Report **where runs die**, not only how far they get: deaths by (night, role, rule) and mean
+   damage / HP per night. One rule dominating the deaths is a pricing error, not a curve error.
+2. Price each boss rule's HP multiplier by how much it weakens the army (a rule removing a
+   quarter of the dice can cut damage to a third — groups, not dice, are what scale). A boss
+   with two rules multiplies both prices.
+3. Change only data; keep tests and checkers on the *formula* (base × multiplier) and on sane
+   ranges, never on tunable numbers, or every tuning pass breaks the suite.
+4. Confirm on 1,000 runs with a fixed seed and log the before/after numbers with the decision.
+
 ## Procedure — adding a shop item kind, reward or upgrade
 
 1. Data row (+ registry entry for its kind); content test passes.

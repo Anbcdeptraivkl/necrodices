@@ -535,30 +535,30 @@ def draw_vfx(e: dict) -> Image.Image:
     d = ImageDraw.Draw(img)
     for f in range(n):
         ox = f * fw
-        if i == "spark":
+        if i == "vfx_spark":
             for x, y in ((1, 0), (0, 1), (1, 1), (2, 1), (1, 2), (2, 2)):
                 put(img, ox + x, y, TINT_WHITE)
-        elif i == "puff":
+        elif i == "vfx_puff":
             r = (1, 2, 3, 3)[f]
             d.ellipse((ox + 4 - r, 4 - r, ox + 3 + r, 3 + r), fill=rgba("N6" if f == 3 else "N7"))
             if f == 3:
                 img.putpixel((ox + 4, 4), CLEAR)
-        elif i == "slash":
+        elif i == "vfx_slash":
             length = (6, 11, 14)[f]
             for k in range(length):
                 put(img, ox + 1 + k, 14 - k, "N7")
                 put(img, ox + 1 + k, 15 - k if k < length - 1 else 14 - k, "N6")
-        elif i == "coin":
+        elif i == "vfx_coin":
             half = (3, 2, 1, 2)[f]
             fill_rect(img, ox + 3 - half, 0, ox + 2 + half, 5, "G1")
             fill_rect(img, ox + 2 + half, 1, ox + 2 + half, 5, "G0")
-        elif i == "soul":
+        elif i == "vfx_soul":
             notched_rect(img, ox + 1, f, ox + 4, 4 + f, "I2")
             put(img, ox + 2, 1 + f, "N7")
-        elif i == "impact_ring":
+        elif i == "vfx_impact_ring":
             r = (3, 5, 7)[f]
             d.ellipse((ox + 8 - r, 8 - r, ox + 7 + r, 7 + r), outline=rgba("N7"))
-        elif i == "aura":
+        elif i == "vfx_aura":
             d.ellipse((ox + 3, 3, ox + 36, 36), outline=rgba("R0"), width=2)
             for k in range(8):   # rotating flames
                 a = k * 5 + f

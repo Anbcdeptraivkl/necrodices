@@ -17,9 +17,11 @@ items, numbers and order.
    static function on plain data (`RefCounted`, no `Node`, no RNG). Projected damage,
    AI/bot evaluation, the real combat and the tests call this same function. A second "quick
    estimate" drifts from the rules the first time an item is added.
-2. **Previews never fire side effects.** Commit-time effects (counters, money from a face)
-   happen in the commit command, not in `score()`. A preview is `score()` over `board +
-   pending` with the run untouched, so pressing the button can never change the number shown.
+2. **Previews never fire side effects — but they simulate them.** Commit-time effects
+   (counters, money from a face) happen in the commit command, not in `score()`. A preview
+   applies those same commit effects to *copies* (relic counters, money, summons left − 1) and
+   scores `board + pending`, so the projection equals the result of attacking now while the
+   run stays untouched.
 3. **Order is the rule, so make it explicit data.** Groups resolve in commit order; within a
    group: base → face modifiers in tray order → items left to right; then final items left to
    right. Order-sensitivity (`+` before `×` vs after) is the player's main decision; test it

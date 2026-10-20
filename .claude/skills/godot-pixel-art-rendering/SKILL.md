@@ -142,3 +142,4 @@ through the Control transform.
 | Rotating pixel sprites freely | Chewed edges | Pre-drawn directional frames (4/8 dirs); rotate only FX/projectiles |
 | `MultiMeshInstance2D` fed through `multimesh.buffer` | A batch with few sprites (FX, smears) is invisible on most frames and appears only when other sprites happen to sit inside its stale bounds | The canvas culls by bounds that buffer writes do not refresh: give every world-spanning batch a custom rect (`RenderingServer.canvas_item_set_custom_rect(get_canvas_item(), true, world_rect)`) |
 | Screenshot looks blurry | Blur in the capture, not the game | Capture from a SubViewport; inspect with nearest zoom (`godot-debugging-testing`) |
+| A palette-swap shader for a handful of key-coloured sprites (two-element hybrids) | A material per sprite, batching lost, and UI icons need the same swap | Swap on the CPU once per colour combination (`Image` → `ImageTexture`), cache it, use it everywhere |

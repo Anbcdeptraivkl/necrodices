@@ -62,7 +62,9 @@ EXPECTED_EQUIPMENT = {
     "BONE_POUCH": None, "BONE_SATCHEL": "BONE_POUCH", "GRAVE_BELL": None, "LOADED_CUP": None,
     "SECOND_CUP": "LOADED_CUP", "RELIQUARY": None, "POCKET_CRYPT": None, "HAGGLER_LANTERN": None,
 }
-EXPECTED_RULE_HP = {"EXORCIST": 2.0, "WITCH_HUNTER": 2.0, "BELL_RINGER": 2.0, "INQUISITOR": 1.5, "ENRAGED": 2.0}
+# HP multipliers and the night curve are tunable (GAME_SPEC §6.9-§6.10, DECISIONS D-G02):
+# check ids and sane ranges, not the numbers.
+EXPECTED_RULES = {"EXORCIST", "WITCH_HUNTER", "BELL_RINGER", "INQUISITOR", "ENRAGED"}
 ROLES = {"MOB", "CHAMPION", "BOSS"}
 ECONOMY_KEYS = {
     "start_money": 4, "reward_mob": 3, "reward_champion": 4, "reward_boss": 5,
@@ -288,8 +290,11 @@ def check_enemies(d):
     if len(en) != 9:
         err(f"enemies: expected 9, got {len(en)}")
     rules = {r.get("id"): r for r in d.get("boss_rules", [])}
-    if {k: r.get("hp_mult") for k, r in rules.items()} != EXPECTED_RULE_HP:
-        err("enemies: boss_rules ids/hp_mult differ from spec 6.9")
+    if set(rules) != EXPECTED_RULES:
+        err("enemies: boss_rules ids differ from spec 6.9")
+    for rid, r in rules.items():
+        if not isinstance(r.get("hp_mult"), (int, float)) or not 0.25 <= r["hp_mult"] <= 4.0:
+            err(f"enemies: rule {rid} hp_mult out of range")
     ids = {e.get("id") for e in en}
     roles = [e.get("role") for e in en]
     if (roles.count("MOB"), roles.count("CHAMPION"), roles.count("BOSS")) != (3, 2, 4):
@@ -318,10 +323,12 @@ def check_enemies(d):
 
 
 def check_curve(d):
-    if d.get("nights") != 8 or d.get("night_base") != [600, 1500, 3500, 8000, 16000, 30000, 55000, 90000]:
-        err("curve: night_base differs from spec 6.10")
-    if d.get("role_mult") != {"MOB": 1.0, "CHAMPION": 1.5, "BOSS": 2.0}:
-        err("curve: role_mult differs from spec 6.10")
+    base = d.get("night_base", [])
+    if d.get("nights") != 8 or len(base) != 8 or any(b <= 0 for b in base) or base != sorted(base):
+        err("curve: night_base must be 8 increasing positive values")
+    mult = d.get("role_mult", {})
+    if set(mult) != {"MOB", "CHAMPION", "BOSS"} or not (mult["MOB"] <= mult["CHAMPION"] <= mult["BOSS"]):
+        err("curve: role_mult must cover MOB <= CHAMPION <= BOSS")
 
 
 def check_economy(d):

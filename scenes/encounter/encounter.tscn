@@ -1,0 +1,447 @@
+[gd_scene load_steps=12 format=3]
+
+[ext_resource type="Script" path="res://scenes/encounter/encounter_screen.gd" id="1_screen"]
+[ext_resource type="Texture2D" path="res://assets/bg/bg_battle.png" id="2_bg"]
+[ext_resource type="PackedScene" path="res://ui/components/top_bar.tscn" id="3_top"]
+[ext_resource type="Script" path="res://ui/components/score_panel.gd" id="4_score"]
+[ext_resource type="PackedScene" path="res://ui/components/info_panel.tscn" id="5_info"]
+[ext_resource type="Script" path="res://scenes/encounter/battle_stage.gd" id="6_stage"]
+[ext_resource type="Script" path="res://ui/components/hp_bar.gd" id="7_hp"]
+[ext_resource type="Script" path="res://fx/horde_renderer.gd" id="8_horde"]
+[ext_resource type="Shader" path="res://fx/enemy.gdshader" id="9_shader"]
+[ext_resource type="Script" path="res://fx/presentation_queue.gd" id="10_queue"]
+[ext_resource type="Script" path="res://ui/components/overlay_host.gd" id="11_overlay"]
+
+[sub_resource type="ShaderMaterial" id="enemy_mat"]
+shader = ExtResource("9_shader")
+
+[node name="Encounter" type="Control"]
+layout_mode = 3
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+script = ExtResource("1_screen")
+
+[node name="Background" type="TextureRect" parent="."]
+layout_mode = 1
+anchors_preset = 8
+anchor_left = 0.5
+anchor_top = 0.5
+anchor_right = 0.5
+anchor_bottom = 0.5
+offset_left = -320.0
+offset_top = -150.0
+offset_right = 320.0
+offset_bottom = 150.0
+grow_horizontal = 2
+grow_vertical = 2
+mouse_filter = 2
+texture = ExtResource("2_bg")
+
+[node name="TopBar" parent="." instance=ExtResource("3_top")]
+unique_name_in_owner = true
+layout_mode = 1
+
+[node name="Left" type="VBoxContainer" parent="."]
+layout_mode = 1
+anchors_preset = 9
+anchor_bottom = 1.0
+offset_left = 4.0
+offset_top = 28.0
+offset_right = 124.0
+offset_bottom = -4.0
+grow_vertical = 2
+theme_override_constants/separation = 4
+
+[node name="RulePanel" type="PanelContainer" parent="Left"]
+unique_name_in_owner = true
+custom_minimum_size = Vector2(120, 40)
+layout_mode = 2
+
+[node name="VBox" type="VBoxContainer" parent="Left/RulePanel"]
+layout_mode = 2
+mouse_filter = 2
+theme_override_constants/separation = 0
+
+[node name="RuleTitle" type="Label" parent="Left/RulePanel/VBox"]
+unique_name_in_owner = true
+layout_mode = 2
+theme_type_variation = &"MutedLabel"
+text = "MOB"
+
+[node name="RuleText" type="Label" parent="Left/RulePanel/VBox"]
+unique_name_in_owner = true
+custom_minimum_size = Vector2(110, 0)
+layout_mode = 2
+theme_type_variation = &"RuleLabel"
+autowrap_mode = 3
+
+[node name="ScorePanel" type="PanelContainer" parent="Left"]
+unique_name_in_owner = true
+custom_minimum_size = Vector2(120, 40)
+layout_mode = 2
+script = ExtResource("4_score")
+
+[node name="VBox" type="VBoxContainer" parent="Left/ScorePanel"]
+layout_mode = 2
+mouse_filter = 2
+theme_override_constants/separation = 2
+
+[node name="Row" type="HBoxContainer" parent="Left/ScorePanel/VBox"]
+layout_mode = 2
+mouse_filter = 2
+theme_override_constants/separation = 2
+alignment = 1
+
+[node name="PowerBox" type="PanelContainer" parent="Left/ScorePanel/VBox/Row"]
+custom_minimum_size = Vector2(48, 14)
+layout_mode = 2
+theme_type_variation = &"PowerBox"
+
+[node name="Power" type="Label" parent="Left/ScorePanel/VBox/Row/PowerBox"]
+unique_name_in_owner = true
+layout_mode = 2
+text = "0"
+horizontal_alignment = 1
+
+[node name="Times" type="Label" parent="Left/ScorePanel/VBox/Row"]
+layout_mode = 2
+text = "×"
+
+[node name="CountBox" type="PanelContainer" parent="Left/ScorePanel/VBox/Row"]
+custom_minimum_size = Vector2(48, 14)
+layout_mode = 2
+theme_type_variation = &"CountBox"
+
+[node name="Count" type="Label" parent="Left/ScorePanel/VBox/Row/CountBox"]
+unique_name_in_owner = true
+layout_mode = 2
+text = "0"
+horizontal_alignment = 1
+
+[node name="Total" type="Label" parent="Left/ScorePanel/VBox"]
+unique_name_in_owner = true
+layout_mode = 2
+theme_type_variation = &"NumberLabel"
+text = "= 0 / 0"
+horizontal_alignment = 1
+clip_text = true
+
+[node name="Essence" type="HBoxContainer" parent="Left"]
+unique_name_in_owner = true
+custom_minimum_size = Vector2(120, 12)
+layout_mode = 2
+theme_override_constants/separation = 2
+alignment = 1
+
+[node name="Items" type="HBoxContainer" parent="Left"]
+custom_minimum_size = Vector2(120, 20)
+layout_mode = 2
+theme_override_constants/separation = 4
+
+[node name="Consumables" type="HBoxContainer" parent="Left/Items"]
+unique_name_in_owner = true
+layout_mode = 2
+size_flags_horizontal = 3
+theme_override_constants/separation = 4
+
+[node name="Book" type="Button" parent="Left/Items"]
+unique_name_in_owner = true
+custom_minimum_size = Vector2(20, 20)
+layout_mode = 2
+mouse_default_cursor_shape = 2
+theme_type_variation = &"SecondaryButton"
+icon_alignment = 1
+
+[node name="InfoPanel" parent="Left" instance=ExtResource("5_info")]
+unique_name_in_owner = true
+layout_mode = 2
+size_flags_vertical = 3
+
+[node name="Stage" type="Control" parent="."]
+unique_name_in_owner = true
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+offset_left = 128.0
+offset_top = 28.0
+offset_right = -128.0
+offset_bottom = -4.0
+grow_horizontal = 2
+grow_vertical = 2
+mouse_filter = 2
+script = ExtResource("6_stage")
+
+[node name="Aura" type="TextureRect" parent="Stage"]
+unique_name_in_owner = true
+visible = false
+layout_mode = 1
+anchors_preset = 5
+anchor_left = 0.5
+anchor_right = 0.5
+offset_left = -20.0
+offset_top = -6.0
+offset_right = 20.0
+offset_bottom = 34.0
+grow_horizontal = 2
+mouse_filter = 2
+
+[node name="PedestalTop" type="ColorRect" parent="Stage"]
+layout_mode = 1
+anchors_preset = 5
+anchor_left = 0.5
+anchor_right = 0.5
+offset_left = -24.0
+offset_top = 28.0
+offset_right = 24.0
+offset_bottom = 29.0
+grow_horizontal = 2
+mouse_filter = 2
+color = Color(0.341176, 0.270588, 0.466667, 1)
+
+[node name="Pedestal" type="ColorRect" parent="Stage"]
+layout_mode = 1
+anchors_preset = 5
+anchor_left = 0.5
+anchor_right = 0.5
+offset_left = -24.0
+offset_top = 29.0
+offset_right = 24.0
+offset_bottom = 34.0
+grow_horizontal = 2
+mouse_filter = 2
+color = Color(0.231373, 0.172549, 0.333333, 1)
+
+[node name="Enemy" type="TextureRect" parent="Stage"]
+unique_name_in_owner = true
+material = SubResource("enemy_mat")
+layout_mode = 1
+anchors_preset = 5
+anchor_left = 0.5
+anchor_right = 0.5
+offset_left = -16.0
+offset_right = 16.0
+offset_bottom = 32.0
+grow_horizontal = 2
+
+[node name="EnemyName" type="Label" parent="Stage"]
+unique_name_in_owner = true
+layout_mode = 1
+anchors_preset = 10
+anchor_right = 1.0
+offset_top = 35.0
+offset_bottom = 44.0
+grow_horizontal = 2
+text = "ENEMY"
+horizontal_alignment = 1
+
+[node name="HpBar" type="Control" parent="Stage"]
+unique_name_in_owner = true
+layout_mode = 1
+anchors_preset = 5
+anchor_left = 0.5
+anchor_right = 0.5
+offset_left = -80.0
+offset_top = 47.0
+offset_right = 80.0
+offset_bottom = 54.0
+grow_horizontal = 2
+mouse_filter = 2
+script = ExtResource("7_hp")
+
+[node name="HpLabel" type="Label" parent="Stage"]
+unique_name_in_owner = true
+layout_mode = 1
+anchors_preset = 10
+anchor_right = 1.0
+offset_top = 55.0
+offset_bottom = 64.0
+grow_horizontal = 2
+theme_type_variation = &"BodyLabel"
+text = "0 HP"
+horizontal_alignment = 1
+
+[node name="Battlefield" type="Control" parent="Stage"]
+unique_name_in_owner = true
+clip_contents = true
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+offset_top = 70.0
+offset_bottom = -28.0
+grow_horizontal = 2
+grow_vertical = 2
+mouse_filter = 2
+
+[node name="Horde" type="Node2D" parent="Stage/Battlefield"]
+unique_name_in_owner = true
+script = ExtResource("8_horde")
+
+[node name="Slam" type="Label" parent="Stage"]
+unique_name_in_owner = true
+visible = false
+layout_mode = 1
+anchors_preset = 10
+anchor_right = 1.0
+offset_top = 58.0
+offset_bottom = 84.0
+grow_horizontal = 2
+theme_type_variation = &"NumberLabel"
+theme_override_colors/font_color = Color(0.956863, 0.937255, 0.894118, 1)
+theme_override_colors/font_shadow_color = Color(0.878431, 0.203922, 0.290196, 1)
+theme_override_colors/font_outline_color = Color(0.0509804, 0.0392157, 0.0784314, 1)
+theme_override_constants/shadow_offset_x = 0
+theme_override_constants/shadow_offset_y = 2
+theme_override_constants/outline_size = 4
+theme_override_font_sizes/font_size = 24
+text = "0"
+horizontal_alignment = 1
+
+[node name="Tray" type="HBoxContainer" parent="Stage"]
+unique_name_in_owner = true
+layout_mode = 1
+anchors_preset = 12
+anchor_top = 1.0
+anchor_right = 1.0
+anchor_bottom = 1.0
+offset_top = -24.0
+grow_horizontal = 2
+grow_vertical = 0
+theme_override_constants/separation = 6
+alignment = 1
+
+[node name="Right" type="VBoxContainer" parent="."]
+layout_mode = 1
+anchors_preset = 11
+anchor_left = 1.0
+anchor_right = 1.0
+anchor_bottom = 1.0
+offset_left = -124.0
+offset_top = 28.0
+offset_right = -4.0
+offset_bottom = -4.0
+grow_horizontal = 0
+grow_vertical = 2
+theme_override_constants/separation = 4
+
+[node name="Counters" type="HBoxContainer" parent="Right"]
+layout_mode = 2
+theme_override_constants/separation = 4
+
+[node name="Summons" type="PanelContainer" parent="Right/Counters"]
+unique_name_in_owner = true
+custom_minimum_size = Vector2(58, 20)
+layout_mode = 2
+theme_type_variation = &"ChipPanel"
+
+[node name="Label" type="Label" parent="Right/Counters/Summons"]
+layout_mode = 2
+text = "SUMMONS 3"
+horizontal_alignment = 1
+
+[node name="Rerolls" type="PanelContainer" parent="Right/Counters"]
+unique_name_in_owner = true
+custom_minimum_size = Vector2(58, 20)
+layout_mode = 2
+theme_type_variation = &"ChipPanel"
+
+[node name="Label" type="Label" parent="Right/Counters/Rerolls"]
+layout_mode = 2
+text = "REROLLS 2"
+horizontal_alignment = 1
+
+[node name="Pending" type="PanelContainer" parent="Right"]
+custom_minimum_size = Vector2(120, 100)
+layout_mode = 2
+
+[node name="VBox" type="VBoxContainer" parent="Right/Pending"]
+layout_mode = 2
+theme_override_constants/separation = 2
+
+[node name="Header" type="Label" parent="Right/Pending/VBox"]
+unique_name_in_owner = true
+layout_mode = 2
+theme_type_variation = &"MutedLabel"
+text = "GROUPS"
+
+[node name="Chips" type="VBoxContainer" parent="Right/Pending/VBox"]
+unique_name_in_owner = true
+layout_mode = 2
+theme_override_constants/separation = 2
+
+[node name="Hint" type="PanelContainer" parent="Right"]
+layout_mode = 2
+size_flags_vertical = 3
+
+[node name="HintLabel" type="Label" parent="Right/Hint"]
+unique_name_in_owner = true
+custom_minimum_size = Vector2(110, 0)
+layout_mode = 2
+size_flags_vertical = 1
+theme_type_variation = &"BodyLabel"
+autowrap_mode = 3
+
+[node name="Actions" type="GridContainer" parent="Right"]
+layout_mode = 2
+theme_override_constants/h_separation = 4
+theme_override_constants/v_separation = 4
+columns = 2
+
+[node name="Reroll" type="Button" parent="Right/Actions"]
+unique_name_in_owner = true
+custom_minimum_size = Vector2(58, 24)
+layout_mode = 2
+mouse_default_cursor_shape = 2
+theme_type_variation = &"SecondaryButton"
+text = "REROLL"
+
+[node name="Bind" type="Button" parent="Right/Actions"]
+unique_name_in_owner = true
+custom_minimum_size = Vector2(58, 24)
+layout_mode = 2
+mouse_default_cursor_shape = 2
+theme_type_variation = &"SecondaryButton"
+text = "BIND"
+
+[node name="Summon" type="Button" parent="Right/Actions"]
+unique_name_in_owner = true
+custom_minimum_size = Vector2(58, 24)
+layout_mode = 2
+mouse_default_cursor_shape = 2
+text = "SUMMON"
+
+[node name="Attack" type="Button" parent="Right/Actions"]
+unique_name_in_owner = true
+custom_minimum_size = Vector2(58, 24)
+layout_mode = 2
+mouse_default_cursor_shape = 2
+text = "ATTACK!"
+
+[node name="Queue" type="Node" parent="."]
+unique_name_in_owner = true
+script = ExtResource("10_queue")
+
+[node name="SkipCatcher" type="Control" parent="."]
+unique_name_in_owner = true
+visible = false
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+
+[node name="Overlays" type="Control" parent="."]
+unique_name_in_owner = true
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+mouse_filter = 2
+script = ExtResource("11_overlay")

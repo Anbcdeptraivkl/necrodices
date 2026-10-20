@@ -42,6 +42,17 @@ is `roguelike-scoring-pipeline`; pixel-perfect rendering rules are `godot-pixel-
     game input is disabled by the owning FSM state, not by checking `is_playing` flags in
     every handler.
 
+## Shape that worked for trace playback
+
+- A typed view interface (`CombatView extends Control`) with one method per beat
+  (`tween_score`, `show_counts`, `charge`, `show_result`, `snap_final`); the screen extends it.
+- Each state gets the view in its constructor, creates **one** parallel Tween, and passes it to
+  the view methods, which only add tweeners — so skipping kills one Tween per state.
+- The screen owns skipping: `queue.skip_all()` then `view.snap_final(final numbers)`; states
+  need no per-state end look.
+- Per-group counts on the battlefield are each group's share of the running Count; a final
+  step rescales every group so the badges always sum to the real Count.
+
 ## Procedure — adding an animation
 
 1. Write the state class with `_start` / `_jump_to_end`; no `await`.

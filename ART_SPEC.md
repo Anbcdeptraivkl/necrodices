@@ -103,7 +103,7 @@ Semantic mapping:
 | Count box / numbers | `R1` fill, `R0` shadow, `N7` text |
 | Money | `G1` / `G0` |
 | Rarity stripe | Common `I1`, Uncommon `L1`, Rare `R1` |
-| Group bind colours (cycle) | 1 `G1`, 2 `I2`, 3 `L2`, 4 `F2` |
+| Group bind colours (cycle) | 1 `I2`, 2 `L2`, 3 `F2`, 4 `N7` (`G1` is the selection ring only, D-R06) |
 | HP bar | fill `R1` (bottom row `R0`), projected-damage preview segment `G1` |
 
 ---

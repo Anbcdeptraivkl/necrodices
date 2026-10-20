@@ -127,3 +127,4 @@ is right, then diff the engine output against the preview pixel for pixel.
 | Edge wobble that does not fade at the cell corners | Blend bands step in width where two cells meet | Multiply the wobble by `sin(π·t)` along the edge so it is zero at both ends |
 | Mottle / patches in a tile too contrasted | The 16 px repeat reads as a grid over large areas (water) | Keep patch colours within ~30% of the mid tone; spread variety with variants, not contrast |
 | A decor-rich battle map pushed into the unit batch every frame | Thousands of static sprites sorted and uploaded each frame | Bake flat decor into the ground; y-sort only standing props, and cull them to the camera view |
+| Asset ids reused across folders in the manifest (a `coin` stat icon and a `coin` VFX sheet) | A generator keyed by id writes the wrong file or fails the size check | Make ids unique when building the manifest (prefix by category) and key every generator by id |

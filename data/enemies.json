@@ -70,31 +70,31 @@
       "id": "EXORCIST",
       "boss": "BOSS_EXORCIST",
       "text": "Holy Water: BONE groups add only half their base Power.",
-      "hp_mult": 2.0
+      "hp_mult": 1.6
     },
     {
       "id": "WITCH_HUNTER",
       "boss": "BOSS_WITCH_HUNTER",
       "text": "Confiscation: your leftmost relic is disabled.",
-      "hp_mult": 2.0
+      "hp_mult": 1.6
     },
     {
       "id": "BELL_RINGER",
       "boss": "BOSS_BELL_RINGER",
       "text": "Toll: after every roll, 1 random die is shackled.",
-      "hp_mult": 2.0
+      "hp_mult": 0.75
     },
     {
       "id": "INQUISITOR",
       "boss": "BOSS_INQUISITOR",
       "text": "Interrogation: −1 Summon this fight.",
-      "hp_mult": 1.5
+      "hp_mult": 0.8
     },
     {
       "id": "ENRAGED",
       "boss": null,
       "text": "Enraged: two rules at once.",
-      "hp_mult": 2.0
+      "hp_mult": 1.25
     }
   ],
   "boss_selection": {

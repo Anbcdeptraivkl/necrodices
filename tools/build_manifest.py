@@ -77,6 +77,8 @@ def build() -> tuple[list[dict], dict[str, str]]:
             name: str | None = None, flags: list[str] | None = None, ramp: str | None = None,
             accent: str | None = None, tag_text: str | None = None, margin: int | None = None) -> None:
         fid = path.rsplit("/", 1)[-1].removesuffix(".png")
+        if category == "vfx":
+            fid = "vfx_" + fid  # ids are unique across folders (stats/coin vs vfx/coin)
         fw = frame_w or w
         e = {
             "id": fid, "path": path, "w": w, "h": h, "frame_w": fw, "frames": w // fw,

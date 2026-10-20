@@ -1,7 +1,7 @@
 {
  "generated_by": "tools/build_manifest.py",
  "spec": "ART_SPEC \u00a711",
- "count": 168,
+ "count": 169,
  "files": [
   {
    "id": "skeleton_warrior",
@@ -1696,6 +1696,19 @@
    "accent": null
   },
   {
+   "id": "gear",
+   "path": "assets/icons/stats/gear.png",
+   "w": 8,
+   "h": 8,
+   "frame_w": 8,
+   "frames": 1,
+   "category": "stat_icon",
+   "flags": [],
+   "tag": "GE",
+   "ramp": "M1",
+   "accent": null
+  },
+  {
    "id": "btn_primary_normal",
    "path": "assets/ui/btn_primary_normal.png",
    "w": 24,
@@ -2112,7 +2125,7 @@
    "accent": "N2"
   },
   {
-   "id": "spark",
+   "id": "vfx_spark",
    "path": "assets/vfx/spark.png",
    "w": 4,
    "h": 4,
@@ -2127,7 +2140,7 @@
    "accent": null
   },
   {
-   "id": "puff",
+   "id": "vfx_puff",
    "path": "assets/vfx/puff.png",
    "w": 32,
    "h": 8,
@@ -2140,7 +2153,7 @@
    "accent": null
   },
   {
-   "id": "slash",
+   "id": "vfx_slash",
    "path": "assets/vfx/slash.png",
    "w": 48,
    "h": 16,
@@ -2153,7 +2166,7 @@
    "accent": null
   },
   {
-   "id": "coin",
+   "id": "vfx_coin",
    "path": "assets/vfx/coin.png",
    "w": 24,
    "h": 6,
@@ -2166,7 +2179,7 @@
    "accent": null
   },
   {
-   "id": "soul",
+   "id": "vfx_soul",
    "path": "assets/vfx/soul.png",
    "w": 12,
    "h": 6,
@@ -2179,7 +2192,7 @@
    "accent": null
   },
   {
-   "id": "impact_ring",
+   "id": "vfx_impact_ring",
    "path": "assets/vfx/impact_ring.png",
    "w": 48,
    "h": 16,
@@ -2192,7 +2205,7 @@
    "accent": null
   },
   {
-   "id": "aura",
+   "id": "vfx_aura",
    "path": "assets/vfx/aura.png",
    "w": 160,
    "h": 40,

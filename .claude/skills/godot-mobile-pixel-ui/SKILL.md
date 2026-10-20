@@ -73,3 +73,4 @@ project art spec names the virtual resolution, rects, palette and 9-slice margin
 | Drag reorder that mutates the model on every hover | Item order flickers; scorer previews jump | Reorder a view-side list during the drag; commit one `reorder(from, to)` command on drop |
 | Empty labels while measuring | Elements look misaligned (1 px tall labels) | Fill real text before measuring |
 | Font imported with antialiasing | Blurry text at ×3 | Pixel font import: no AA, no hinting, no subpixel, no fallback |
+| One deferred `refresh()` per model `changed` signal | A burst of commands (a bot, an auto-play, a preview loop) queues thousands of rebuilds; frame stalls, even a crash | Coalesce: a `_refresh_queued` flag, one deferred refresh per frame |

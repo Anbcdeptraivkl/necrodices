@@ -448,28 +448,30 @@ Theme: on Halloween night the monsters strike back at the village's monster hunt
 
 | Rule ID | Boss | Rule text (UI) | HP mult |
 |---|---|---|---|
-| EXORCIST | The Exorcist | "Holy Water: BONE groups add only half their base Power." | ×2 |
-| WITCH_HUNTER | The Witch Hunter | "Confiscation: your leftmost relic is disabled." | ×2 |
-| BELL_RINGER | The Bell Ringer | "Toll: after every roll, 1 random die is shackled." | ×2 |
-| INQUISITOR | The Inquisitor | "Interrogation: −1 Summon this fight." | ×1.5 |
-| ENRAGED | Night 8 boss | "Enraged: two rules at once." Pick 2 distinct rules from the 4 above (Boss Stream). Sprite = random boss, red palette + aura. | ×2 |
+| EXORCIST | The Exorcist | "Holy Water: BONE groups add only half their base Power." | ×1.6 |
+| WITCH_HUNTER | The Witch Hunter | "Confiscation: your leftmost relic is disabled." | ×1.6 |
+| BELL_RINGER | The Bell Ringer | "Toll: after every roll, 1 random die is shackled." | ×0.75 |
+| INQUISITOR | The Inquisitor | "Interrogation: −1 Summon this fight." | ×0.8 |
+| ENRAGED | Night 8 boss | "Enraged: two rules at once." Pick 2 distinct rules from the 4 above (Boss Stream). Sprite = random boss, red palette + aura. | ×1.25 × both rules |
+
+*(HP multipliers tuned 2026-10-20 by the M7 sim, DECISIONS D-G02: a multiplier prices in how much its rule weakens the army; a boss's HP multiplier is the product of its rules' multipliers.)*
 
 Boss selection: Nights 1–7 pick from the 4 bosses, never the same boss two Nights in a row; Night 1 picks only EXORCIST or BELL_RINGER.
 
 ### 6.10 HP curve *(tunable)*
 
-| Night | Mob (×1) | Champion (×1.5) | Boss (×2) |
+| Night | Mob (×1) | Champion (×1.3) | Boss (× rule, §6.9) |
 |---|---|---|---|
-| 1 | 600 | 900 | 1,200 |
-| 2 | 1,500 | 2,250 | 3,000 |
-| 3 | 3,500 | 5,250 | 7,000 |
-| 4 | 8,000 | 12,000 | 16,000 |
-| 5 | 16,000 | 24,000 | 32,000 |
-| 6 | 30,000 | 45,000 | 60,000 |
-| 7 | 55,000 | 82,500 | 110,000 |
-| 8 | 90,000 | 135,000 | 180,000 |
+| 1 | 500 | 650 | 375 – 800 |
+| 2 | 1,050 | 1,365 | 788 – 1,680 |
+| 3 | 2,000 | 2,600 | 1,500 – 3,200 |
+| 4 | 4,600 | 5,980 | 3,450 – 7,360 |
+| 5 | 10,000 | 13,000 | 7,500 – 16,000 |
+| 6 | 19,000 | 24,700 | 14,250 – 30,400 |
+| 7 | 36,000 | 46,800 | 27,000 – 57,600 |
+| 8 | 60,000 | 78,000 | Enraged: 60,000 × 1.25 × both rules |
 
-Inquisitor uses ×1.5 instead of ×2. Store only the Night base and multipliers in data.
+Tuned 2026-10-20 (DECISIONS D-G02; original v1.0 curve: 600 / 1,500 / 3,500 / 8,000 / 16,000 / 30,000 / 55,000 / 90,000, champion ×1.5, boss ×2). Store only the Night base and multipliers in data (`curve.json`, `enemies.json`).
 
 Rationale: baseline untouched army ≈ 1,590 mean (§5.6). Upgrades scale roughly: +1 die ≈ ×1.8, +2 dice ≈ ×3, +1 summon ≈ ×1.8, 6 dice + 4 summons ≈ ×5.3; Tomes and ×Count relics must provide the remaining ×20–30 for Night 8.
 
