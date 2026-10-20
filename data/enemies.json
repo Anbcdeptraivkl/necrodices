@@ -1,0 +1,109 @@
+{
+  "version": 1,
+  "enemies": [
+    {
+      "id": "MOB_TORCH_VILLAGER",
+      "name": "Torch Villager",
+      "role": "MOB",
+      "pool": "MOB",
+      "rule": null
+    },
+    {
+      "id": "MOB_PITCHFORK_FARMER",
+      "name": "Pitchfork Farmer",
+      "role": "MOB",
+      "pool": "MOB",
+      "rule": null
+    },
+    {
+      "id": "MOB_LANTERN_WATCHMAN",
+      "name": "Lantern Watchman",
+      "role": "MOB",
+      "pool": "MOB",
+      "rule": null
+    },
+    {
+      "id": "CHAMP_GUARD_CAPTAIN",
+      "name": "Guard Captain",
+      "role": "CHAMPION",
+      "pool": "CHAMPION",
+      "rule": null
+    },
+    {
+      "id": "CHAMP_MONSTER_HUNTER",
+      "name": "Monster Hunter",
+      "role": "CHAMPION",
+      "pool": "CHAMPION",
+      "rule": null
+    },
+    {
+      "id": "BOSS_EXORCIST",
+      "name": "The Exorcist",
+      "role": "BOSS",
+      "pool": "BOSS",
+      "rule": "EXORCIST"
+    },
+    {
+      "id": "BOSS_WITCH_HUNTER",
+      "name": "The Witch Hunter",
+      "role": "BOSS",
+      "pool": "BOSS",
+      "rule": "WITCH_HUNTER"
+    },
+    {
+      "id": "BOSS_BELL_RINGER",
+      "name": "The Bell Ringer",
+      "role": "BOSS",
+      "pool": "BOSS",
+      "rule": "BELL_RINGER"
+    },
+    {
+      "id": "BOSS_INQUISITOR",
+      "name": "The Inquisitor",
+      "role": "BOSS",
+      "pool": "BOSS",
+      "rule": "INQUISITOR"
+    }
+  ],
+  "boss_rules": [
+    {
+      "id": "EXORCIST",
+      "boss": "BOSS_EXORCIST",
+      "text": "Holy Water: BONE groups add only half their base Power.",
+      "hp_mult": 2.0
+    },
+    {
+      "id": "WITCH_HUNTER",
+      "boss": "BOSS_WITCH_HUNTER",
+      "text": "Confiscation: your leftmost relic is disabled.",
+      "hp_mult": 2.0
+    },
+    {
+      "id": "BELL_RINGER",
+      "boss": "BOSS_BELL_RINGER",
+      "text": "Toll: after every roll, 1 random die is shackled.",
+      "hp_mult": 2.0
+    },
+    {
+      "id": "INQUISITOR",
+      "boss": "BOSS_INQUISITOR",
+      "text": "Interrogation: −1 Summon this fight.",
+      "hp_mult": 1.5
+    },
+    {
+      "id": "ENRAGED",
+      "boss": null,
+      "text": "Enraged: two rules at once.",
+      "hp_mult": 2.0
+    }
+  ],
+  "boss_selection": {
+    "night1_pool": [
+      "EXORCIST",
+      "BELL_RINGER"
+    ],
+    "no_repeat": true,
+    "enraged_night": 8,
+    "enraged_rule_count": 2
+  }
+}

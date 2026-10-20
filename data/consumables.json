@@ -1,0 +1,185 @@
+{
+  "version": 1,
+  "consumables": [
+    {
+      "id": "TOME_BONE",
+      "name": "Tome of Bone",
+      "kind": "TOME",
+      "price": 3,
+      "element": "BONE",
+      "modifier": null,
+      "max_targets": 0,
+      "text": "+1 level to units with BONE, and to Wisp"
+    },
+    {
+      "id": "TOME_FIRE",
+      "name": "Tome of Fire",
+      "kind": "TOME",
+      "price": 3,
+      "element": "FIRE",
+      "modifier": null,
+      "max_targets": 0,
+      "text": "+1 level to units with FIRE, and to Wisp"
+    },
+    {
+      "id": "TOME_ICE",
+      "name": "Tome of Ice",
+      "kind": "TOME",
+      "price": 3,
+      "element": "ICE",
+      "modifier": null,
+      "max_targets": 0,
+      "text": "+1 level to units with ICE, and to Wisp"
+    },
+    {
+      "id": "TOME_LEAF",
+      "name": "Tome of Leaf",
+      "kind": "TOME",
+      "price": 3,
+      "element": "LEAF",
+      "modifier": null,
+      "max_targets": 0,
+      "text": "+1 level to units with LEAF, and to Wisp"
+    },
+    {
+      "id": "TOME_VOLT",
+      "name": "Tome of Volt",
+      "kind": "TOME",
+      "price": 3,
+      "element": "VOLT",
+      "modifier": null,
+      "max_targets": 0,
+      "text": "+1 level to units with VOLT, and to Wisp"
+    },
+    {
+      "id": "TOME_METAL",
+      "name": "Tome of Metal",
+      "kind": "TOME",
+      "price": 3,
+      "element": "METAL",
+      "modifier": null,
+      "max_targets": 0,
+      "text": "+1 level to units with METAL, and to Wisp"
+    },
+    {
+      "id": "SIGIL_BONE",
+      "name": "Sigil of Bone",
+      "kind": "SIGIL",
+      "price": 3,
+      "element": "BONE",
+      "modifier": null,
+      "max_targets": 2,
+      "text": "Change up to 2 faces to BONE"
+    },
+    {
+      "id": "SIGIL_FIRE",
+      "name": "Sigil of Fire",
+      "kind": "SIGIL",
+      "price": 3,
+      "element": "FIRE",
+      "modifier": null,
+      "max_targets": 2,
+      "text": "Change up to 2 faces to FIRE"
+    },
+    {
+      "id": "SIGIL_ICE",
+      "name": "Sigil of Ice",
+      "kind": "SIGIL",
+      "price": 3,
+      "element": "ICE",
+      "modifier": null,
+      "max_targets": 2,
+      "text": "Change up to 2 faces to ICE"
+    },
+    {
+      "id": "SIGIL_LEAF",
+      "name": "Sigil of Leaf",
+      "kind": "SIGIL",
+      "price": 3,
+      "element": "LEAF",
+      "modifier": null,
+      "max_targets": 2,
+      "text": "Change up to 2 faces to LEAF"
+    },
+    {
+      "id": "SIGIL_VOLT",
+      "name": "Sigil of Volt",
+      "kind": "SIGIL",
+      "price": 3,
+      "element": "VOLT",
+      "modifier": null,
+      "max_targets": 2,
+      "text": "Change up to 2 faces to VOLT"
+    },
+    {
+      "id": "SIGIL_METAL",
+      "name": "Sigil of Metal",
+      "kind": "SIGIL",
+      "price": 3,
+      "element": "METAL",
+      "modifier": null,
+      "max_targets": 2,
+      "text": "Change up to 2 faces to METAL"
+    },
+    {
+      "id": "INK_WILD",
+      "name": "Wild Ink",
+      "kind": "INK",
+      "price": 4,
+      "element": null,
+      "modifier": "WILD",
+      "max_targets": 1,
+      "text": "Give 1 face the WILD modifier"
+    },
+    {
+      "id": "INK_SHARP",
+      "name": "Whetstone",
+      "kind": "INK",
+      "price": 4,
+      "element": null,
+      "modifier": "SHARP",
+      "max_targets": 1,
+      "text": "Give 1 face the SHARP modifier"
+    },
+    {
+      "id": "INK_SWARM",
+      "name": "Swarm Seed",
+      "kind": "INK",
+      "price": 4,
+      "element": null,
+      "modifier": "SWARM",
+      "max_targets": 1,
+      "text": "Give 1 face the SWARM modifier"
+    },
+    {
+      "id": "INK_HEX",
+      "name": "Hex Doll",
+      "kind": "INK",
+      "price": 4,
+      "element": null,
+      "modifier": "HEX",
+      "max_targets": 1,
+      "text": "Give 1 face the HEX modifier"
+    },
+    {
+      "id": "INK_GOLD",
+      "name": "Gilded Leaf",
+      "kind": "INK",
+      "price": 4,
+      "element": null,
+      "modifier": "GOLD",
+      "max_targets": 1,
+      "text": "Give 1 face the GOLD modifier"
+    },
+    {
+      "id": "SPARE_DIE",
+      "name": "Spare Bone Die",
+      "kind": "DIE",
+      "price": 5,
+      "element": null,
+      "modifier": null,
+      "max_targets": 0,
+      "text": "+1 Standard Die (max 8)"
+    }
+  ]
+}

@@ -1,0 +1,35 @@
+{
+  "version": 1,
+  "elements": [
+    {
+      "id": "BONE",
+      "index": 0,
+      "name": "Bone"
+    },
+    {
+      "id": "FIRE",
+      "index": 1,
+      "name": "Fire"
+    },
+    {
+      "id": "ICE",
+      "index": 2,
+      "name": "Ice"
+    },
+    {
+      "id": "LEAF",
+      "index": 3,
+      "name": "Leaf"
+    },
+    {
+      "id": "VOLT",
+      "index": 4,
+      "name": "Volt"
+    },
+    {
+      "id": "METAL",
+      "index": 5,
+      "name": "Metal"
+    }
+  ]
+}

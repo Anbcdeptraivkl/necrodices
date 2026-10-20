@@ -1,0 +1,65 @@
+; Engine configuration file.
+; Display and import settings follow ART_SPEC §2; deviations are logged in DECISIONS.md.
+
+config_version=5
+
+[application]
+
+config/name="Rattle & Roll"
+config/version="0.0.1"
+run/main_scene="res://scenes/boot/boot.tscn"
+config/features=PackedStringArray("4.6", "GL Compatibility")
+config/use_custom_user_dir=true
+config/custom_user_dir_name="NecroDices"
+boot_splash/bg_color=Color(0.0509804, 0.0392157, 0.0784314, 1)
+boot_splash/show_image=false
+
+[autoload]
+
+Display="*res://autoload/display.gd"
+Events="*res://autoload/events.gd"
+Settings="*res://autoload/settings.gd"
+Audio="*res://autoload/audio.gd"
+Game="*res://autoload/game.gd"
+
+[display]
+
+window/size/viewport_width=270
+window/size/viewport_height=480
+window/size/window_width_override=540
+window/size/window_height_override=960
+window/stretch/mode="viewport"
+window/stretch/aspect="keep"
+window/stretch/scale_mode="integer"
+window/handheld/orientation=1
+
+[gui]
+
+theme/custom="res://ui/theme/pixel_theme.tres"
+theme/default_font_antialiasing=0
+theme/default_font_hinting=0
+theme/default_font_subpixel_positioning=0
+
+[importer_defaults]
+
+font_data_dynamic={
+"allow_system_fallback": false,
+"antialiasing": 0,
+"generate_mipmaps": false,
+"hinting": 0,
+"subpixel_positioning": 0
+}
+texture={
+"compress/mode": 0,
+"mipmaps/generate": false,
+"process/fix_alpha_border": true
+}
+
+[rendering]
+
+renderer/rendering_method="gl_compatibility"
+renderer/rendering_method.mobile="gl_compatibility"
+textures/canvas_textures/default_texture_filter=0
+2d/snap/snap_2d_transforms_to_pixel=true
+2d/snap/snap_2d_vertices_to_pixel=true
+environment/defaults/default_clear_color=Color(0.0509804, 0.0392157, 0.0784314, 1)

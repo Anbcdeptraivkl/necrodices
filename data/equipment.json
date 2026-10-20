@@ -1,0 +1,85 @@
+{
+  "version": 1,
+  "equipment": [
+    {
+      "id": "BONE_POUCH",
+      "name": "Bone Pouch",
+      "price": 10,
+      "requires": null,
+      "effect": {
+        "dice": 1
+      },
+      "text": "+1 Standard Die"
+    },
+    {
+      "id": "BONE_SATCHEL",
+      "name": "Bone Satchel",
+      "price": 10,
+      "requires": "BONE_POUCH",
+      "effect": {
+        "dice": 1
+      },
+      "text": "+1 Standard Die"
+    },
+    {
+      "id": "GRAVE_BELL",
+      "name": "Grave Bell",
+      "price": 10,
+      "requires": null,
+      "effect": {
+        "summons": 1
+      },
+      "text": "+1 Summon per encounter"
+    },
+    {
+      "id": "LOADED_CUP",
+      "name": "Loaded Cup",
+      "price": 10,
+      "requires": null,
+      "effect": {
+        "rerolls": 1
+      },
+      "text": "+1 Reroll per encounter"
+    },
+    {
+      "id": "SECOND_CUP",
+      "name": "Second Cup",
+      "price": 10,
+      "requires": "LOADED_CUP",
+      "effect": {
+        "rerolls": 1
+      },
+      "text": "+1 Reroll per encounter"
+    },
+    {
+      "id": "RELIQUARY",
+      "name": "Reliquary",
+      "price": 10,
+      "requires": null,
+      "effect": {
+        "relic_slots": 1
+      },
+      "text": "+1 Relic slot"
+    },
+    {
+      "id": "POCKET_CRYPT",
+      "name": "Pocket Crypt",
+      "price": 10,
+      "requires": null,
+      "effect": {
+        "consumable_slots": 1
+      },
+      "text": "+1 Consumable slot"
+    },
+    {
+      "id": "HAGGLER_LANTERN",
+      "name": "Haggler's Lantern",
+      "price": 10,
+      "requires": null,
+      "effect": {
+        "shop_reroll_discount": 2
+      },
+      "text": "Shop rerolls cost $2 less"
+    }
+  ]
+}

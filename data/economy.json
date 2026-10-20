@@ -1,0 +1,64 @@
+{
+  "version": 1,
+  "start_money": 4,
+  "start_dice": 4,
+  "reward_mob": 3,
+  "reward_champion": 4,
+  "reward_boss": 5,
+  "unused_summon_bonus": 1,
+  "interest_per": 5,
+  "interest_amount": 1,
+  "interest_cap": 5,
+  "shop_reroll_base": 4,
+  "shop_reroll_step": 1,
+  "shop_reroll_min": 0,
+  "relic_slots": 5,
+  "consumable_slots": 2,
+  "max_dice": 8,
+  "base_summons": 3,
+  "base_rerolls": 2,
+  "min_summons": 1,
+  "shop_item_slots": 3,
+  "shop_equipment_slots": 1,
+  "shop_category_weights": {
+    "RELIC": 40,
+    "TOME": 25,
+    "SIGIL": 20,
+    "INK": 10,
+    "DIE": 5
+  },
+  "relic_rarity_weights": {
+    "COMMON": 70,
+    "UNCOMMON": 25,
+    "RARE": 5
+  },
+  "sell_relic_divisor": 2,
+  "sell_consumable": 1,
+  "modifiers": {
+    "SHARP": {
+      "op": "add_power",
+      "value": 10,
+      "when": "GROUP"
+    },
+    "SWARM": {
+      "op": "add_count",
+      "value": 2,
+      "when": "GROUP"
+    },
+    "HEX": {
+      "op": "mul_count",
+      "value": 1.5,
+      "when": "GROUP"
+    },
+    "GOLD": {
+      "op": "add_money",
+      "value": 2,
+      "when": "COMMIT"
+    },
+    "WILD": {
+      "op": null,
+      "value": null,
+      "when": "RECIPE"
+    }
+  }
+}

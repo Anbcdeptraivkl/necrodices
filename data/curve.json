@@ -1,0 +1,20 @@
+{
+  "version": 1,
+  "nights": 8,
+  "night_base": [
+    600,
+    1500,
+    3500,
+    8000,
+    16000,
+    30000,
+    55000,
+    90000
+  ],
+  "role_mult": {
+    "MOB": 1.0,
+    "CHAMPION": 1.5,
+    "BOSS": 2.0
+  },
+  "_note": "Boss HP multiplier comes from enemies.json boss_rules[].hp_mult (Inquisitor 1.5, others 2.0); role_mult.BOSS is the default/reference value only."
+}

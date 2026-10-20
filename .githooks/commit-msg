@@ -1,0 +1,21 @@
+#!/bin/sh
+# Enforces the commit message rule in AGENTS.md -> Git and commits:
+# one line, <= 72 characters, capital first letter, no body or trailers (e.g. Co-Authored-By).
+MSG=$(grep -v '^#' "$1" | grep -v '^[[:space:]]*$')
+FIRST=$(printf '%s\n' "$MSG" | head -n 1 | sed -e 's/[[:space:]]*$//')
+LINES=$(printf '%s' "$MSG" | grep -c .)
+
+fail() {
+  echo "commit-msg: $1" >&2
+  echo "  Rule: one line, <= 72 chars, capital first letter, no Co-Authored-By or other trailers." >&2
+  exit 1
+}
+
+[ -n "$FIRST" ] || fail "empty message."
+[ "$LINES" -eq 1 ] || fail "message has $LINES non-empty lines; use a single line."
+[ "${#FIRST}" -le 72 ] || fail "message is ${#FIRST} characters; keep it at 72 or fewer."
+case "$FIRST" in
+  [A-Z]*) ;;
+  *) fail "message must start with a capital letter: '$FIRST'" ;;
+esac
+exit 0

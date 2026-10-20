@@ -1,0 +1,12 @@
+#!/bin/sh
+# Blocks a commit when the agent skills are invalid or the AGENTS.md skill index is stale.
+# Activate once per clone:  git config core.hooksPath .githooks  (see AGENTS.md -> Setup)
+PY=$(command -v python || command -v python3)
+if [ -z "$PY" ]; then
+  echo "pre-commit: python not found on PATH; cannot validate skills." >&2
+  exit 1
+fi
+"$PY" tools/skills_index.py || {
+  echo "pre-commit: fix the skills above (python tools/skills_index.py --write regenerates the index)." >&2
+  exit 1
+}

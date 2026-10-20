@@ -1,0 +1,7 @@
+# Godot writes LF; normalise every text file to LF so core.autocrlf cannot flag
+# untouched .import/.tscn files as modified. Later rules override this one.
+* text=auto eol=lf
+# Shell hooks must keep LF endings or sh fails on macOS/Linux.
+.githooks/* text eol=lf
+*.sh text eol=lf
+*.cmd text eol=crlf
