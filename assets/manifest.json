@@ -1,7 +1,7 @@
 {
  "generated_by": "tools/build_manifest.py",
  "spec": "ART_SPEC \u00a711",
- "count": 169,
+ "count": 168,
  "files": [
   {
    "id": "skeleton_warrior",
@@ -2062,9 +2062,9 @@
   {
    "id": "bg_title",
    "path": "assets/bg/bg_title.png",
-   "w": 270,
-   "h": 480,
-   "frame_w": 270,
+   "w": 640,
+   "h": 300,
+   "frame_w": 640,
    "frames": 1,
    "category": "bg",
    "flags": [],
@@ -2075,9 +2075,9 @@
   {
    "id": "bg_map",
    "path": "assets/bg/bg_map.png",
-   "w": 270,
-   "h": 480,
-   "frame_w": 270,
+   "w": 640,
+   "h": 300,
+   "frame_w": 640,
    "frames": 1,
    "category": "bg",
    "flags": [],
@@ -2088,9 +2088,9 @@
   {
    "id": "bg_battle",
    "path": "assets/bg/bg_battle.png",
-   "w": 270,
-   "h": 480,
-   "frame_w": 270,
+   "w": 640,
+   "h": 300,
+   "frame_w": 640,
    "frames": 1,
    "category": "bg",
    "flags": [],
@@ -2101,26 +2101,13 @@
   {
    "id": "bg_shop",
    "path": "assets/bg/bg_shop.png",
-   "w": 270,
-   "h": 480,
-   "frame_w": 270,
+   "w": 640,
+   "h": 300,
+   "frame_w": 640,
    "frames": 1,
    "category": "bg",
    "flags": [],
    "tag": "BS",
-   "ramp": "N1",
-   "accent": "N2"
-  },
-  {
-   "id": "bg_battle_ext",
-   "path": "assets/bg/bg_battle_ext.png",
-   "w": 270,
-   "h": 96,
-   "frame_w": 270,
-   "frames": 1,
-   "category": "bg",
-   "flags": [],
-   "tag": "BBE",
    "ramp": "N1",
    "accent": "N2"
   },

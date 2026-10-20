@@ -22,8 +22,8 @@
 | ID | Decision | Value |
 |---|---|---|
 | D-01 | Engine | Godot 4.3+ (GDScript). 2D only. |
-| D-02 | Primary target | Web (HTML5) export, portrait. Secondary: Android/iOS (same build). |
-| D-03 | Virtual resolution | 270 × 480 portrait, integer scaling, nearest filtering (see ART_SPEC §2). |
+| D-02 | Primary target | Web (HTML5) export for desktop browsers, **landscape**, published on itch.io first. Secondary: mobile landscape (same build). *(changed 2026-10-20, DECISIONS D-A09/D-A10)* |
+| D-03 | Virtual resolution | 480 × 270 landscape, integer scaling, nearest filtering (see ART_SPEC §2). |
 | D-04 | Dice | 6 faces, faces are **elements**, not numbers. Start with **4** dice. |
 | D-05 | Elements | `BONE, FIRE, ICE, LEAF, VOLT, METAL` (canonical order, index 0–5). |
 | D-06 | Group size | A group = 2 or 3 dice. Every 2-dice combination is valid (fallback unit). 3-dice groups are valid only for the 4 T3 recipes. |
@@ -681,12 +681,12 @@ How to Play overlay: 4 pages mirroring the above with diagrams (static images fr
 
 | M | Day | Scope | Acceptance criteria |
 |---|---|---|---|
-| M0 | 1 | Project scaffold, project settings (ART_SPEC §2), autoloads, placeholder generator, data JSON stubs | Game boots to a Title placeholder at 270×480 with integer scaling; `gen_placeholders.py` creates every manifest file |
+| M0 | 1 | Project scaffold, project settings (ART_SPEC §2), autoloads, placeholder generator, data JSON stubs | Game boots to a Title placeholder at 480×270 with integer scaling; `gen_placeholders.py` creates every manifest file |
 | M1 | 1–2 | `core/`: db, recipes, scorer, relic DSL, encounter state machine, RNG, tests, balance sim | All §5.5 fixtures pass; §5.6 regression within ±5%; all 21 pair keys + 4 triples resolve; same seed ⇒ identical 100-turn bot log |
 | M2 | 3–4 | Encounter screen playable with placeholders: roll/reroll/bind/unbind/summon/attack now, projected damage, basic combat result | A full encounter can be played and won/lost on Web; projected damage equals final damage every time |
 | M3 | 5 | Run loop: Night map, cash-out, shop (buy/sell/reroll/equipment), consumables + Dice Inspector, Game Over/Victory | A full 24-encounter run is completable via debug HP override; money math matches §4.5 |
 | M4 | 6 | All content data complete (§6) + relic reorder + boss rules | Every relic/consumable/equipment/boss has a test or scripted scenario proving its effect |
-| M5 | 7–8 | Horde renderer, combat playback, juice, final art integration, audio | Night 6+ army with C ≥ 10,000 renders ≤ 240 sprites at ≥ 55 fps on a mid-range Android browser; playback ≤ 6 s at ×1 |
+| M5 | 7–8 | Horde renderer, combat playback, juice, final art integration, audio | Night 6+ army with C ≥ 10,000 renders ≤ 240 sprites at ≥ 55 fps in a desktop browser on a mid-range laptop (integrated GPU) and stays playable on a mid-range Android browser; playback ≤ 6 s at ×1 |
 | M6 | 9 | Save/continue, settings, tutorial, How to Play, Run Info recipe book | Kill tab mid-shop → Continue restores identical state |
 | M7 | 10 | Balance pass via sim, QA, Web export, itch.io page build | Sim bot (Appendix B policy) reaches Night 4 in ≥ 50% and wins ≤ 15% of 1,000 runs; no console errors |
 | — | 11 | Buffer / launch | — |

@@ -5,9 +5,10 @@ const COVERS: Array[String] = ["project.godot", "ui/theme/", "assets/fonts/"]
 
 
 func test_virtual_resolution() -> void:
-	_eq(ProjectSettings.get_setting("display/window/size/viewport_width"), 270, "viewport width")
-	_eq(ProjectSettings.get_setting("display/window/size/viewport_height"), 480, "viewport height")
+	_eq(ProjectSettings.get_setting("display/window/size/viewport_width"), 480, "viewport width")
+	_eq(ProjectSettings.get_setting("display/window/size/viewport_height"), 270, "viewport height")
 	_eq(ProjectSettings.get_setting("display/window/stretch/mode"), "viewport", "stretch mode")
+	_eq(ProjectSettings.get_setting("display/window/handheld/orientation"), 0, "landscape")
 	_eq(ProjectSettings.get_setting("display/window/stretch/scale_mode"), "integer", "integer scale")
 	# expand + integer is godot#92055; tall screens are handled by DisplayFit (D-A08).
 	_eq(ProjectSettings.get_setting("display/window/stretch/aspect"), "keep", "aspect keep")

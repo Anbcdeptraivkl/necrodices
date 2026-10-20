@@ -2,7 +2,7 @@
 
 > Companion to `GAME_SPEC.md`. IDs used here (units, relics, enemies…) are defined there and must not be renamed.
 > Audience: artists, AI-image pipelines, and LLM coding agents integrating assets.
-> Rule priority: **readability at 270×480 > consistency > detail**.
+> Rule priority: **readability at 480×270 > consistency > detail**.
 
 ---
 
@@ -22,34 +22,36 @@
 
 | Item | Value |
 |---|---|
-| Virtual resolution | **270 × 480** portrait |
-| Scaling | Integer only (×2 = 540×960, ×3 = 810×1440, ×4 = 1080×1920). Leftover space letterboxed in `N0`. |
-| Aspect | Expand vertically on tall phones: extra height goes to the Battlefield (§6.2), up to 640 virtual px tall; any remainder is letterboxed. Top and bottom bars are anchored. Width is always 270 (sides letterboxed on wide screens). |
+| Virtual resolution | **480 × 270** landscape (16:9) |
+| Scaling | Integer only (×2 = 960×540, ×3 = 1440×810, ×4 = 1920×1080, ×8 = 3840×2160). Leftover space letterboxed in `N0`. |
+| Aspect | The canvas grows on either axis to fill non-16:9 windows, up to **640×300** (21:9 / 16:10); the rest is letterboxed. Extra space goes to the centre column / battlefield (§6.1 flex rule). |
 | Pixel grid | 1 virtual px = 1 art px. Sprites rendered at ×1 everywhere, except the **showcase exception**: icons may be shown at exactly ×2 in shop cards, tooltip headers and reward popups. Nothing else is upscaled. |
 | Transient transforms | Scale punches / rotations allowed only during tweens ≤ 200 ms; resting state is always ×1, axis-aligned, pixel-snapped. |
 
 Godot 4.6.3 project settings (agent must apply in M0):
 
 ```
-display/window/size/viewport_width = 270
-display/window/size/viewport_height = 480
-display/window/size/window_width_override = 540
-display/window/size/window_height_override = 960
+display/window/size/viewport_width = 480
+display/window/size/viewport_height = 270
+display/window/size/window_width_override = 960
+display/window/size/window_height_override = 540
 display/window/stretch/mode = "viewport"
 display/window/stretch/aspect = "keep"          # NOT "expand": expand + integer is buggy (godot#92055)
 display/window/stretch/scale_mode = "integer"
-display/window/handheld/orientation = "portrait"
+display/window/handheld/orientation = "landscape"
 rendering/textures/canvas_textures/default_texture_filter = Nearest
 rendering/2d/snap/snap_2d_transforms_to_pixel = true
 rendering/2d/snap/snap_2d_vertices_to_pixel = true
 ```
-Tall screens: the `Display` autoload sets `Window.content_scale_size` to `(270, clamp(window_h / scale, 480, 640))` with
-`scale = max(1, min(window_w / 270, window_h / 480))` on start and on every resize (`core/display_fit.gd`, DECISIONS D-A08).
+Non-16:9 windows: the `Display` autoload sets `Window.content_scale_size` to
+`(clamp(window_w / scale, 480, 640), clamp(window_h / scale, 270, 300))` with
+`scale = max(1, min(window_w / 480, window_h / 270))` on start and on every resize
+(`core/display_fit.gd`, DECISIONS D-A08).
 The built-in `keep` + `integer` stretch then renders that canvas at exactly `scale`.
 
 Texture import preset (all PNGs): Filter Nearest, Mipmaps off, Compress Lossless, Repeat off.
 Font import (`[importer_defaults] font_data_dynamic`): antialiasing off, hinting none, subpixel positioning off, system fallback off.
-Web export: canvas resize policy Adaptive; background colour `#0d0a14`.
+Web export (itch.io first, D-A10): Thread Support **off** (single-threaded: no COOP/COEP headers or SharedArrayBuffer), canvas resize policy Adaptive, background colour `#0d0a14`, VRAM compression For Desktop. itch.io embed: "Embed in page" 960×540 (= ×2) with the fullscreen button, Click to play on (unlocks audio).
 
 ---
 
@@ -267,91 +269,102 @@ BONE_POUCH (small pouch), BONE_SATCHEL (bigger bag), GRAVE_BELL (bell), LOADED_C
 
 ---
 
-## 6. UI layout (virtual px, origin top-left)
+## 6. UI layout (virtual px, origin top-left, landscape)
+
+> Status: **approved 2026-10-20** (D-A09). Wireframes:
+> `docs/mockups/*.png`, generated from these tables by `python tools/layout_mockup.py`.
 
 ### 6.1 Global
-- Safe margins: 4 px sides. Bottom 12 px kept free of buttons (home-indicator area).
-- Min touch target: 20×20 virtual (80 physical px at ×4).
+- Base canvas 480×270. Every screen has three columns: **left 4..124** (information),
+  **centre 128..w−128** (the stage: enemy, battlefield, dice, cards), **right w−124..w−4**
+  (player controls). Rects below are for the base canvas.
+- **Flex rule** (canvas up to 640×300, §2): side columns anchor left / right, the top bar
+  anchors top, the dice tray and action buttons anchor bottom. Extra **width** widens the
+  centre column, extra **height** goes to the battlefield (Encounter), the info panel and the
+  card area. Backgrounds are 640×300, centred (§11).
+- Safe margins: 4 px on every side. Min touch / click target: 20×20 virtual.
+- Primary input is the mouse (Web desktop, D-A10): hover may open tooltips, but every
+  tooltip is also shown by click / tap in the docked **info panel** (left column), so touch
+  still works without hover.
 - Spacing grid: multiples of 2 px; default gap 4 px.
 - Modal overlays: dim layer = `N0` at 70% alpha (the only alpha-blended UI layer allowed).
 
 ### 6.2 Encounter screen
 
 ```
-y   0 ┌──────────────────────────────────────┐
-      │ NIGHT 3 · BOSS              $12  ⚙   │ Top bar (16)
-y  16 ├──────────────────────────────────────┤
-      │   [R1][R2][R3][R4][R5]               │ Relic bar (22)
-y  40 ├──────────────────────────────────────┤
-      │              ▓▓ enemy ▓▓             │
-      │              ▀▀pedestal▀▀            │ Enemy zone (88)
-      │            THE EXORCIST              │
-      │      [ Holy Water: BONE ½ Power ]    │
-      │      ██████████████░░░░  1,200 HP    │
-y 128 ├──────────────────────────────────────┤
-      │                                      │
-      │   BATTLEFIELD (army)                 │ 270 × 190
-      │   expands with extra screen height   │
-y 318 ├──────────────────────────────────────┤
-      │ [⚔ 70] × [💀 36] = 2,520 / 1,200     │ Score panel (28)
-      │  ●5  ●1  ●1  ●0  ●0  ●0  (essence)   │
-y 346 ├──────────────────────────────────────┤
-      │   [d][d][d][d]                       │ Dice tray (64)
-      │   (1 Skeleton Warrior)(2 Wisp)       │ pending group chips
-y 410 ├──────────────────────────────────────┤
-      │ [C1][C2] [📖]   Summons 2 · Rerolls 1│ Status row
-      │ [REROLL 1][ BIND ][SUMMON][ATTACK!]  │ Action buttons
-y 480 └──────────────────────────────────────┘
+y   0 ┌──────────────┬──────────────────────────────────────┬────────────────────┐
+      │ NIGHT 3·BOSS │        [R1][R2][R3][R4][R5]          │          $12  ⚙    │ Top bar (24)
+y  28 ├──────────────┼──────────────────────────────────────┼────────────────────┤
+      │ BOSS RULE    │            ▓▓ enemy ▓▓               │ [SUMMONS 2][REROLL]│
+      │ Holy Water…  │            ▀▀pedestal▀▀              ├────────────────────┤
+      │[⚔70]×[💀36]  │           THE EXORCIST               │ 1 Skeleton Warrior │
+      │= 2,520/1,200 │    ██████████████░░░░  1,200 HP      │ 2 Wisp  (pending)  │
+      │●5 ●1 ●1 ●0 … ├──────────────────────────────────────┤                    │
+      │[C1][C2]  [📖]│                                      ├────────────────────┤
+      │ INFO PANEL   │           BATTLEFIELD (army)         │ HINT               │
+      │ (docked      │      extra width + height go here    ├─────────┬──────────┤
+      │  tooltip)    │                                      │ REROLL 1│  BIND    │
+      │              │   [d][d][d][d][d][d][d][d]           │ SUMMON  │ ATTACK!  │
+y 270 └──────────────┴──────────────────────────────────────┴─────────┴──────────┘
 ```
 
 | Element | Rect (x, y, w, h) | Notes |
 |---|---|---|
-| Top bar | 0, 0, 270, 16 | Left: Night + encounter label. Right: coin icon + money (`G1`), settings 16×16 at x 250 |
-| Relic bar | centred, y 18, slots 20×20, gap 4 | 5 slots = 116 px wide (6 with Reliquary). Drag to reorder. Disabled relic: `N0` checker dim |
-| Enemy sprite | 119, 44, 32, 32 | Pedestal 48×6 at 111, 74 (`N3`/`N4` stone), drawn behind the sprite's feet |
-| Enemy name | centre, y 82, h 9 | `N7` |
-| Rule chip | centre, y 93, h 12, max w 240 | chip 9-slice, `F2` text for boss rule; hidden for Mob/Champion |
-| HP bar | 55, 108, 160, 7 | Projected damage shown as `G1` segment from the right end |
-| HP text | centre, y 117, h 9 | `1,200 HP` |
-| Battlefield | 0, 128, 270, 190 (+ extra height) | Groups in columns left→right; badge with Count above each cluster |
-| Score panel | 4, 320, 262, 14 | Power box 48×14 (`I1`), `×`, Count box 48×14 (`R1`), `=`, projected `/` HP text. Projected ≥ HP → text `L2` |
-| Essence row | centre, y 336, pips 6×6 + 1-digit count, gap 8 | Zero essence pips dimmed |
-| Dice row | centred, y 352, dice 20×20, gap 6 | Up to 8 dice = 202 px |
-| Pending chips | from x 8, y 380, h 20 | Chip: group colour number + unit icon 16×16 + short name; tap = unbind |
-| Status row | y 414, h 20 | Consumable slots 20×20 at x 8, 32 (56 with Pocket Crypt); recipe book 20×20 at x 84; text right-aligned at x 266 |
-| Action buttons | y 442, h 24, w 62, gap 4, x 5 | Reroll & Bind = secondary; Summon & Attack = primary. Disabled state when not allowed |
+| Top bar | 0, 0, 480, 24 | Left x 4: Night + encounter label. Centre: relic bar. Right: coin + money (`G1`) at x 420, settings 16×16 at x 460, y 4 |
+| Relic bar | centred, y 2, slots 20×20, gap 4 | 5 slots = 116 px (6 with Reliquary = 140). Drag to reorder. Disabled relic: `N0` checker dim |
+| Rule panel | 4, 28, 120, 40 | Boss: rule short text `F2` (full text in the info panel); Mob / Champion: role + reward |
+| Score panel | 4, 72, 120, 40 | Power box 48×14 at (8, 76) `I1`, `×`, Count box 48×14 at (68, 76) `R1`; line 2 at y 94 (numbers font): `= projected / HP`, projected ≥ HP → `L2` |
+| Essence row | 4, 116, 120, 12 | 6 pips 6×6 + 1-digit count, pitch 20; zero essence dimmed |
+| Consumables + book | y 132: slots 20×20 at x 8, 32 (56 with Pocket Crypt); recipe book 20×20 at x 100 | |
+| Info panel | 4, 156, 120, 110 (+ extra height) | Docked tooltip: header (icon ×2 + name), kind / rarity line, body `N6`. Shows the hovered or last clicked item |
+| Enemy sprite | x c−16, y 28, 32×32 | `c` = centre of the centre column (240 at base). Pedestal 48×6 at (c−24, 56), `N3`/`N4` stone |
+| Enemy name | centred on c, y 64, h 9 | `N7` |
+| HP bar | c−80, 76, 160, 7 | Projected damage shown as `G1` segment from the right end |
+| HP text | centred on c, y 85, h 9 | `1,200 HP` |
+| Battlefield | 128, 98, 224, 140 (+ extra width and height) | Groups in columns left→right; Count badge above each cluster; units lunge **up** to the enemy |
+| Dice row | centred on c, y 244, dice 20×20, gap 6 | Up to 8 dice = 202 px. Selected die raised 3 px. Anchored bottom |
+| Counters | 356, 28: Summons 58×20; Rerolls 58×20 at x 418 | icon + number |
+| Pending groups | 356, 52, 120, 100 | Chips 116×20, gap 2, from y 62 (max 4): group colour number + unit icon 16×16 + short name; click = unbind |
+| Hint | 356, 156, 120, 50 (+ extra height) | Context text: "No recipe for these 3", bind preview "→ Lich (T3)" |
+| Action buttons | 2×2 at (356, 210), (418, 210), (356, 238), (418, 238); each 58×24 | Row 1 REROLL / BIND = secondary; row 2 SUMMON / ATTACK = primary. Anchored bottom-right |
 
 ### 6.3 Shop screen
 | Element | Rect | Notes |
 |---|---|---|
-| Top bar + relic bar | as Encounter | Tap relic → tooltip with SELL ($x) |
-| Header | y 44, h 32 | Shopkeeper 32×32 at x 8; title "CRYPT MARKET" `F2` |
-| Item cards ×3 | x 7, y 82, each 82×110, gap 5 | `panel_card`; rarity stripe 4 px top; icon ×2 (32×32) centred at card y+10; name 2 lines; price tag `G1`; BUY button 70×18 at bottom; consumables also show USE (buy & use) |
-| Equipment card | 7, 198, 256, 48 | Icon ×2 left, name + effect text, price, BUY |
-| Held consumables | 8, 254, slots 20×20 | |
-| Reroll shop button | 170, 252, 92, 24 | "REROLL $4" secondary |
-| Your dice strip | 8, 286, 254, 24 | Current dice faces (tap → Dice Inspector) |
-| Continue | 5, 442, 260, 24 | primary "NEXT FIGHT" |
+| Top bar + relic bar | as Encounter | Click relic → info panel with SELL ($x) |
+| Header | 4, 28, 120, 40 | Shopkeeper 32×32 at (8, 32); title "CRYPT MARKET" `F2` at x 44 |
+| Held consumables | 8, 72, slots 20×20 | |
+| Info panel | 4, 100, 120, 166 | Item details + SELL button for owned relics / consumables |
+| Item cards ×3 | x 128 / 204 / 280, y 28, each 72×128, gap 4 | `panel_card`; rarity stripe 4 px top; icon ×2 (32×32) at card (20, 10); name 2 lines; price `G1`; BUY 64×18 at card y+82; consumables also USE (buy & use) at y+104 |
+| Equipment card | 128, 160, 224, 44 | Icon ×2 left, name + effect text, price, BUY |
+| Your dice strip | 128, 208, 224, 24 | Current dice faces (click → Dice Inspector) |
+| Reroll shop | 356, 28, 120, 24 | "REROLL $4" secondary |
+| Recipes | 356, 56, 120, 24 | Opens Run Info |
+| Continue | 356, 238, 120, 24 | primary "NEXT FIGHT" |
 
 ### 6.4 Night Map
-- Header y 8: "NIGHT 3 / 8" + money.
-- 3 encounter cards stacked: x 15, y 40 / 150 / 260, size 240×100 (`panel_card`): enemy sprite ×1 at left on pedestal, name, HP, reward, rule chip (boss). Current card has `G1` 1 px border; defeated cards stamped "DEFEATED" (`R1`, rotated stamp is pre-drawn, not runtime-rotated).
-- FIGHT button: 5, 442, 260, 24 primary.
+- Top bar as Encounter (Night label "NIGHT 3 / 8", relics, money).
+- 3 encounter cards side by side: x 8 / 164 / 320, y 32, 152×192 (`panel_card`): enemy sprite ×1
+  on pedestal at the top centre, name, role, HP, reward, rule chip (boss). Current card has
+  `G1` 1 px border; defeated cards stamped "DEFEATED" (`R1`, pre-drawn stamp).
+- FIGHT button: centred, y 236, 160×24 primary.
 
 ### 6.5 Title
-- `bg_title`; logo 160×48 at x 55, y 72.
-- Buttons 140×24 at x 65: Continue y 200, New Run y 230, How to Play y 260, Settings y 290.
-- Footer text y 466: version + seed of last run (`N5`).
+- `bg_title` centred; logo 160×48 centred at y 40.
+- Buttons 140×24 centred (x 170 at base), gap 4: Continue y 104, New Run y 132, How to Play
+  y 160, Settings y 188.
+- Footer y 258: version + seed of last run (`N5`). Everything anchors to the canvas centre.
 
-### 6.6 Overlays
+### 6.6 Overlays (centred on the canvas)
 | Overlay | Panel size | Content |
 |---|---|---|
-| Tooltip | max w 140, padding 4 | Header (icon ×2 + name), rarity/kind line, body text `N6` |
-| Dice Inspector | 250 × 300 centred | One row per die: index + 6 `face_tile` 16×16 with glyph8 + badge; select up to N faces (`G1` ring); Confirm / Cancel |
-| Cash-out | 200 × 160 centred | Lines (label left, `$` right `G1`), total, CONTINUE |
-| Run Info / Recipe book | 260 × 420 | 6×6 pair matrix with unit icons 16×16 (cell 20×20 + header glyph8 row/col) + triple list + level table |
-| Game Over / Victory | full screen panel | Title text large, stats list, buttons |
-| Settings | 220 × 260 | Toggles/sliders built from button 9-slices |
+| Tooltip (floating) | max w 140, padding 4 | Only over overlays, where the info panel is covered. Header (icon ×2 + name), kind line, body `N6` |
+| Dice Inspector | 300 × 232 | One row per die: index + 6 `face_tile` 16×16 with glyph8 + badge; select up to N faces (`G1` ring); Confirm / Cancel |
+| Cash-out | 200 × 160 | Lines (label left, `$` right `G1`), total, CONTINUE |
+| Run Info / Recipe book | 456 × 246 | Left: 6×6 pair matrix (cell 20×20 + glyph8 header row/col); right: triple list + level table |
+| Game Over / Victory | full canvas | Title text large, stats list, buttons |
+| Settings | 220 × 200 | Toggles / sliders built from button 9-slices |
+| Confirm | 200 × 80 | Message + two buttons |
 
 ---
 
@@ -496,7 +509,7 @@ VFX sprites (`vfx/`):
 | Equipment icons | `assets/icons/equipment/<equipment_id>.png` | 16×16 | 1 | 8 |
 | Stat icons | `assets/icons/stats/<name>.png` | 8×8 | 1 | 9 |
 | UI 9-slices & parts | `assets/ui/*.png` (§7) | various | 1 | 22 |
-| Backgrounds | `assets/bg/bg_title.png`, `bg_map.png`, `bg_battle.png`, `bg_shop.png` | 270×480 (+ 270×96 extension strip `bg_battle_ext.png` tiled for tall screens) | 1 | 5 |
+| Backgrounds | `assets/bg/bg_title.png`, `bg_map.png`, `bg_battle.png`, `bg_shop.png` | 640×300 (largest canvas), drawn centred; the 480×270 centre at (80, 15) is the safe area | 1 | 4 |
 | VFX | `assets/vfx/*.png` (§10) | various | various | 7 |
 | Logo | `assets/ui/logo.png` | 160×48 | 1 | 1 |
 | App icon | `assets/icon/app_icon_32.png` → exported ×16 to 512×512 | 32×32 | 1 | 1 |
@@ -506,7 +519,7 @@ VFX sprites (`vfx/`):
 All filenames lowercase snake_case of the GAME_SPEC ID (e.g. `skeleton_warrior.png`, `crown_of_the_lich.png`).
 
 Background rules:
-- `bg_battle`: graveyard at night, crooked fence, distant village with tiny `F2` windows, moon top-right. Battlefield band (y 128–318) uses only `N1`/`N2` with very low detail.
+- `bg_battle`: graveyard at night, crooked fence, distant village with tiny `F2` windows, moon top-right. The battlefield area (bg x 128–512, y 98–268: the centre column on every canvas size) uses only `N1`/`N2` with very low detail; the horizon (fence, village) sits behind the enemy zone above it.
 - `bg_shop`: crypt interior, candles (`F1/F2` 1–2 px flames), shelves silhouettes.
 - `bg_map`: winding village road with 3 lantern posts (cards sit on top).
 - `bg_title`: big moon, castle silhouette, bats.

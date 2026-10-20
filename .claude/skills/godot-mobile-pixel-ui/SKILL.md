@@ -1,6 +1,6 @@
 ---
 name: godot-mobile-pixel-ui
-description: Touch-first pixel-art UI for portrait mobile and web builds in Godot 4 — low virtual resolution with integer scaling and tall-screen expansion, safe areas, minimum touch targets, tap / long-press instead of hover, tooltips that work without a mouse, drag-to-reorder slots, 9-slice panels and buttons, modal overlays, pixel fonts, containers instead of hand offsets, measuring layout from the running game, plus web (HTML5) export and cold-start concerns. Use when building or editing any screen, HUD, overlay, button, slot, tooltip, drag interaction or .tscn layout, setting stretch / window / orientation settings, preparing a Web or mobile export, or when a layout is misaligned, cramped, overflows on tall phones, taps miss, tooltips need hover, text is blurry, or the build starts slowly.
+description: Pixel-art UI for web (itch.io) and mobile builds in Godot 4, portrait or landscape — low virtual resolution with integer scaling and canvas expansion for other aspect ratios, safe areas, minimum touch / click targets, tap / long-press as well as hover, tooltips and docked info panels that work without a mouse, drag-to-reorder slots, 9-slice panels and buttons, modal overlays, pixel fonts, containers instead of hand offsets, measuring layout from the running game, plus HTML5 / itch.io export and cold-start concerns. Use when building or editing any screen, HUD, overlay, button, slot, tooltip, drag interaction or .tscn layout, setting stretch / window / orientation settings, preparing a Web, itch.io or mobile export, or when a layout is misaligned, cramped, overflows on other aspect ratios, clicks or taps miss, tooltips need hover, text is blurry, or the build starts slowly.
 ---
 
 # Mobile Pixel UI
@@ -14,9 +14,9 @@ project art spec names the virtual resolution, rects, palette and 9-slice margin
 
 1. **Design in virtual pixels, scale by integers.** All rects in the art spec are virtual px;
    the root renders at that size and scales by a whole number (stretch `viewport`, aspect
-   `keep`, scale `integer`, canvas height picked in code — see the first trap). Tall screens get *extra
-   virtual height* given to one designated flexible region (e.g. the battlefield); bars
-   anchored to top and bottom keep their rects.
+   `keep`, scale `integer`, canvas size picked in code — see the first trap). Other aspect
+   ratios get *extra virtual width or height*, given to one designated flexible region (e.g.
+   the battlefield); bars and side columns anchored to the edges keep their rects.
 2. **Touch targets ≥ the spec minimum** (typically 20×20 virtual at ×4 ≈ 80 physical px). A
    small icon gets an invisible larger hit area, not a bigger sprite. Keep the bottom strip
    (home indicator) free of buttons.
@@ -63,7 +63,7 @@ project art spec names the virtual resolution, rects, palette and 9-slice margin
 
 | Trap | Symptom | Fix |
 | --- | --- | --- |
-| `aspect = expand` + `scale_mode = integer` | View jumps / expands one way only / inconsistent bars on resize (godotengine/godot#92055, open as of 2026-10) | Aspect `keep` + `integer`, and set `get_window().content_scale_size` yourself on start and every `size_changed`: `scale = max(1, min(w / base_w, h / base_h))`, size `(base_w, clamp(h / scale, base_h, max_h))`. Pure fit function + table test; check with a probe scene at several `--resolution`s (verified on Godot 4.6.3) |
+| `aspect = expand` + `scale_mode = integer` | View jumps / expands one way only / inconsistent bars on resize (godotengine/godot#92055, open as of 2026-10) | Aspect `keep` + `integer`, and set `get_window().content_scale_size` yourself on start and every `size_changed`: `scale = max(1, min(w / base_w, h / base_h))`, size `(clamp(w / scale, base_w, max_w), clamp(h / scale, base_h, max_h))`; anchor layouts to the canvas edges / centre. Pure fit function + table test; check with a probe scene at several `--resolution`s (verified on Godot 4.6.3) |
 | Movie Maker (`--write-movie`) to check a resize | Every capture is the base size, whatever `--resolution` says | It records at the startup viewport size; print `get_viewport().get_visible_rect()` from a probe scene instead |
 | Godot `tooltip_text` | Tiny smooth popup at window resolution; never shows on touch | One pixel tooltip panel in the scaled root, opened by the gesture helper |
 | `mouse_entered` / `mouse_exited` for tooltips | Blinking across slot gaps; nothing on touch | Poll the hovered control (desktop) + tap/long-press (touch) |

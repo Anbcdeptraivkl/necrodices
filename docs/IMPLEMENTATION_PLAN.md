@@ -1,6 +1,6 @@
 # Implementation Plan — Rattle & Roll (NecroDices)
 
-Status: **2026-10-20 — M0 done**, M1 next (see Progress).
+Status: **2026-10-20 — M0 done (landscape 480×270)**; landscape layouts approved; M1 next.
 Sources: [GAME_SPEC.md](../GAME_SPEC.md) (rules, normative), [ART_SPEC.md](../ART_SPEC.md)
 (look and layout, normative), [DECISIONS.md](../DECISIONS.md) (deviations / resolved ambiguity).
 This plan says **what gets built, in which order, by which class, and how we know it works**.
@@ -150,9 +150,10 @@ Task IDs are referenced from commits / reviews. ✅ done · ⏳ in progress · �
 | M0-5 | Art manifest, palette, placeholder generator, validator | ✅ |
 | M0-6 | Test runner + first suites (project settings, data load, recipes) | ✅ |
 | M0-7 | Pixel theme from 9-slices; Fusion Pixel font (D-R05) | ✅ |
-| M0-8 | Integer-scale display fit for tall / wide screens (`Display` autoload, D-A08) + probe scene | ✅ |
+| M0-8 | Integer-scale display fit for non-16:9 windows (`Display` autoload, D-A08) + probe scene | ✅ |
+| M0-9 | Switch to landscape 480×270 (D-A09): settings, DisplayFit, backgrounds 640×300, Title; ART_SPEC §6 layouts rewritten + wireframes (`docs/mockups/`) | ✅ (layouts approved) |
 
-**Accept:** game boots to Title at 270×480 with integer scaling; `gen_placeholders.py`
+**Accept:** game boots to Title at 480×270 with integer scaling; `gen_placeholders.py`
 creates every manifest file; `validate_art.py`, `check_data.py`, `tools\test.cmd` pass.
 
 ### M1 — Core rules (Days 1–2, 10-20 → 10-21)
@@ -184,7 +185,7 @@ resolve; determinism log identical.
 | M2-6 | Score panel (projected P × C = dmg / HP; ≥ HP → `L2`), essence row, HP bar with projected segment |
 | M2-7 | Enemy zone (sprite on pedestal, name, rule chip, HP), relic bar (static), top bar |
 | M2-8 | Basic combat result: score → immediate win/lose banner (no horde yet) |
-| M2-9 | Sandbox + presets; screenshot runner; web export smoke test (boots in a browser) |
+| M2-9 | Sandbox + presets; screenshot runner; web export smoke test on a private itch.io draft page (embed 960×540, fullscreen) |
 | M2-10 | Test: projected damage == final damage for scripted encounters (property test over seeds) |
 
 **Accept:** a full encounter can be played and won/lost on Web; projected = final every time.
@@ -228,10 +229,10 @@ resolve; determinism log identical.
 | M5-4 | Juice per ART §10 (summon pop, clone burst, lunge waves, slam, shake) with reduce-motion profile |
 | M5-5 | Final art integration as delivered (anchors approved first, ART §9.2) — files replace placeholders 1:1 |
 | M5-6 | Audio: SFX set, rising-pitch counter ticks (+1 semitone/step, cap 12), music after first tap |
-| M5-7 | Perf: horde_test at 240 sprites on a mid-range Android browser ≥ 55 fps; MultiMesh only if not |
+| M5-7 | Perf: horde_test at 240 sprites ≥ 55 fps in a desktop browser (integrated GPU laptop), playable on a mid-range Android browser; MultiMesh only if not |
 
-**Accept:** Night 6+ army with C ≥ 10,000 renders ≤ 240 sprites at ≥ 55 fps on a mid-range
-Android browser; playback ≤ 6 s at ×1.
+**Accept:** Night 6+ army with C ≥ 10,000 renders ≤ 240 sprites at ≥ 55 fps in a desktop
+browser on an integrated-GPU laptop; playback ≤ 6 s at ×1.
 
 ### M6 — Persistence, settings, onboarding (Day 9, 10-28)
 
@@ -249,8 +250,8 @@ Android browser; playback ≤ 6 s at ×1.
 | ID | Task |
 | --- | --- |
 | M7-1 | Appendix B bot over 1,000 runs; tune `curve.json` / prices only in data |
-| M7-2 | QA pass: no console errors; test matrix (Chrome Android, Safari iOS, desktop Chrome/Firefox) |
-| M7-3 | Web export (threads off), itch.io page, app icon, version footer |
+| M7-2 | QA pass: no console errors; test matrix (desktop Chrome / Firefox / Edge / Safari, itch.io embed + fullscreen, then Chrome Android / Safari iOS landscape) |
+| M7-3 | Web export preset (Thread Support off, Compatibility, `index.html`), `tools/export_web.cmd` → zip (< 1,000 files); itch.io page: Embed in page 960×540, fullscreen button, Click to play, Mobile friendly (landscape); app icon, version footer |
 
 **Accept:** bot reaches Night 4 in ≥ 50% and wins ≤ 15% of 1,000 runs; no console errors.
 
@@ -285,7 +286,8 @@ pattern, playtest notes = fun.
 | Risk | Impact | Mitigation |
 | --- | --- | --- |
 | 11 days to Halloween, no slack | Miss the trend | Critical path §8; cut list §7; human playtest at M2, not later |
-| `aspect=expand` + `scale_mode=integer` engine bug (godot#92055) | Jumping / inconsistent letterbox on resize | **Resolved in M0** (D-A08): aspect `keep` + `DisplayFit` canvas height; re-check on real phones / rotation in M2 |
+| `aspect=expand` + `scale_mode=integer` engine bug (godot#92055) | Jumping / inconsistent letterbox on resize | **Resolved in M0** (D-A08): aspect `keep` + `DisplayFit` canvas size; re-check in the itch.io embed + fullscreen in M2 |
+| Layout proposal rejected late | Rework of every screen | Approve ART_SPEC §6 wireframes before M2 starts (M1 is pure logic, unaffected) |
 | Web perf with 240 sprites + tweens | Choppy climax on phones | Pool from day one; perf check early in M5; MultiMesh fallback |
 | Final art not ready | Ship with placeholders | Placeholder pipeline passes validator; art swaps 1:1; anchors approved first |
 | Font coverage | Fusion Pixel subset is Latin only | **Resolved in M0** (D-R05, OFL); re-subset only if Vietnamese localization is pulled in |
@@ -322,3 +324,4 @@ once M2 lands (separate files: `fx/` vs `scenes/overlays/`).
 | --- | --- |
 | 2026-10-20 | M0: repo + remote, skills (reused 6 from necwarband/necdrawmancer, added 4), agent guide, project.godot, autoloads, boot, data JSON + checker, art pipeline + 169 placeholders (`ART OK`), test runner (8 cases green), Title renders at 270×480 (movie-maker capture). Appendix A baseline reproduced in Python. |
 | 2026-10-20 | Display switched to `keep` + integer + DisplayFit (D-A08, probe-verified); Fusion Pixel font (D-R05); 13 cases green. |
+| 2026-10-20 | Switched to landscape 480×270 + itch.io-first (D-A09, D-A10): settings, DisplayFit (both axes, ≤ 640×300), 640×300 backgrounds, Title relayout, ART_SPEC §6 rewritten with wireframes; 12 cases green. |

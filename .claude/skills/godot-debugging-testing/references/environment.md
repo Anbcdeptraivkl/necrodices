@@ -44,6 +44,15 @@ The dev machine is usually in use for other work while the agent runs the game.
 - Toggle with `F11` / `Alt+Enter`; use `WINDOW_MODE_FULLSCREEN`, not a screen-sized
   borderless window (see engine traps).
 
+## Scripted edits on Windows
+
+- Python's `Path.read_text()` / `write_text()` default to the ANSI code page (cp1252), not
+  UTF-8: a search string with `§`, `×` or `—` silently fails to match, and a rewrite can
+  mangle non-ASCII text. Always pass `encoding="utf-8"` and assert each replacement matched.
+- Shell heredocs with GDScript escapes (`"\n"`) or nested quotes are fragile; prefer the
+  editor tool, or a script file, for multi-line code edits. Re-run the suite after any
+  scripted edit — the runner fails on `SCRIPT ERROR` lines even when every case passes.
+
 ## Save files
 
 - Set `application/config/use_custom_user_dir` + a custom dir name in `project.godot`, so

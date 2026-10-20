@@ -128,8 +128,10 @@ UI_FILES = [
     ("stamp_defeated", 64, 20, None), ("divider", 8, 1, None),
 ]
 assert len(UI_FILES) == 22
-BACKGROUNDS = [("bg_title", 270, 480), ("bg_map", 270, 480), ("bg_battle", 270, 480),
-               ("bg_shop", 270, 480), ("bg_battle_ext", 270, 96)]
+# Drawn at the largest canvas (ART_SPEC §2, 640x300) and centred; the 480x270 centre is the
+# safe area every screen size shows.
+BACKGROUNDS = [("bg_title", 640, 300), ("bg_map", 640, 300), ("bg_battle", 640, 300),
+               ("bg_shop", 640, 300)]
 VFX = [  # (name, sheet w, h, frame_w)
     ("spark", 4, 4, 4), ("puff", 32, 8, 8), ("slash", 48, 16, 16), ("coin", 24, 6, 6),
     ("soul", 12, 6, 6), ("impact_ring", 48, 16, 16), ("aura", 160, 40, 40),

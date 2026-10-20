@@ -1,13 +1,13 @@
 extends Node
-## Keeps the root window's canvas at a whole-number scale with the design width and as much
-## height as the screen allows (DisplayFit). Applied on start and on every resize, so every
+## Keeps the root window's canvas at a whole-number scale, grown to fill the window up to
+## MAX_SIZE (DisplayFit). Applied on start and on every resize, so every
 ## scene (including dev sandboxes) gets the same canvas.
 
-## Tallest canvas, in virtual px (ART_SPEC §2: extra height goes to the battlefield).
-const MAX_HEIGHT := 640
+## Largest canvas in virtual px (ART_SPEC §2): 640 wide covers 21:9, 300 tall covers 16:10.
+const MAX_SIZE := Vector2i(640, 300)
 
 var scale := 1
-var canvas_size := Vector2i(270, 480)
+var canvas_size := Vector2i(480, 270)
 
 
 func _ready() -> void:
@@ -19,7 +19,7 @@ func _apply() -> void:
 	var base := Vector2i(
 		ProjectSettings.get_setting("display/window/size/viewport_width"),
 		ProjectSettings.get_setting("display/window/size/viewport_height"))
-	var result := DisplayFit.fit(get_window().size, base, MAX_HEIGHT)
+	var result := DisplayFit.fit(get_window().size, base, MAX_SIZE)
 	scale = result["scale"]
 	canvas_size = result["size"]
 	get_window().content_scale_size = canvas_size

@@ -24,14 +24,14 @@ Game="*res://autoload/game.gd"
 
 [display]
 
-window/size/viewport_width=270
-window/size/viewport_height=480
-window/size/window_width_override=540
-window/size/window_height_override=960
+window/size/viewport_width=480
+window/size/viewport_height=270
+window/size/window_width_override=960
+window/size/window_height_override=540
 window/stretch/mode="viewport"
 window/stretch/aspect="keep"
 window/stretch/scale_mode="integer"
-window/handheld/orientation=1
+window/handheld/orientation=0
 
 [gui]
 

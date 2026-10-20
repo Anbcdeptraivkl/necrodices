@@ -493,39 +493,39 @@ def draw_howto(e: dict) -> Image.Image:
 
 
 def draw_bg(e: dict) -> Image.Image:
+    """Landscape backgrounds at the largest canvas (640x300); the 480x270 safe area is centred
+    at (80, 15). The battlefield (base canvas 128,98 224x140 -> 208,113 here) stays plain N1."""
     w, h, i = e["w"], e["h"], e["id"]
     img = new(w, h, "N1")
     d = ImageDraw.Draw(img)
     n2 = rgba("N2")
     if i == "bg_battle":
-        d.ellipse((214, 22, 250, 58), fill=n2)                      # moon top-right
-        d.polygon([(0, 110), (60, 96), (130, 108), (200, 94), (270, 104), (270, 126), (0, 126)], fill=n2)
-        for x in range(6, 270, 14):                                 # crooked fence
-            d.rectangle((x, 112 + (x // 14) % 3, x + 2, 126), fill=n2)
-        for x, y in ((30, 330), (210, 334), (120, 420)):            # gravestones below the band
+        d.ellipse((540, 20, 576, 56), fill=n2)                      # moon top-right
+        d.polygon([(0, 96), (120, 84), (260, 94), (400, 82), (520, 92), (640, 86), (640, 110), (0, 110)], fill=n2)
+        for x in range(4, 640, 14):                                 # crooked fence
+            if not 208 <= x <= 432:
+                d.rectangle((x, 98 + (x // 14) % 3, x + 2, 110), fill=n2)
+        for x, y in ((20, 200), (110, 240), (520, 210), (600, 250)):  # gravestones, side columns
             d.rectangle((x, y, x + 12, y + 14), fill=n2)
-    elif i == "bg_battle_ext":
-        for x, y in ((20, 20), (150, 50), (230, 14), (90, 70)):
-            d.rectangle((x, y, x + 6, y + 4), fill=n2)
     elif i == "bg_title":
-        d.ellipse((75, 20, 195, 140), fill=n2)                      # big moon
-        d.rectangle((60, 320, 210, 480), fill=n2)                   # castle
-        for x in (60, 100, 150, 190):
-            d.rectangle((x, 280, x + 20, 320), fill=n2)
-        for x, y in ((40, 60), (220, 90), (30, 150)):               # bats
+        d.ellipse((260, 20, 380, 140), fill=n2)                     # big moon behind the logo
+        d.rectangle((40, 180, 170, 300), fill=n2)                   # castle, left
+        for x in (40, 80, 130):
+            d.rectangle((x, 150, x + 20, 180), fill=n2)
+        for x, y in ((140, 60), (480, 90), (540, 50), (110, 120)):  # bats
             d.polygon([(x, y), (x + 6, y + 4), (x + 12, y)], fill=n2)
     elif i == "bg_map":
-        pts = [(135, 480), (80, 400), (190, 300), (70, 190), (170, 90), (135, 0)]
-        d.line(pts, fill=n2, width=14)                               # winding road
-        for x, y in ((40, 380), (220, 250), (40, 120)):              # lantern posts
+        pts = [(0, 250), (140, 230), (240, 270), (400, 240), (520, 270), (640, 250)]
+        d.line(pts, fill=n2, width=14)                               # winding road under the cards
+        for x, y in ((150, 200), (330, 205), (500, 200)):            # lantern posts
             d.rectangle((x, y, x + 3, y + 30), fill=n2)
             d.rectangle((x - 2, y - 6, x + 5, y), fill=n2)
     elif i == "bg_shop":
-        for y in (150, 230, 310):                                   # shelves
-            d.rectangle((10, y, 260, y + 4), fill=n2)
-        for x in (30, 120, 220):                                    # candles
-            d.rectangle((x, 130, x + 3, 150), fill=n2)
-    text(img, 4, h - 14, e["tag"], "N2", scale=2)
+        for y in (80, 150, 220):                                    # shelves
+            d.rectangle((10, y, 630, y + 4), fill=n2)
+        for x in (60, 300, 580):                                    # candles
+            d.rectangle((x, 60, x + 3, 80), fill=n2)
+    text(img, 84, h - 30, e["tag"], "N2", scale=2)
     return img
 
 
