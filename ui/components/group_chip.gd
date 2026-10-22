@@ -6,9 +6,18 @@ extends PanelContainer
 signal pressed(index: int)
 
 var index := -1
+var hovered := false:
+	set(v):
+		hovered = v
+		theme_type_variation = &"ChipPanelHover" if v else &"ChipPanel"
 @onready var _num: Label = %Num
 @onready var _icon: TextureRect = %Icon
 @onready var _name: Label = %Name
+
+
+func _ready() -> void:
+	set_meta(&"press_fx", true)
+	set_meta(&"hover_fx", true)
 
 
 func show_group(db: ContentDb, g: Group, group_index: int) -> void:

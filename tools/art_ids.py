@@ -116,9 +116,9 @@ STAT_ICONS = {
 UI_FILES = [
     # (name, w, h, nine-slice margin or None)
     ("btn_primary_normal", 24, 24, 6), ("btn_primary_pressed", 24, 24, 6),
-    ("btn_primary_disabled", 24, 24, 6),
+    ("btn_primary_disabled", 24, 24, 6), ("btn_primary_hover", 24, 24, 6),
     ("btn_secondary_normal", 24, 24, 6), ("btn_secondary_pressed", 24, 24, 6),
-    ("btn_secondary_disabled", 24, 24, 6),
+    ("btn_secondary_disabled", 24, 24, 6), ("btn_secondary_hover", 24, 24, 6),
     ("panel_dark", 24, 24, 6), ("panel_card", 24, 24, 6), ("panel_tooltip", 16, 16, 4),
     ("chip", 16, 12, 4), ("slot", 20, 20, None), ("slot_selected", 20, 20, None),
     ("hp_frame", 16, 7, 3), ("hp_fill", 1, 5, None), ("hp_preview", 1, 5, None),
@@ -127,11 +127,11 @@ UI_FILES = [
     ("rarity_stripe_rare", 4, 4, None),
     ("stamp_defeated", 64, 20, None), ("divider", 8, 1, None),
 ]
-assert len(UI_FILES) == 22
+assert len(UI_FILES) == 24
 # Drawn at the largest canvas (ART_SPEC §2, 640x300) and centred; the 480x270 centre is the
 # safe area every screen size shows.
 BACKGROUNDS = [("bg_title", 640, 300), ("bg_map", 640, 300), ("bg_battle", 640, 300),
-               ("bg_shop", 640, 300)]
+               ("shop_decor", 120, 182)]   # shop: dark screen + a decorated right corner (D-R12)
 VFX = [  # (name, sheet w, h, frame_w)
     ("spark", 4, 4, 4), ("puff", 32, 8, 8), ("slash", 48, 16, 16), ("coin", 24, 6, 6),
     ("soul", 12, 6, 6), ("impact_ring", 48, 16, 16), ("aura", 160, 40, 40),

@@ -1,6 +1,6 @@
-"""Hallow32 palette (ART_SPEC §3) — the single source of truth for palette colours.
+"""Hallow32 palette + K0 (ART_SPEC §3) — the single source of truth for palette colours.
 
-    python tools/palette.py     # writes assets/palette/hallow32.gpl and hallow32.png (32x1)
+    python tools/palette.py     # writes assets/palette/hallow32.gpl, hallow32.hex and hallow32.png (33x1)
 
 Other tools import HALLOW32 / rgb() / MASK_KEYS from here.
 """
@@ -12,7 +12,8 @@ from pathlib import Path
 ROOT = Path(__file__).resolve().parent.parent
 PALETTE_DIR = ROOT / "assets" / "palette"
 
-# Order matters: it is the order of the .gpl entries and the 32x1 strip.
+# Order matters: it is the order of the .gpl / .hex entries and the 33x1 strip. K0 (pure black,
+# the designer's deepest sky and void, D-R14) is appended so the original 32 keep their places.
 HALLOW32: dict[str, str] = {
     "N0": "#0d0a14", "N1": "#1a1326", "N2": "#281d3b", "N3": "#3b2c55",
     "N4": "#574577", "N5": "#8577a3", "N6": "#c4bad8", "N7": "#f4efe4",
@@ -25,8 +26,9 @@ HALLOW32: dict[str, str] = {
     "R0": "#8c1c34", "R1": "#e0344a",
     "G0": "#c98a17", "G1": "#ffe066",
     "S0": "#a8643c", "S1": "#f0b896",
+    "K0": "#000000",
 }
-assert len(HALLOW32) == 32
+assert len(HALLOW32) == 33
 
 # §4.3 mask key colours (runtime palette swap). Outline stays N0.
 MASK_KEYS: dict[str, str] = {
@@ -76,19 +78,22 @@ def write_palette_files(out_dir: Path = PALETTE_DIR) -> list[Path]:
     from PIL import Image
 
     out_dir.mkdir(parents=True, exist_ok=True)
-    lines = ["GIMP Palette", "Name: Hallow32", "Columns: 8", "#"]
+    lines = ["GIMP Palette", "Name: Hallow32+K0", "Columns: 8", "#"]
     for key, hx in HALLOW32.items():
         r, g, b = hex_to_rgb(hx)
         lines.append(f"{r:3d} {g:3d} {b:3d}\t{key} {hx}")
     gpl = out_dir / "hallow32.gpl"
     gpl.write_text("\n".join(lines) + "\n", encoding="utf-8", newline="\n")
 
-    img = Image.new("RGBA", (32, 1))
+    hexf = out_dir / "hallow32.hex"
+    hexf.write_text("\n".join(v.lstrip("#") for v in HALLOW32.values()) + "\n", encoding="utf-8", newline="\n")
+
+    img = Image.new("RGBA", (len(HALLOW32), 1))
     for i, key in enumerate(HALLOW32):
         img.putpixel((i, 0), rgba(key))
     png = out_dir / "hallow32.png"
     img.save(png)
-    return [gpl, png]
+    return [gpl, hexf, png]
 
 
 if __name__ == "__main__":

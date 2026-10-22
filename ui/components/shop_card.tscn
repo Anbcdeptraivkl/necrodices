@@ -3,7 +3,7 @@
 [ext_resource type="Script" path="res://ui/components/shop_card.gd" id="1"]
 
 [node name="ShopCard" type="PanelContainer"]
-custom_minimum_size = Vector2(72, 128)
+custom_minimum_size = Vector2(72, 120)
 theme_type_variation = &"CardPanel"
 script = ExtResource("1")
 

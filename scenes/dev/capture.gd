@@ -7,6 +7,9 @@ extends Node
 
 const PRESETS := {
 	"title": {"screen": "title"},
+	"title_hover": {"screen": "title", "hover": "NewRun"},
+	"map_tip_codex": {"screen": "night_map", "seed": "CAPTURE1", "hover": "Codex", "wait": 0.8},
+	"map_tip_card": {"screen": "night_map", "seed": "CAPTURE1", "hover": "EncounterCard", "wait": 0.8},
 	"night_map": {"screen": "night_map", "seed": "CAPTURE1"},
 	"encounter": {"screen": "encounter", "seed": "CAPTURE1", "relics": ["RATTLE_DRUM", "EMBER_JAR", "CROWN_OF_THE_LICH"],
 		"consumables": ["SIGIL_FIRE", "TOME_BONE"], "army_turns": 1},
@@ -53,6 +56,18 @@ func _capture() -> void:
 		"tut_first_combat": true, "tut_first_shop": true}
 	var preset: Dictionary = PRESETS[_args.get("preset", "title")]
 	await _build(game, db, preset)
+	if preset.has("hover"):
+		var target: Control = null
+		for i in 30:  # the scene change is deferred: wait until the target exists
+			await get_tree().process_frame
+			var scene := get_tree().current_scene
+			target = scene.find_child(preset["hover"], true, false) if scene != null else null
+			if target != null:
+				break
+		var motion := InputEventMouseMotion.new()
+		motion.position = target.get_global_rect().get_center() * Vector2(get_window().size) / get_viewport().get_visible_rect().size
+		Input.parse_input_event(motion)
+		get_viewport().warp_mouse(target.get_global_rect().get_center())  # tooltips sit at the pointer
 	await get_tree().create_timer(float(preset.get("wait", 0.6))).timeout
 	await RenderingServer.frame_post_draw
 	var img := get_viewport().get_texture().get_image()

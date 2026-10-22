@@ -147,14 +147,6 @@ layout_mode = 2
 size_flags_horizontal = 3
 theme_override_constants/separation = 4
 
-[node name="Book" type="Button" parent="Left/Items"]
-unique_name_in_owner = true
-custom_minimum_size = Vector2(20, 20)
-layout_mode = 2
-mouse_default_cursor_shape = 2
-theme_type_variation = &"SecondaryButton"
-icon_alignment = 1
-
 [node name="InfoPanel" parent="Left" instance=ExtResource("5_info")]
 unique_name_in_owner = true
 layout_mode = 2

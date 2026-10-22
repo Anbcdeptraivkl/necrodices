@@ -1,7 +1,7 @@
 [gd_scene load_steps=6 format=3]
 
 [ext_resource type="Script" path="res://scenes/shop/shop_screen.gd" id="1"]
-[ext_resource type="Texture2D" path="res://assets/bg/bg_shop.png" id="2_bg"]
+[ext_resource type="Texture2D" path="res://assets/bg/shop_decor.png" id="2_decor"]
 [ext_resource type="PackedScene" path="res://ui/components/top_bar.tscn" id="3_top"]
 [ext_resource type="PackedScene" path="res://ui/components/info_panel.tscn" id="4_info"]
 [ext_resource type="Script" path="res://ui/components/overlay_host.gd" id="5_overlay"]
@@ -15,21 +15,15 @@ grow_horizontal = 2
 grow_vertical = 2
 script = ExtResource("1")
 
-[node name="Background" type="TextureRect" parent="."]
+[node name="Background" type="ColorRect" parent="."]
 layout_mode = 1
-anchors_preset = 8
-anchor_left = 0.5
-anchor_top = 0.5
-anchor_right = 0.5
-anchor_bottom = 0.5
-offset_left = -320.0
-offset_top = -150.0
-offset_right = 320.0
-offset_bottom = 150.0
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
 grow_horizontal = 2
 grow_vertical = 2
 mouse_filter = 2
-texture = ExtResource("2_bg")
+color = Color(0.0509804, 0.0392157, 0.0784314, 1)
 
 [node name="TopBar" parent="." instance=ExtResource("3_top")]
 unique_name_in_owner = true
@@ -46,29 +40,52 @@ offset_bottom = -4.0
 grow_vertical = 2
 theme_override_constants/separation = 4
 
-[node name="Header" type="HBoxContainer" parent="Left"]
-custom_minimum_size = Vector2(120, 40)
+[node name="Equipment" type="PanelContainer" parent="Left"]
+unique_name_in_owner = true
+custom_minimum_size = Vector2(120, 120)
 layout_mode = 2
-theme_override_constants/separation = 4
+theme_type_variation = &"CardPanel"
 
-[node name="Keeper" type="TextureRect" parent="Left/Header"]
+[node name="VBox" type="VBoxContainer" parent="Left/Equipment"]
+layout_mode = 2
+mouse_filter = 2
+theme_override_constants/separation = 2
+
+[node name="EquipHeader" type="Label" parent="Left/Equipment/VBox"]
+unique_name_in_owner = true
+layout_mode = 2
+theme_type_variation = &"MutedLabel"
+horizontal_alignment = 1
+
+[node name="EquipIcon" type="TextureRect" parent="Left/Equipment/VBox"]
 unique_name_in_owner = true
 custom_minimum_size = Vector2(32, 32)
 layout_mode = 2
-size_flags_vertical = 4
+size_flags_horizontal = 4
+mouse_filter = 2
+expand_mode = 1
+stretch_mode = 5
 
-[node name="Title" type="Label" parent="Left/Header"]
+[node name="EquipName" type="Label" parent="Left/Equipment/VBox"]
 unique_name_in_owner = true
 layout_mode = 2
-size_flags_horizontal = 3
-theme_type_variation = &"RuleLabel"
+horizontal_alignment = 1
 autowrap_mode = 3
 
-[node name="Held" type="HBoxContainer" parent="Left"]
+[node name="EquipText" type="Label" parent="Left/Equipment/VBox"]
 unique_name_in_owner = true
-custom_minimum_size = Vector2(120, 20)
+custom_minimum_size = Vector2(110, 0)
 layout_mode = 2
-theme_override_constants/separation = 4
+size_flags_vertical = 3
+theme_type_variation = &"BodyLabel"
+horizontal_alignment = 1
+autowrap_mode = 3
+
+[node name="EquipBuy" type="Button" parent="Left/Equipment/VBox"]
+unique_name_in_owner = true
+custom_minimum_size = Vector2(0, 18)
+layout_mode = 2
+mouse_default_cursor_shape = 2
 
 [node name="InfoPanel" parent="Left" instance=ExtResource("4_info")]
 unique_name_in_owner = true
@@ -90,74 +107,78 @@ theme_override_constants/separation = 4
 
 [node name="Cards" type="HBoxContainer" parent="Center"]
 unique_name_in_owner = true
-layout_mode = 2
-theme_override_constants/separation = 4
-alignment = 1
-
-[node name="Equipment" type="PanelContainer" parent="Center"]
-unique_name_in_owner = true
-custom_minimum_size = Vector2(0, 44)
-layout_mode = 2
-theme_type_variation = &"CardPanel"
-
-[node name="Row" type="HBoxContainer" parent="Center/Equipment"]
+custom_minimum_size = Vector2(0, 120)
 layout_mode = 2
 theme_override_constants/separation = 4
 
-[node name="EquipIcon" type="TextureRect" parent="Center/Equipment/Row"]
-unique_name_in_owner = true
-custom_minimum_size = Vector2(32, 32)
-layout_mode = 2
-size_flags_vertical = 4
-mouse_filter = 2
-expand_mode = 1
-stretch_mode = 5
-
-[node name="Texts" type="VBoxContainer" parent="Center/Equipment/Row"]
-layout_mode = 2
-size_flags_horizontal = 3
-theme_override_constants/separation = 0
-alignment = 1
-
-[node name="EquipName" type="Label" parent="Center/Equipment/Row/Texts"]
+[node name="Loadout" type="PanelContainer" parent="Center"]
 unique_name_in_owner = true
 layout_mode = 2
+size_flags_vertical = 3
 
-[node name="EquipText" type="Label" parent="Center/Equipment/Row/Texts"]
-unique_name_in_owner = true
+[node name="VBox" type="VBoxContainer" parent="Center/Loadout"]
 layout_mode = 2
-theme_type_variation = &"BodyLabel"
-autowrap_mode = 3
+theme_override_constants/separation = 4
 
-[node name="EquipBuy" type="Button" parent="Center/Equipment/Row"]
-unique_name_in_owner = true
-custom_minimum_size = Vector2(44, 18)
-layout_mode = 2
-size_flags_vertical = 4
-mouse_default_cursor_shape = 2
-
-[node name="DiceStrip" type="PanelContainer" parent="Center"]
-unique_name_in_owner = true
-custom_minimum_size = Vector2(0, 40)
-layout_mode = 2
-mouse_default_cursor_shape = 2
-
-[node name="VBox" type="VBoxContainer" parent="Center/DiceStrip"]
-layout_mode = 2
-mouse_filter = 2
-theme_override_constants/separation = 0
-
-[node name="DiceLabel" type="Label" parent="Center/DiceStrip/VBox"]
+[node name="LoadoutTitle" type="Label" parent="Center/Loadout/VBox"]
 unique_name_in_owner = true
 layout_mode = 2
 theme_type_variation = &"MutedLabel"
 
-[node name="Dice" type="HBoxContainer" parent="Center/DiceStrip/VBox"]
+[node name="ItemsRow" type="HBoxContainer" parent="Center/Loadout/VBox"]
+custom_minimum_size = Vector2(0, 20)
+layout_mode = 2
+theme_override_constants/separation = 4
+
+[node name="ItemsLabel" type="Label" parent="Center/Loadout/VBox/ItemsRow"]
+unique_name_in_owner = true
+custom_minimum_size = Vector2(36, 0)
+layout_mode = 2
+size_flags_vertical = 4
+theme_type_variation = &"BodyLabel"
+
+[node name="Held" type="HBoxContainer" parent="Center/Loadout/VBox/ItemsRow"]
 unique_name_in_owner = true
 layout_mode = 2
-mouse_filter = 2
 theme_override_constants/separation = 4
-alignment = 1
+
+[node name="DiceRow" type="HBoxContainer" parent="Center/Loadout/VBox"]
+unique_name_in_owner = true
+custom_minimum_size = Vector2(0, 23)
+layout_mode = 2
+mouse_default_cursor_shape = 2
+theme_override_constants/separation = 4
+
+[node name="DiceLabel" type="Label" parent="Center/Loadout/VBox/DiceRow"]
+unique_name_in_owner = true
+custom_minimum_size = Vector2(36, 0)
+layout_mode = 2
+size_flags_vertical = 4
+mouse_filter = 1
+theme_type_variation = &"BodyLabel"
+
+[node name="Dice" type="HBoxContainer" parent="Center/Loadout/VBox/DiceRow"]
+unique_name_in_owner = true
+layout_mode = 2
+mouse_filter = 1
+theme_override_constants/separation = 2
+
+[node name="EquipRow" type="HBoxContainer" parent="Center/Loadout/VBox"]
+custom_minimum_size = Vector2(0, 16)
+layout_mode = 2
+theme_override_constants/separation = 4
+
+[node name="OwnedLabel" type="Label" parent="Center/Loadout/VBox/EquipRow"]
+unique_name_in_owner = true
+custom_minimum_size = Vector2(36, 0)
+layout_mode = 2
+size_flags_vertical = 4
+theme_type_variation = &"BodyLabel"
+
+[node name="Owned" type="HBoxContainer" parent="Center/Loadout/VBox/EquipRow"]
+unique_name_in_owner = true
+layout_mode = 2
+theme_override_constants/separation = 2
 
 [node name="Right" type="VBoxContainer" parent="."]
 layout_mode = 1
@@ -173,24 +194,60 @@ grow_horizontal = 0
 grow_vertical = 2
 theme_override_constants/separation = 4
 
+[node name="Decor" type="Control" parent="Right"]
+custom_minimum_size = Vector2(120, 182)
+layout_mode = 2
+size_flags_vertical = 3
+mouse_filter = 2
+
+[node name="Alcove" type="TextureRect" parent="Right/Decor"]
+layout_mode = 1
+anchors_preset = 12
+anchor_top = 1.0
+anchor_right = 1.0
+anchor_bottom = 1.0
+offset_top = -182.0
+grow_horizontal = 2
+grow_vertical = 0
+mouse_filter = 2
+texture = ExtResource("2_decor")
+stretch_mode = 2
+
+[node name="Keeper" type="TextureRect" parent="Right/Decor"]
+unique_name_in_owner = true
+layout_mode = 1
+anchors_preset = 7
+anchor_left = 0.5
+anchor_top = 1.0
+anchor_right = 0.5
+anchor_bottom = 1.0
+offset_left = -16.0
+offset_top = -42.0
+offset_right = 16.0
+offset_bottom = -10.0
+grow_horizontal = 2
+grow_vertical = 0
+
+[node name="Title" type="Label" parent="Right/Decor"]
+unique_name_in_owner = true
+layout_mode = 1
+anchors_preset = 12
+anchor_top = 1.0
+anchor_right = 1.0
+anchor_bottom = 1.0
+offset_top = -182.0
+offset_bottom = -172.0
+grow_horizontal = 2
+grow_vertical = 0
+theme_type_variation = &"RuleLabel"
+horizontal_alignment = 1
+
 [node name="Reroll" type="Button" parent="Right"]
 unique_name_in_owner = true
 custom_minimum_size = Vector2(120, 24)
 layout_mode = 2
 mouse_default_cursor_shape = 2
 theme_type_variation = &"SecondaryButton"
-
-[node name="Recipes" type="Button" parent="Right"]
-unique_name_in_owner = true
-custom_minimum_size = Vector2(120, 24)
-layout_mode = 2
-mouse_default_cursor_shape = 2
-theme_type_variation = &"SecondaryButton"
-
-[node name="Spacer" type="Control" parent="Right"]
-layout_mode = 2
-size_flags_vertical = 3
-mouse_filter = 2
 
 [node name="Next" type="Button" parent="Right"]
 unique_name_in_owner = true

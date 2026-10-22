@@ -5,13 +5,17 @@ extends PanelContainer
 ## InfoText dictionary and is evaluated when shown, so content is never stale.
 ## Polls the hovered control each frame (no mouse_entered/exited flicker; skill
 ## godot-mobile-pixel-ui) — click / tap pins the info, so touch works without hover.
+## A new target shows at once; leaving all targets (a gap between slots) keeps the last one
+## for GRACE_TIME before falling back to the pinned info, so sweeping a row never blinks.
 
 signal action_pressed(which: int)
 
 const META := &"info"
+const GRACE_TIME := 0.15
 
 var _pinned := {}
 var _shown_for: Control
+var _grace := 0.0
 @onready var _icon: TextureRect = %Icon
 @onready var _title: Label = %Title
 @onready var _kind: Label = %Kind
@@ -61,16 +65,18 @@ func set_action(text: String, text2: String = "") -> void:
 	_action2.visible = text2 != ""
 
 
-func _process(_delta: float) -> void:
-	var hovered := get_viewport().gui_get_hovered_control()
-	var target := _find_target(hovered)
+func _process(delta: float) -> void:
+	var target := _find_target(get_viewport().gui_get_hovered_control())
 	if target == _shown_for:
+		_grace = 0.0
 		return
+	if target == null and _shown_for != null:
+		_grace += delta
+		if _grace < GRACE_TIME:
+			return
+	_grace = 0.0
 	_shown_for = target
-	if target != null:
-		_show(target.get_meta(META).call())
-	else:
-		_show(_pinned)
+	_show(target.get_meta(META).call() if target != null else _pinned)
 
 
 func _find_target(c: Control) -> Control:

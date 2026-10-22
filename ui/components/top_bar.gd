@@ -1,12 +1,13 @@
 class_name TopBar
 extends PanelContainer
 ## Top bar shared by Night Map, Encounter and Shop (ART_SPEC §6.2): label left, relic bar
-## centred (drag to reorder when allowed), money and settings right. Emits intents; the screen
+## centred (drag to reorder when allowed), money, the recipe codex and settings right. Emits intents; the screen
 ## applies them through commands.
 
 signal relic_pressed(index: int)
 signal reorder_requested(from: int, to: int)
 signal settings_pressed
+signal codex_pressed
 
 const SLOT_SCENE := "res://ui/components/item_slot.tscn"
 
@@ -18,18 +19,23 @@ var _run: RunState
 @onready var _money: Label = %Money
 @onready var _coin: TextureRect = %Coin
 @onready var _settings: Button = %Settings
+@onready var _codex: Button = %Codex
 
 
 func _ready() -> void:
 	_coin.texture = Art.stat("coin")
 	_settings.icon = Art.stat("gear")
 	_settings.pressed.connect(func() -> void: settings_pressed.emit())
+	_codex.icon = Art.stat("book")
+	_codex.pressed.connect(func() -> void: codex_pressed.emit())
 
 
 func setup(db: ContentDb, run: RunState, label: String) -> void:
 	_db = db
 	_run = run
 	_label.text = label
+	_codex.set_meta(&"tip", db.text("tip_codex"))
+	_settings.set_meta(&"tip", db.text("tip_settings"))
 	refresh()
 
 

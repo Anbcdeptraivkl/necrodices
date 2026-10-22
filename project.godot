@@ -5,7 +5,7 @@ config_version=5
 
 [application]
 
-config/name="Rattle & Roll"
+config/name="Roll the Bones"
 config/version="0.0.1"
 run/main_scene="res://scenes/boot/boot.tscn"
 config/features=PackedStringArray("4.6", "GL Compatibility")
@@ -19,6 +19,7 @@ boot_splash/show_image=false
 Display="*res://autoload/display.gd"
 Settings="*res://autoload/settings.gd"
 Audio="*res://autoload/audio.gd"
+UiFx="*res://autoload/ui_fx.gd"
 Game="*res://autoload/game.gd"
 
 [display]

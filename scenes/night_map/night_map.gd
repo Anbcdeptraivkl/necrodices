@@ -30,8 +30,7 @@ func _ready() -> void:
 	_fight.pressed.connect(func() -> void:
 		Audio.play("click")
 		Game.start_encounter())
-	%Recipes.text = db.text("btn_recipes")
-	%Recipes.pressed.connect(func() -> void:
+	_top.codex_pressed.connect(func() -> void:
 		var o: Control = (load(RUN_INFO_SCENE) as PackedScene).instantiate()
 		_overlays.push(o)
 		o.call(&"setup", db, run))

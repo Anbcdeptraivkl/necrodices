@@ -12,11 +12,17 @@ var selected := false:
 	set(v):
 		selected = v
 		queue_redraw()
+var hovered := false:
+	set(v):
+		hovered = v
+		queue_redraw()
 
 
 func _init() -> void:
 	custom_minimum_size = Vector2(16, 16)
 	mouse_default_cursor_shape = Control.CURSOR_POINTING_HAND
+	set_meta(&"press_fx", true)
+	set_meta(&"hover_fx", true)
 
 
 func show_face(f: Face, die: int, index: int) -> void:
@@ -35,7 +41,9 @@ func _draw() -> void:
 	if badge != null:
 		draw_texture(badge, Vector2(11, 0))
 	if selected:
-		draw_rect(Rect2(0.5, 0.5, 15, 15), Art.colour("G1"), false, 1.0)
+		Art.draw_ring(self, Rect2(Vector2.ZERO, size), Art.colour("G1"))
+	elif hovered:
+		Art.draw_ring(self, Rect2(Vector2.ZERO, size), Art.colour("N5"))
 
 
 func _gui_input(event: InputEvent) -> void:

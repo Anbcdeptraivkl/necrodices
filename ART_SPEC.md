@@ -1,4 +1,4 @@
-# RATTLE & ROLL — Art Spec v1.0
+# ROLL THE BONES — Art Spec v1.0
 
 > Companion to `GAME_SPEC.md`. IDs used here (units, relics, enemies…) are defined there and must not be renamed.
 > Audience: artists, AI-image pipelines, and LLM coding agents integrating assets.
@@ -57,7 +57,7 @@ Web export (itch.io first, D-A10): Thread Support **off** (single-threaded: no C
 
 ## 3. Palette — "Hallow32"
 
-All opaque pixels in final art must come from this list (exceptions: §4.3 mask files, VFX tint at runtime). Export as `assets/palette/hallow32.gpl` and `hallow32.png` (32×1 px strip).
+All opaque pixels in final art must come from this list (exceptions: §4.3 mask files, VFX tint at runtime). Export as `assets/palette/hallow32.gpl`, `hallow32.hex` and `hallow32.png` (33×1 px strip; 32 colours + `K0`, file names kept). Source of truth: `tools/palette.py`.
 
 | Key | Hex | Role |
 |---|---|---|
@@ -93,6 +93,7 @@ All opaque pixels in final art must come from this list (exceptions: §4.3 mask 
 | G1 | `#ffe066` | Gold — money, selection |
 | S0 | `#a8643c` | Skin dark (enemies) |
 | S1 | `#f0b896` | Skin light (enemies) |
+| K0 | `#000000` | Pure black — the designer's deepest sky and void (added 2026-10-22, D-R14) |
 
 Semantic mapping:
 
@@ -310,7 +311,7 @@ y 270 └──────────────┴────────�
 
 | Element | Rect (x, y, w, h) | Notes |
 |---|---|---|
-| Top bar | 0, 0, 480, 24 | Left x 4: Night + encounter label. Centre: relic bar. Right: coin + money (`G1`) at x 420, settings 16×16 at x 460, y 4 |
+| Top bar | 0, 0, 480, 24 | Left x 4: Night + encounter label. Centre: relic bar. Right: coin + money (`G1`), then two 16×16 icon buttons: the Recipe **Codex** (book) and Settings (gear), both with tooltips. Shared by Night Map, Encounter and Shop |
 | Relic bar | centred, y 2, slots 20×20, gap 4 | 5 slots = 116 px (6 with Reliquary = 140). Drag to reorder. Disabled relic: `N0` checker dim |
 | Rule panel | 4, 28, 120, 40 | Boss: rule short text `F2` (full text in the info panel); Mob / Champion: role + reward |
 | Score panel | 4, 72, 120, 40 | Power box 48×14 at (8, 76) `I1`, `×`, Count box 48×14 at (68, 76) `R1`; line 2 at y 94 (numbers font): `= projected / HP`, projected ≥ HP → `L2` |
@@ -329,25 +330,38 @@ y 270 └──────────────┴────────�
 | Action buttons | 2×2 at (356, 210), (418, 210), (356, 238), (418, 238); each 58×24 | Row 1 REROLL / BIND = secondary; row 2 SUMMON / ATTACK = primary. Anchored bottom-right |
 
 ### 6.3 Shop screen
+The screen is dark (`N0`); only the right-column corner is decorated (D-R12). Every panel sits
+on one grid: columns **A** x 4–124, **B** x 128–352 (flexes with the canvas), **C** x 356–476;
+rows **1** y 28–148, **2** y 152–266. Shared edges, 4 px gaps, nothing hand-offset.
+
 | Element | Rect | Notes |
 |---|---|---|
-| Top bar + relic bar | as Encounter | Click relic → info panel with SELL ($x) |
-| Header | 4, 28, 120, 40 | Shopkeeper 32×32 at (8, 32); title "CRYPT MARKET" `F2` at x 44 |
-| Held consumables | 8, 72, slots 20×20 | |
-| Info panel | 4, 100, 120, 166 | Item details + SELL button for owned relics / consumables |
-| Item cards ×3 | x 128 / 204 / 280, y 28, each 72×128, gap 4 | `panel_card`; rarity stripe 4 px top; icon ×2 (32×32) at card (20, 10); name 2 lines; price `G1`; BUY 64×18 at card y+82; consumables also USE (buy & use) at y+104 |
-| Equipment card | 128, 160, 224, 44 | Icon ×2 left, name + effect text, price, BUY |
-| Your dice strip | 128, 208, 224, 24 | Current dice faces (click → Dice Inspector) |
-| Reroll shop | 356, 28, 120, 24 | "REROLL $4" secondary |
-| Recipes | 356, 56, 120, 24 | Opens Run Info |
-| Continue | 356, 238, 120, 24 | primary "NEXT FIGHT" |
+| Top bar + relic bar | as Encounter | Click relic → info panel with SELL ($x); Codex / Settings icons |
+| Equipment card | A1: 4, 28, 120, 120 | `panel_card`: "EQUIPMENT", icon ×2, name + price, effect, BUY (one offer per night) |
+| Item cards ×3 | B1: 128 / 204 / 280, 28, each 72×120 | `panel_card`; rarity stripe 4 px top; icon ×2; name 2 lines; price `G1`; BUY; consumables also BUY & USE. Cards share column B's width evenly |
+| Info panel | A2: 4, 152, 120, 114 | Hover / click details; USE and SELL actions for owned items |
+| Your loadout | B2: 128, 152, 224, 114 | Rows: ITEMS (held consumable slots), DICE (click → Dice Inspector), GEAR (owned equipment icons with info) |
+| Decor | C1: 356, 28, 120, 182 | `assets/bg/shop_decor.png`: arched alcove, shelf (skulls, candle, coins); the shopkeeper sprite stands in front at the bottom; "CRYPT MARKET" title above the arch |
+| Reroll shop | 356, 214, 120, 24 | "REROLL $4" secondary, tooltip |
+| Continue | 356, 242, 120, 24 | primary "NEXT FIGHT" |
 
 ### 6.4 Night Map
-- Top bar as Encounter (Night label "NIGHT 3 / 8", relics, money).
+- Background: a plain ordered-dither fade, light at the top (`N3`) to dark at the bottom
+  (`N0`), no scenery (D-R12): the cards carry the information.
+- Top bar as Encounter (Night label "NIGHT 3 / 8", relics, money, Codex, Settings).
 - 3 encounter cards side by side: x 8 / 164 / 320, y 32, 152×192 (`panel_card`): enemy sprite ×1
-  on pedestal at the top centre, name, role, HP, reward, rule chip (boss). Current card has
-  `G1` 1 px border; defeated cards stamped "DEFEATED" (`R1`, pre-drawn stamp).
+  on pedestal at the top centre, name, role, HP, reward, rule chip (boss); hover → tooltip.
+  Current card has `G1` 1 px border; defeated cards stamped "DEFEATED" (`R1`, pre-drawn stamp).
 - FIGHT button: centred, y 236, 160×24 primary.
+
+### 6.4b Hover, press and tooltips (all screens, D-R13)
+- Buttons: hover = lighter 9-slice + label lifted 1 px; press = 120 ms squash (1 → 0.92 → 1).
+- Custom controls (slots, dice, chips, face tiles): hover highlight drawn by the control (`N5`
+  ring, 1 px lift, bright chip border) and the same press squash.
+- Tooltips: one pixel panel above everything, beside the pointer (flips at the canvas edges,
+  never under the pointer). Opens after 0.25 s at rest; moving to another target switches it
+  at once; leaving keeps it 0.15 s (gaps between slots never blink); hidden while dragging,
+  holding a button, and after a click until the pointer reaches another target.
 
 ### 6.5 Title
 - `bg_title` centred; logo 160×48 centred at y 40.
@@ -391,6 +405,7 @@ y 270 └──────────────┴────────�
 | `chip.png` | 16×12 | 4 | `N3` fill, `N5` border |
 | `btn_primary_{normal,pressed,disabled}.png` | 24×24 | 6 | `F1` fill, `F2` highlight, `F0` shadow |
 | `btn_secondary_{normal,pressed,disabled}.png` | 24×24 | 6 | `N4` fill, `N5` highlight, `N2` shadow |
+| `btn_{primary,secondary}_hover.png` | 24×24 | 6 | The normal button one ramp step lighter (`F1→F2`, `F2→V2` / `N4→N5`, `N5→N6`), derived by `tools/art/ui_buttons.py` (D-R09) |
 | `slot.png`, `slot_selected.png` | 20×20 | – | Empty slot `N2` with `N3` dashed inner border; selected `G1` ring |
 | `hp_frame.png` | 16×7 | 3 | `N0` outline, `N2` inner |
 | `hp_fill.png` | 1×5 | tile | `R1` rows 0–3, `R0` row 4 |
@@ -509,7 +524,8 @@ VFX sprites (`vfx/`):
 | Equipment icons | `assets/icons/equipment/<equipment_id>.png` | 16×16 | 1 | 8 |
 | Stat icons | `assets/icons/stats/<name>.png` | 8×8 | 1 | 9 |
 | UI 9-slices & parts | `assets/ui/*.png` (§7) | various | 1 | 22 |
-| Backgrounds | `assets/bg/bg_title.png`, `bg_map.png`, `bg_battle.png`, `bg_shop.png` | 640×300 (largest canvas), drawn centred; the 480×270 centre at (80, 15) is the safe area | 1 | 4 |
+| Backgrounds | `assets/bg/bg_title.png`, `bg_map.png`, `bg_battle.png` | 640×300 (largest canvas), drawn centred; the 480×270 centre at (80, 15) is the safe area | 1 | 3 |
+| Shop decor | `assets/bg/shop_decor.png` | 120×182 (shop column C1) | 1 | 1 |
 | VFX | `assets/vfx/*.png` (§10) | various | various | 7 |
 | Logo | `assets/ui/logo.png` | 160×48 | 1 | 1 |
 | App icon | `assets/icon/app_icon_32.png` → exported ×16 to 512×512 | 32×32 | 1 | 1 |
@@ -518,12 +534,19 @@ VFX sprites (`vfx/`):
 
 All filenames lowercase snake_case of the GAME_SPEC ID (e.g. `skeleton_warrior.png`, `crown_of_the_lich.png`).
 
-Background rules:
-- `bg_battle`: graveyard at night, crooked fence, distant village with tiny `F2` windows, moon top-right. The battlefield area (bg x 128–512, y 98–268: the centre column on every canvas size) uses only `N1`/`N2` with very low detail; the horizon (fence, village) sits behind the enemy zone above it.
-- `bg_shop`: crypt interior, candles (`F1/F2` 1–2 px flames), shelves silhouettes.
-- `bg_map`: winding village road with 3 lantern posts (cards sit on top).
-- `bg_title`: big moon, castle silhouette, bats.
-- Max 16 colours per background, ordered dithering allowed in sky only.
+Background rules (style reference: the designer's hand-drawn `bg_title` and `bg_battle`, 2026-10-22):
+- **Style:** big flat silhouettes in `N0`–`N2`; the sky fades from the darkest value in
+  row-alternating ordered dither; single-pixel `N7` stars; one bright focal point (moon, white
+  dead trees); a few `F2` warm dots. Low detail, no texture patterns, no extra shading. Every
+  element states what the screen is for.
+- `bg_title`, `bg_battle`: **hand-drawn by the designer — no generator owns them; never edit
+  without the designer's permission.** The battlefield area (bg x 128–512, y 98–268) stays
+  plain so the army reads.
+- `bg_map` (`tools/art/backgrounds.py`): a plain light-to-dark fade (`N3` → `N0`), no scenery.
+- `shop_decor` (`tools/art/backgrounds.py`): the shop's only decoration, 120×182 in column C —
+  an arched alcove with the undertaker's shelf (skulls, one tall candle, a pile of coins); the
+  shopkeeper sprite stands in front of it. The rest of the shop screen is plain `N0`.
+- Max 16 colours per background, ordered dithering in the sky / glow only.
 
 ---
 
@@ -533,5 +556,5 @@ Background rules:
 - No recognisable film characters: no Jack Skellington-like pumpkin-king figure, no Universal-style Frankenstein (flat head, neck bolts), no Disney Evil Queen silhouette. Headless Horseman is public-domain folklore — use an original design.
 - No real-world religious symbols on enemies (use invented sun/eye/bell emblems).
 - No real brand marks (e.g. on the spirit board).
-- If an AI image tool is used: confirm its terms allow commercial use and that outputs can be owned/licensed by the studio; keep prompts and raw outputs in `art_source/` for provenance.
+- If an AI image tool is used: confirm its terms allow commercial use and that outputs can be owned/licensed by the studio; keep prompts and raw outputs in `art_source/` for provenance. Designer source files (`.aseprite`, layered PNGs) also live in `art_source/` (it has a `.gdignore`, so Godot never imports or ships it).
 - Fonts: confirm licence (§8); keep licence files in `assets/fonts/LICENSES/`.

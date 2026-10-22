@@ -65,13 +65,6 @@ grow_vertical = 0
 theme_override_constants/separation = 6
 alignment = 1
 
-[node name="Recipes" type="Button" parent="Buttons"]
-unique_name_in_owner = true
-custom_minimum_size = Vector2(80, 24)
-layout_mode = 2
-mouse_default_cursor_shape = 2
-theme_type_variation = &"SecondaryButton"
-
 [node name="Fight" type="Button" parent="Buttons"]
 unique_name_in_owner = true
 custom_minimum_size = Vector2(160, 24)

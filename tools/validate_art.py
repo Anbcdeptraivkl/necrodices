@@ -14,7 +14,7 @@ Checks:
     row 15 is a single N0 shadow run 4-6 px wide
   - enemies (+ shopkeeper): lowest opaque pixel on row 31 in every frame
   - no fully transparent frames
-  - palette files: hallow32.png is the 32x1 strip in palette order, hallow32.gpl exists
+  - palette files: hallow32.png is the palette strip (33x1) in palette order, hallow32.gpl exists
 """
 
 from __future__ import annotations
@@ -127,9 +127,9 @@ def check_palette() -> list[str]:
         return probs
     with Image.open(p) as im:
         img = im.convert("RGBA")
-    if img.size != (32, 1):
-        return [f"{PALETTE_PNG}: size {img.size}, expected 32x1"]
-    got = [img.getpixel((i, 0)) for i in range(32)]
+    if img.size != (len(HALLOW32), 1):
+        return [f"{PALETTE_PNG}: size {img.size}, expected {len(HALLOW32)}x1"]
+    got = [img.getpixel((i, 0)) for i in range(len(HALLOW32))]
     want = [(*hex_to_rgb(v), 255) for v in HALLOW32.values()]
     if got != want:
         probs.append(f"{PALETTE_PNG}: does not match tools/palette.py")

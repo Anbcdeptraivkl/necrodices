@@ -28,8 +28,9 @@ tools\ui_test.cmd                     :: UI smoke tests in the real game (autolo
 tools\screenshot.cmd encounter captures\x.png   :: capture a preset (scenes/dev/capture.gd PRESETS)
 tools\balance_sim.cmd --mode=baseline --trials=20000   :: Appendix A regression (§5.6)
 tools\balance_sim.cmd --mode=runs --trials=1000        :: Appendix B bot: reach / win / deaths by rule
-tools\export_web.cmd                  :: Web release → build\web + build\rattle_and_roll_web.zip (needs 4.6.3 templates)
-python tools\art\<units|enemies_dice|icons|scenery|howto>.py [--only id] [--preview out.png]   :: final art generators
+tools\export_web.cmd                  :: Web release → build\web + build\roll_the_bones_web.zip (needs 4.6.3 templates)
+tools\serve_web.cmd [port]            :: play the Web build at http://127.0.0.1:8060/ (opening index.html from disk fails: file:// blocks fetch)
+python tools\art\<units|enemies_dice|icons|scenery|backgrounds|ui_buttons|howto>.py [--only id | --all] [--preview out.png]   :: art generators: no flag = create missing files only (hand edits are never overwritten); --only rewrites the named ids; --all rewrites every changed id
 "%GODOT_EXE%" --path . --resolution 1600x900 res://scenes/dev/display_probe.tscn  :: print scale / canvas for a window size
 ```
 
@@ -47,5 +48,6 @@ data/       content JSON (GAME_SPEC §9)
 assets/     art per ART_SPEC §11 (manifest.json is generated)
 tools/      python + cmd tooling, balance_sim.gd
 tests/      _run.gd, _suite.gd, test_*.gd (headless core), ui/ui_runner.tscn (in-game UI flows)
-docs/       plan, tech notes
+docs/       plan, tech notes, wireframes
+art_source/ designer source files (.aseprite, layered PNGs); .gdignore, never exported
 ```

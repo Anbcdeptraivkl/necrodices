@@ -1,7 +1,7 @@
 {
  "generated_by": "tools/build_manifest.py",
  "spec": "ART_SPEC \u00a711",
- "count": 169,
+ "count": 171,
  "files": [
   {
    "id": "skeleton_warrior",
@@ -1751,6 +1751,20 @@
    "margin": 6
   },
   {
+   "id": "btn_primary_hover",
+   "path": "assets/ui/btn_primary_hover.png",
+   "w": 24,
+   "h": 24,
+   "frame_w": 24,
+   "frames": 1,
+   "category": "ui",
+   "flags": [],
+   "tag": "BPH",
+   "ramp": null,
+   "accent": null,
+   "margin": 6
+  },
+  {
    "id": "btn_secondary_normal",
    "path": "assets/ui/btn_secondary_normal.png",
    "w": 24,
@@ -1788,6 +1802,20 @@
    "category": "ui",
    "flags": [],
    "tag": "BSD",
+   "ramp": null,
+   "accent": null,
+   "margin": 6
+  },
+  {
+   "id": "btn_secondary_hover",
+   "path": "assets/ui/btn_secondary_hover.png",
+   "w": 24,
+   "h": 24,
+   "frame_w": 24,
+   "frames": 1,
+   "category": "ui",
+   "flags": [],
+   "tag": "BSH",
    "ramp": null,
    "accent": null,
    "margin": 6
@@ -2112,15 +2140,15 @@
    "accent": "N2"
   },
   {
-   "id": "bg_shop",
-   "path": "assets/bg/bg_shop.png",
-   "w": 640,
-   "h": 300,
-   "frame_w": 640,
+   "id": "shop_decor",
+   "path": "assets/bg/shop_decor.png",
+   "w": 120,
+   "h": 182,
+   "frame_w": 120,
    "frames": 1,
    "category": "bg",
    "flags": [],
-   "tag": "BS",
+   "tag": "SD",
    "ramp": "N1",
    "accent": "N2"
   },

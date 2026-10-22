@@ -14,7 +14,7 @@ const PALETTE := {
 	"V0": Color("#7d7a12"), "V1": Color("#e3df34"), "V2": Color("#fbfaa6"),
 	"M0": Color("#4f5b66"), "M1": Color("#93a3ae"), "M2": Color("#dfe8ec"),
 	"R0": Color("#8c1c34"), "R1": Color("#e0344a"), "G0": Color("#c98a17"), "G1": Color("#ffe066"),
-	"S0": Color("#a8643c"), "S1": Color("#f0b896"),
+	"S0": Color("#a8643c"), "S1": Color("#f0b896"), "K0": Color("#000000"),
 }
 const ELEMENT_RAMP := {"BONE": "B", "FIRE": "F", "ICE": "I", "LEAF": "L", "VOLT": "V", "METAL": "M"}
 ## Group bind colours, cycled by pending index (ART_SPEC §3; G1 is kept for selection, D-R06).
@@ -25,6 +25,14 @@ const MASK_KEYS := {
 }
 
 static var _cache := {}
+
+
+## A 1 px rectangle outline on whole pixels (draw_rect with filled = false lands on half pixels).
+static func draw_ring(item: CanvasItem, r: Rect2, c: Color) -> void:
+	item.draw_rect(Rect2(r.position, Vector2(r.size.x, 1)), c)
+	item.draw_rect(Rect2(r.position + Vector2(0, r.size.y - 1), Vector2(r.size.x, 1)), c)
+	item.draw_rect(Rect2(r.position, Vector2(1, r.size.y)), c)
+	item.draw_rect(Rect2(r.position + Vector2(r.size.x - 1, 0), Vector2(1, r.size.y)), c)
 
 
 static func colour(key: String) -> Color:

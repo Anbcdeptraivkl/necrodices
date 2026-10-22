@@ -1,6 +1,6 @@
-# RATTLE & ROLL — Game Loop Spec v1.0
+# ROLL THE BONES — Game Loop Spec v1.0
 
-> Working title. Halloween 2026 dice-summoning roguelike (Balatro-style scoring, no poker).
+> Title: **Roll the Bones** (renamed from "Rattle & Roll" on 2026-10-21, DECISIONS D-A13). Halloween 2026 dice-summoning roguelike (Balatro-style scoring, no poker).
 > Companion document: `ART_SPEC.md` (resolution, palette, sprites, UI layout, asset manifest).
 > Audience: human developers **and** LLM coding agents. Every rule here is normative unless marked *(tunable)* or *(stretch)*.
 

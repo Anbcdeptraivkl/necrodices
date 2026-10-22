@@ -1,5 +1,5 @@
 GIMP Palette
-Name: Hallow32
+Name: Hallow32+K0
 Columns: 8
 #
  13  10  20	N0 #0d0a14
@@ -34,3 +34,4 @@ Columns: 8
 255 224 102	G1 #ffe066
 168 100  60	S0 #a8643c
 240 184 150	S1 #f0b896
+  0   0   0	K0 #000000

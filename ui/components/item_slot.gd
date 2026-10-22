@@ -24,6 +24,10 @@ var icon: Texture2D:
 	set(v):
 		icon = v
 		queue_redraw()
+var hovered := false:
+	set(v):
+		hovered = v
+		queue_redraw()
 ## Horizontal icon offset in px, tweened by playback to shake a relic that fires.
 var shake := 0.0:
 	set(v):
@@ -31,8 +35,15 @@ var shake := 0.0:
 		queue_redraw()
 
 
+func _ready() -> void:
+	set_meta(&"press_fx", true)
+	set_meta(&"hover_fx", true)
+
+
 func _draw() -> void:
 	draw_texture(Art.ui("slot_selected" if selected else "slot"), Vector2.ZERO)
+	if hovered and not selected:
+		Art.draw_ring(self, Rect2(Vector2(1, 1), size - Vector2(2, 2)), Art.colour("N5"))
 	if icon != null:
 		var at := ((size - icon.get_size()) / 2.0).floor() + Vector2(roundf(shake), 0)
 		draw_texture(icon, at)

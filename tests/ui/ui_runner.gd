@@ -44,6 +44,7 @@ func _run() -> void:
 	await _case("continue_restores_shop", _continue_restores_shop)
 	await _case("loss_reaches_end", _loss)
 	await _case("overlays_open", _overlays)
+	await _case("tooltip_no_flicker", _tooltip_states)
 	_game.store.delete_run()
 	print("UI %s (%d failures)" % ["PASSED" if _failures == 0 else "FAILED", _failures])
 	get_tree().quit(1 if _failures > 0 else 0)
@@ -197,7 +198,7 @@ func _overlays() -> void:
 	_game.start_encounter()
 	await _frames()
 	var screen := _scene()
-	(screen.get_node("%Book") as Button).pressed.emit()
+	(screen.get_node("%TopBar").get_node("%Codex") as Button).pressed.emit()
 	await _frames(2)
 	var host: OverlayHost = screen.get_node("%Overlays")
 	_check(_find(host, "RunInfo") != null, "recipe book opens")
@@ -231,3 +232,47 @@ func _find(host: Node, name: String) -> Node:
 		if n.name == name:
 			return n
 	return null
+
+
+## The tooltip state machine (autoload UiFx): rest before opening, no blink across a gap,
+## instant switch between targets, close after the grace, muted after a click.
+func _tooltip_states() -> void:
+	var fx := get_node("/root/UiFx")
+	var a := Control.new()
+	var b := Control.new()
+	a.set_meta(&"tip", "A")
+	b.set_meta(&"tip", "B")
+	add_child(a)
+	add_child(b)
+	var panel: Control = fx.get(&"_tip_panel")
+	fx.call(&"_update_tip", a, 0.1)
+	fx.call(&"_update_tip", a, 0.1)
+	_check(not panel.visible, "not before the rest time")
+	fx.call(&"_update_tip", a, 0.2)
+	_check(panel.visible, "opens after resting")
+	fx.call(&"_update_tip", null, 0.05)
+	_check(panel.visible, "a gap between slots does not close it")
+	fx.call(&"_update_tip", b, 0.01)
+	_check(panel.visible and fx.get(&"_tip_target") == b, "switches to the next target at once")
+	fx.call(&"_update_tip", null, 0.1)   # enters the grace
+	fx.call(&"_update_tip", null, 0.1)
+	_check(panel.visible, "still open inside the grace time")
+	fx.call(&"_update_tip", null, 0.1)
+	_check(not panel.visible, "closes after the grace time")
+	fx.call(&"_update_tip", a, 0.3)
+	fx.call(&"_update_tip", a, 0.3)
+	_check(panel.visible, "reopens on a target")
+	var click := InputEventMouseButton.new()
+	click.pressed = true
+	click.button_index = MOUSE_BUTTON_LEFT
+	fx.call(&"_input", click)
+	fx.call(&"_update_tip", a, 0.5)
+	fx.call(&"_update_tip", a, 0.5)
+	_check(not panel.visible, "muted on the clicked target")
+	fx.call(&"_update_tip", b, 0.3)
+	fx.call(&"_update_tip", b, 0.3)
+	_check(panel.visible, "unmuted on another target")
+	fx.call(&"_set_tip", 0, null)
+	a.queue_free()
+	b.queue_free()
+	await _frames(1)

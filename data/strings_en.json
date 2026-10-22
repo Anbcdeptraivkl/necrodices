@@ -143,5 +143,16 @@
   "howto_2": "SUMMON commits your groups (3 summons per fight, 2 rerolls shared). Unbound dice are lost. ATTACK! fights right away.",
   "howto_3": "Damage = Power × Count. Relics fire left to right — drag them to reorder. Beat the enemy's HP or the run ends.",
   "howto_4": "Win to earn money. In the Crypt Market buy relics, tomes (level up units), sigils and inks (rewrite die faces). Survive 8 nights.",
-  "title_cash_out": "ENEMY DEFEATED"
+  "title_cash_out": "ENEMY DEFEATED",
+  "tip_codex": "Recipe Codex",
+  "tip_settings": "Settings",
+  "lbl_loadout": "YOUR LOADOUT",
+  "lbl_consumables": "ITEMS",
+  "lbl_dice": "DICE",
+  "lbl_equipment": "EQUIPMENT",
+  "lbl_for_sale": "FOR SALE",
+  "tip_reroll_shop": "New stock for the three cards",
+  "msg_no_equipment_owned": "none yet",
+  "lbl_equipment_short": "GEAR",
+  "tip_dice_row": "Click to inspect every face"
 }

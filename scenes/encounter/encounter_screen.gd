@@ -96,7 +96,6 @@ func _build_static() -> void:
 			return InfoText.consumable(db, run.consumables[i]) if i < run.consumables.size() else {})
 		%Consumables.add_child(s)
 		_consumable_slots.append(s)
-	%Book.icon = Art.stat("book")
 	%Reroll.text = db.text("btn_reroll")
 	%Bind.text = db.text("btn_bind")
 	%Summon.text = db.text("btn_summon")
@@ -109,7 +108,7 @@ func _connect_input() -> void:
 	%Bind.pressed.connect(_on_bind)
 	%Summon.pressed.connect(_on_summon)
 	%Attack.pressed.connect(_on_attack)
-	%Book.pressed.connect(func() -> void: _open(RUN_INFO_SCENE).call(&"setup", db, run))
+	_top.codex_pressed.connect(func() -> void: _open(RUN_INFO_SCENE).call(&"setup", db, run))
 	_top.settings_pressed.connect(func() -> void: _open(SETTINGS_SCENE))
 	_top.reorder_requested.connect(func(a: int, b: int) -> void:
 		if not _playing and RunFlow.reorder_relic(run, a, b):

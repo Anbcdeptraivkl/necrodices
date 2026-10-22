@@ -1,4 +1,4 @@
-# Implementation Plan — Rattle & Roll (NecroDices)
+# Implementation Plan — Roll the Bones (NecroDices)
 
 Status: **2026-10-20 — M0–M7 implemented** (full game loop, final code-generated art, audio,
 balance tuned by sim). Open: Web export needs the 4.6.3 templates, itch.io page, human
@@ -342,7 +342,7 @@ once M2 lands (separate files: `fx/` vs `scenes/overlays/`).
 | M4 | ✅ | `test_content`: every relic (25, with / without), consumable (18), equipment (8), boss rule (5); relic drag-reorder (TopBar drag & drop → `RunFlow.reorder_relic`) | — |
 | M5 | ✅ (desktop) | PresentationQueue + CombatPlayer (timeline compressed to 6 s, ×1/×2/×4, tap-skip), HordeRenderer (pool 260, §11.1 curve, tiers, LEGION), enemy flash / dissolve / Enraged shader, juice with reduce-motion, final art (units, enemies, dice, icons, backgrounds, VFX, logo), procedural SFX + 2 music loops | Frame-time check on a mid-range laptop browser and an Android browser (needs the Web build) |
 | M6 | ✅ | Atomic run save at encounter start + after every shop command (D-G03), Continue routes on the saved phase (`ui_test continue_restores_shop` = identical state), Settings overlay, 5 coach marks, How to Play (4 pages, images captured from the game), Run Info recipe book | — |
-| M7 | ◐ | Balance: Appendix B bot 1,000 runs → 55.7% reach Night 4, 0.2% win (D-G02); Web release exported with the 4.6.3 templates (`build/rattle_and_roll_web.zip`, 10 MB, 9 files, `index.html` at the root); local smoke test in a browser: Title → New Run → Night Map → Encounter, no console errors | Upload to a draft itch.io page (embed 960×540 + fullscreen), browser QA matrix, human playtest |
+| M7 | ◐ | Balance: Appendix B bot 1,000 runs → 55.7% reach Night 4, 0.2% win (D-G02); Web release exported with the 4.6.3 templates (`build/roll_the_bones_web.zip`, 10 MB, 9 files, `index.html` at the root); local smoke test in a browser: Title → New Run → Night Map → Encounter, no console errors | Upload to a draft itch.io page (embed 960×540 + fullscreen), browser QA matrix, human playtest |
 
 ### Next steps (in order)
 

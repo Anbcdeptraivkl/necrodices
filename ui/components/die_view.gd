@@ -10,7 +10,13 @@ const RAISE := 3
 const ROLL_FRAME_TIME := 0.05
 
 var index := -1
+var hovered := false:
+	set(v):
+		hovered = v
+		_place_face()
 var _rolling := 0.0
+var _selected := false
+var _locked := false   # bound or shackled: no hover lift
 @onready var _face: Control = %Face
 @onready var _body: TextureRect = %Body
 @onready var _glyph: TextureRect = %Glyph
@@ -26,6 +32,8 @@ func _ready() -> void:
 	_bound.texture = Art.dice("die_bound")
 	_shackle.texture = Art.dice("die_shackle")
 	set_process(false)
+	set_meta(&"press_fx", true)
+	set_meta(&"hover_fx", true)
 
 
 func show_state(face: Face, selected: bool, bound_group: int, shackled: bool) -> void:
@@ -36,8 +44,22 @@ func show_state(face: Face, selected: bool, bound_group: int, shackled: bool) ->
 	if bound_group >= 0:
 		_bound.self_modulate = Art.group_colour(bound_group)
 	_shackle.visible = shackled
-	_face.position.y = 0 if selected else RAISE
+	_selected = selected
+	_locked = shackled or bound_group >= 0
+	_place_face()
 	mouse_default_cursor_shape = Control.CURSOR_ARROW if shackled or bound_group >= 0 else Control.CURSOR_POINTING_HAND
+
+
+## Selected: raised fully; hovered (free die): lifted 1 px; otherwise at rest.
+func _place_face() -> void:
+	if _face == null:
+		return
+	if _selected:
+		_face.position.y = 0
+	elif hovered and not _locked and mouse_filter != Control.MOUSE_FILTER_IGNORE:
+		_face.position.y = RAISE - 1
+	else:
+		_face.position.y = RAISE
 
 
 ## Tumble frames for `duration` seconds (4 × 50 ms at ×1), then the face lands.

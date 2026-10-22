@@ -4,13 +4,16 @@ Art is authored as hand-placed row-string grids with a legend of palette keys, n
 primitives. A generator module (tools/art/<group>.py) defines ASSETS = {id: draw_fn} where
 draw_fn() returns a PIL RGBA image at the exact manifest size, and calls `run(ASSETS, argv)`.
 
-    python tools/art/<group>.py                 # write every id of the group that changed
-    python tools/art/<group>.py --only frost_*  # only matching ids
-    python tools/art/<group>.py --preview out.png  # x8 contact sheet, writes no asset
+    python tools/art/<group>.py                 # create MISSING files only (never overwrites)
+    python tools/art/<group>.py --only frost_*  # (re)write the matching ids
+    python tools/art/<group>.py --all           # rewrite every id whose pixels differ
+    python tools/art/<group>.py --preview out.png  # x6 contact sheet, writes no asset
 
 Rules enforced here:
   - the image size must equal the manifest entry (path, w, h);
   - every opaque pixel must be a Hallow32 colour (or a mask key for `mask` files);
+  - an existing PNG is the designer's truth: it is overwritten only when its id is named with
+    `--only` or with `--all` (skill godot-pixel-art-generation rule 11);
   - a file is written only when its pixels changed (no byte churn in git).
 Run `python tools/validate_art.py` afterwards; it is the gate.
 """
@@ -47,6 +50,7 @@ BASE_LEGEND: Legend = {
     "r": "R0", "R": "R1",             # red
     "o": "G0", "O": "G1",             # gold
     "s": "S0", "S": "S1",             # skin
+    "k": "K0",                        # pure black (designer sky / void)
     # mask keys (wisp masks only)
     "x": "A0", "X": "A1", "y": "A2",  # primary ramp
     "z": "C0", "Z": "C1", "q": "C2",  # secondary ramp
@@ -200,7 +204,8 @@ def run(assets: dict[str, Callable[[], Image.Image]], argv: list[str]) -> int:
     only = [argv[i + 1] for i, a in enumerate(argv) if a == "--only" and i + 1 < len(argv)]
     preview = next((argv[i + 1] for i, a in enumerate(argv) if a == "--preview" and i + 1 < len(argv)), None)
     ids = [i for i in assets if not only or any(fnmatch.fnmatch(i, g) for g in only)]
-    problems, written, same, images = [], 0, 0, {}
+    overwrite = bool(only) or "--all" in argv
+    problems, written, same, kept, images = [], 0, 0, 0, {}
     for asset_id in ids:
         if asset_id not in entries:
             problems.append(f"{asset_id}: not in manifest")
@@ -221,6 +226,9 @@ def run(assets: dict[str, Callable[[], Image.Image]], argv: list[str]) -> int:
         if path.exists() and _same(Image.open(path), img):
             same += 1
             continue
+        if path.exists() and not overwrite:
+            kept += 1  # differs from the recipe: maybe hand-edited; name it with --only to replace
+            continue
         path.parent.mkdir(parents=True, exist_ok=True)
         img.save(path)
         written += 1
@@ -230,7 +238,7 @@ def run(assets: dict[str, Callable[[], Image.Image]], argv: list[str]) -> int:
     for p in problems:
         print("PROBLEM", p)
     if not preview:
-        print(f"art: wrote {written}, unchanged {same}, problems {len(problems)}")
+        print(f"art: wrote {written}, unchanged {same}, kept {kept} (differ, not overwritten), problems {len(problems)}")
     return 1 if problems else 0
 
 

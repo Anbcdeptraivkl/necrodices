@@ -53,7 +53,8 @@ def common_top(w: int) -> list:
     rx = (w - relic_w) // 2
     rows = [("bar", (0, 0, w, 24), "NIGHT 3 · BOSS")]
     rows += [("slot", (rx + i * 24, 2, 20, 20), f"R{i + 1}") for i in range(5)]
-    rows += [("money", (w - 60, 4, 36, 16), "$12"), ("slot", (w - 20, 4, 16, 16), "S")]
+    rows += [("money", (w - 78, 4, 36, 16), "$12"), ("secondary", (w - 40, 4, 16, 16), "CX"),
+             ("secondary", (w - 20, 4, 16, 16), "S")]
     return rows
 
 
@@ -70,7 +71,6 @@ def encounter(w: int, h: int) -> list:
         ("money", (8, 94, 112, 14), "= 2,520 / 1,200"),
         ("panel", (4, 116, 120, 12), "B5 F1 I1 L0 V0 M0"),
         ("slot", (8, 132, 20, 20), "C1"), ("slot", (32, 132, 20, 20), "C2"),
-        ("slot", (100, 132, 20, 20), "BK"),
         ("panel", (4, 156, 120, h - 160), "INFO PANEL\n(docked tooltip:\nrelic / die / unit /\nconsumable text)"),
         ("enemy", (cx + (cw - 32) // 2, 28, 32, 32), "EN"),
         ("chip", (cx + (cw - 48) // 2, 58, 48, 4), ""),
@@ -94,31 +94,26 @@ def encounter(w: int, h: int) -> list:
 
 
 def shop(w: int, h: int) -> list:
+    """Grid: columns A 4..124, B 128..w-128, C w-124..w-4; rows 1 y 28..148, 2 y 152..h-4."""
     cw = w - 256
     cx = 128
     rx = w - 124
     card_w = (cw - 8) // 3
     rows = common_top(w)
-    rows += [
-        ("enemy", (8, 32, 32, 32), "SK"), ("bar", (44, 40, 76, 12), "CRYPT MARKET"),
-        ("slot", (8, 72, 20, 20), "C1"), ("slot", (32, 72, 20, 20), "C2"),
-        ("panel", (4, 100, 120, h - 104), "INFO PANEL\n(+ SELL $x)"),
-    ]
+    rows += [("card", (4, 28, 120, 120), "EQUIPMENT\nicon x2\nname $10\neffect\n\n\nBUY"),
+             ("panel", (4, 152, 120, h - 156), "INFO PANEL\n(+ USE / SELL)")]
     for i in range(3):
         x = cx + i * (card_w + 4)
-        rows += [("card", (x, 28, card_w, 128), ""), ("power", (x, 28, card_w, 4), ""),
-                 ("slot", (x + (card_w - 32) // 2, 38, 32, 32), "ICON×2"),
-                 ("bar", (x + 4, 74, card_w - 8, 18), "Name\n2 lines"),
-                 ("money", (x + 4, 96, card_w - 8, 10), "$6"),
-                 ("primary", (x + 4, 110, card_w - 8, 18), "BUY"),
-                 ("secondary", (x + 4, 132, card_w - 8, 18), "USE")]
-    rows += [
-        ("card", (cx, 160, cw, 44), "EQUIPMENT  icon · name · effect · $10 · BUY"),
-        ("panel", (cx, 208, cw, 24), "YOUR DICE (tap → inspector)"),
-        ("secondary", (rx, 28, 120, 24), "REROLL $4"),
-        ("secondary", (rx, 56, 120, 24), "RECIPES"),
-        ("primary", (rx, h - 32, 120, 24), "NEXT FIGHT"),
-    ]
+        rows += [("card", (x, 28, card_w, 120), ""), ("power", (x, 28, card_w, 4), ""),
+                 ("slot", (x + (card_w - 32) // 2, 34, 32, 32), "ICONx2"),
+                 ("bar", (x + 4, 68, card_w - 8, 18), "Name\n2 lines"),
+                 ("money", (x + 4, 88, card_w - 8, 10), "$6"),
+                 ("primary", (x + 4, 100, card_w - 8, 18), "BUY"),
+                 ("secondary", (x + 4, 122, card_w - 8, 18), "USE")]
+    rows += [("panel", (cx, 152, cw, h - 156), "YOUR LOADOUT\nITEMS [C1][C2]\nDICE [d][d][d][d]\nGEAR [e][e]"),
+             ("field", (rx, 28, 120, h - 88), "DECOR\n(alcove, shelf)\n\n\n\nSHOPKEEPER"),
+             ("secondary", (rx, h - 56, 120, 24), "REROLL $4"),
+             ("primary", (rx, h - 28, 120, 24), "NEXT FIGHT")]
     return rows
 
 

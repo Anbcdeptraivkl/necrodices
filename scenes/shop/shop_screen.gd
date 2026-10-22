@@ -1,5 +1,7 @@
 extends Control
-## Crypt Market (GAME_SPEC §4.6, ART_SPEC §6.3): buy / buy & use / sell / reroll / equipment,
+## Crypt Market (GAME_SPEC §4.6, ART_SPEC §6.3, D-R12): dark screen, decorated right corner with
+## the shopkeeper; for-sale cards + equipment, the current loadout and the info panel on one grid.
+## Buy / buy & use / sell / reroll / equipment,
 ## reorder relics, use held consumables. Every command goes through ShopState / ConsumableFx /
 ## RunFlow, then the run is saved, so Continue always restores what the player sees.
 
@@ -34,15 +36,19 @@ func _ready() -> void:
 	_top.setup(db, run, db.text("msg_night") % [run.night, int(db.curve["nights"])])
 	%Title.text = db.text("title_shop")
 	%Reroll.pressed.connect(_on_reroll)
-	%Recipes.text = db.text("btn_recipes")
-	%Recipes.pressed.connect(func() -> void: _open(RUN_INFO_SCENE).call(&"setup", db, run))
+	%Reroll.set_meta(&"tip", db.text("tip_reroll_shop"))
+	%EquipHeader.text = db.text("lbl_equipment")
+	%LoadoutTitle.text = db.text("lbl_loadout")
+	%ItemsLabel.text = db.text("lbl_consumables")
+	%DiceLabel.text = db.text("lbl_dice")
+	%OwnedLabel.text = db.text("lbl_equipment_short")
+	_top.codex_pressed.connect(func() -> void: _open(RUN_INFO_SCENE).call(&"setup", db, run))
 	%Next.text = db.text("btn_next_fight")
 	%Next.pressed.connect(func() -> void:
 		Audio.play("click")
 		Game.leave_shop())
 	%EquipBuy.text = db.text("btn_buy")
 	%EquipBuy.pressed.connect(_on_buy_equipment)
-	%DiceLabel.text = db.text("lbl_your_dice")
 	_top.settings_pressed.connect(func() -> void: _open(SETTINGS_SCENE))
 	_top.relic_pressed.connect(func(i: int) -> void: _select(Pick.RELIC, i))
 	_top.reorder_requested.connect(func(a: int, b: int) -> void:
@@ -56,6 +62,7 @@ func _ready() -> void:
 		card.slot = i
 		card.buy_pressed.connect(_on_buy)
 		card.use_pressed.connect(_on_buy_use)
+		card.size_flags_horizontal = Control.SIZE_EXPAND_FILL
 		%Cards.add_child(card)
 		_cards.append(card)
 	var slot_scene: PackedScene = load(SLOT_SCENE)
@@ -69,7 +76,8 @@ func _ready() -> void:
 		_held.append(s)
 	InfoPanel.attach(%Equipment, func() -> Dictionary:
 		return InfoText.equipment(db, run.equipment_offer) if run.equipment_offer != "" else {})
-	%DiceStrip.gui_input.connect(func(e: InputEvent) -> void:
+	%DiceRow.set_meta(&"tip", db.text("tip_dice_row"))
+	%DiceRow.gui_input.connect(func(e: InputEvent) -> void:
 		if e is InputEventMouseButton and e.pressed:
 			_open(INSPECTOR_SCENE).call(&"setup", db, run, ""))
 	Audio.music("shop")
@@ -103,6 +111,7 @@ func _refresh() -> void:
 		_held[i].icon = Art.consumable(run.consumables[i]) if i < run.consumables.size() else null
 		_held[i].selected = _pick == Pick.CONSUMABLE and _pick_index == i
 	_refresh_dice()
+	_refresh_owned()
 	_refresh_actions()
 
 
@@ -129,6 +138,27 @@ func _refresh_dice() -> void:
 		_dice.append(d)
 	for i in _dice.size():
 		_dice[i].show_state(run.dice[i].faces[_featured_face(run.dice[i])], false, -1, false)
+
+
+## Equipment already bought this run: icons with their info as a tooltip / info-panel entry.
+func _refresh_owned() -> void:
+	var row: HBoxContainer = %Owned
+	for c in row.get_children():
+		row.remove_child(c)
+		c.queue_free()
+	if run.equipment.is_empty():
+		var none := Label.new()
+		none.text = db.text("msg_no_equipment_owned")
+		none.theme_type_variation = &"MutedLabel"
+		row.add_child(none)
+		return
+	for id in run.equipment:
+		var icon := TextureRect.new()
+		icon.texture = Art.equipment(id)
+		icon.custom_minimum_size = Vector2(16, 16)
+		icon.mouse_filter = Control.MOUSE_FILTER_STOP
+		InfoPanel.attach(icon, func() -> Dictionary: return InfoText.equipment(db, id))
+		row.add_child(icon)
 
 
 ## The face worth showing in the strip: the first modified or re-elemented face.

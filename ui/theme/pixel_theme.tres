@@ -8,6 +8,8 @@
 [ext_resource type="Texture2D" path="res://assets/ui/btn_secondary_normal.png" id="sn"]
 [ext_resource type="Texture2D" path="res://assets/ui/btn_secondary_pressed.png" id="sp"]
 [ext_resource type="Texture2D" path="res://assets/ui/btn_secondary_disabled.png" id="sd"]
+[ext_resource type="Texture2D" path="res://assets/ui/btn_primary_hover.png" id="ph"]
+[ext_resource type="Texture2D" path="res://assets/ui/btn_secondary_hover.png" id="sh"]
 [ext_resource type="Texture2D" path="res://assets/ui/panel_dark.png" id="panel_dark"]
 [ext_resource type="Texture2D" path="res://assets/ui/panel_card.png" id="panel_card"]
 [ext_resource type="Texture2D" path="res://assets/ui/panel_tooltip.png" id="panel_tooltip"]
@@ -80,6 +82,28 @@ content_margin_left = 3.0
 content_margin_top = 2.0
 content_margin_right = 3.0
 content_margin_bottom = 3.0
+
+[sub_resource type="StyleBoxTexture" id="p_hover"]
+texture = ExtResource("ph")
+texture_margin_left = 6.0
+texture_margin_top = 6.0
+texture_margin_right = 6.0
+texture_margin_bottom = 6.0
+content_margin_left = 3.0
+content_margin_top = 1.0
+content_margin_right = 3.0
+content_margin_bottom = 4.0
+
+[sub_resource type="StyleBoxTexture" id="s_hover"]
+texture = ExtResource("sh")
+texture_margin_left = 6.0
+texture_margin_top = 6.0
+texture_margin_right = 6.0
+texture_margin_bottom = 6.0
+content_margin_left = 3.0
+content_margin_top = 1.0
+content_margin_right = 3.0
+content_margin_bottom = 4.0
 
 [sub_resource type="StyleBoxEmpty" id="empty"]
 
@@ -173,7 +197,7 @@ Button/colors/font_hover_pressed_color = Color(0.0509804, 0.0392157, 0.0784314, 
 Button/colors/font_disabled_color = Color(0.341176, 0.270588, 0.466667, 1)
 Button/constants/h_separation = 2
 Button/styles/normal = SubResource("p_normal")
-Button/styles/hover = SubResource("p_normal")
+Button/styles/hover = SubResource("p_hover")
 Button/styles/pressed = SubResource("p_pressed")
 Button/styles/hover_pressed = SubResource("p_pressed")
 Button/styles/disabled = SubResource("p_disabled")
@@ -186,7 +210,7 @@ SecondaryButton/colors/font_focus_color = Color(0.956863, 0.937255, 0.894118, 1)
 SecondaryButton/colors/font_hover_pressed_color = Color(0.956863, 0.937255, 0.894118, 1)
 SecondaryButton/colors/font_disabled_color = Color(0.341176, 0.270588, 0.466667, 1)
 SecondaryButton/styles/normal = SubResource("s_normal")
-SecondaryButton/styles/hover = SubResource("s_normal")
+SecondaryButton/styles/hover = SubResource("s_hover")
 SecondaryButton/styles/pressed = SubResource("s_pressed")
 SecondaryButton/styles/hover_pressed = SubResource("s_pressed")
 SecondaryButton/styles/disabled = SubResource("s_disabled")
@@ -222,6 +246,8 @@ TooltipPanel/base_type = &"PanelContainer"
 TooltipPanel/styles/panel = SubResource("panel_tooltip_box")
 ChipPanel/base_type = &"PanelContainer"
 ChipPanel/styles/panel = SubResource("chip_box")
+ChipPanelHover/base_type = &"PanelContainer"
+ChipPanelHover/styles/panel = SubResource("panel_tooltip_box")
 PowerBox/base_type = &"PanelContainer"
 PowerBox/styles/panel = SubResource("power_box_s")
 CountBox/base_type = &"PanelContainer"
