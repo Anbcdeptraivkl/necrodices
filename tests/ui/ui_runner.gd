@@ -211,7 +211,7 @@ func _coffer() -> void:
 	_game.goto("shop")
 	await _frames(3)
 	var shop := _scene()
-	(shop.get_node("%Coffers").get_child(0) as CofferCard).open_pressed.emit(0)
+	(shop.get_node("%Coffers").get_child(0) as ShopCard).buy_pressed.emit(0)
 	await _frames(3)
 	var host: OverlayHost = shop.get_node("%Overlays")
 	var coffer := _find(host, "Coffer")

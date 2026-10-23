@@ -30,6 +30,10 @@ func _ready() -> void:
 	_fight.pressed.connect(func() -> void:
 		Audio.play("click")
 		Game.start_encounter())
+	_top.dice_pressed.connect(func() -> void:
+		var o: Control = (load("res://scenes/overlays/dice_inspector.tscn") as PackedScene).instantiate()
+		_overlays.push(o)
+		o.call(&"setup", db, run, ""))
 	_top.codex_pressed.connect(func() -> void:
 		var o: Control = (load(RUN_INFO_SCENE) as PackedScene).instantiate()
 		_overlays.push(o)

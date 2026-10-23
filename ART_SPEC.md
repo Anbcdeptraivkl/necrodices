@@ -350,19 +350,31 @@ y 270 └──────────────┴────────�
 | Actions | bottom right, 2 × 58×24 | REROLL (secondary) · ROLL / SUMMON (primary, same button by phase) |
 
 ### 6.3 Shop screen (Balatro layout, D-R16)
-The screen is dark (`N0`); only the right column is decorated (D-R12). Every block sits on one
-grid: columns **A** x 4–124, **B** x 128–352 (flexes with the canvas), **C** x 356–476.
+The screen is dark (`N0`); only the right column is decorated (D-R12). The shop itself is **one
+frame** (`panel_dark`, x 4–352, y 28–266) holding a 2×2 grid with 4 px gaps; trays are
+`TrayPanel` (flat `N0`, 1 px `N2` border). No captions, no names: every item is the same card and
+explains itself in its tooltip.
 
-| Element | Rect | Notes |
-|---|---|---|
-| Top bar | as Battle | Trinket block + potion / gem block; click an owned item → USE / SELL $n menu |
-| NEXT BATTLE | A: 4, 28, 120×24 | primary |
-| REROLL $n | A: 4, 56, 120×24 | secondary, tooltip |
-| Your gear and dice | A: under REROLL, flexible | GEAR icons; DICE face tiles (click → Dice Inspector) |
-| Gear of the night | A, bottom-left corner | `panel_card`: caption, icon ×2, price `G1`, BUY; one offer per night |
-| Cards block | B, top (≥ 120 tall) | Compact cards in a centred, top-aligned row: price tag `G1`, 2 px rarity stripe (trinkets), icon ×2 or a die's six face tiles, BUY, BUY+USE for potions / gems. No names: the tooltip carries name + effect |
-| Coffers block | B, bottom (110 tall) | Compact coffers: price tag, coffin icon ×2, OPEN; the Coffer overlay lists the choices as compact cards with TAKE |
-| Decor | C: 356, 28 → bottom | `assets/bg/shop_decor.png` alcove anchored bottom, the shopkeeper in front, "CRYPT MARKET" title near the top |
+```
+┌──────────┬──────────────────────────────┐
+│  NEXT    │   [card] [card] ( … up to 4) │  row 1: buttons 84 wide | cards tray
+│  BATTLE  │                              │
+├──────────┤                              │
+│ REROLL $5│                              │
+├──────────┼──────────────────────────────┤
+│ [gear]   │   [coffer] [coffer]          │  row 2 (108 tall): gear tray | coffers tray
+└──────────┴──────────────────────────────┘
+```
+
+| Element | Notes |
+|---|---|
+| Top bar | Trinket block + potion / gem block (click an owned item → USE / SELL $n), money, Dice, Codex, Settings |
+| NEXT BATTLE / REROLL $n | Two tall buttons filling the left half of row 1 (primary / secondary) |
+| Market card (`ShopCard`, 56 wide, fixed height) | Price tag `G1`, 2 px rarity stripe (trinkets only, space kept on all), art 32×32 ×2 (a die: its six face tiles), BUY, then a second row that is BUY+USE for potions / gems and empty otherwise — so every card lines up. Sold = 45% alpha, "Sold out" |
+| Cards tray | Row 1 right: market cards centred |
+| Gear tray | Row 2 left: the night's gear as the same card (BUY) |
+| Coffers tray | Row 2 right: coffers as the same card (price, coffin, OPEN); the Coffer overlay shows choices as the same card with TAKE |
+| Decor | Column C: `shop_decor.png` alcove anchored bottom, the shopkeeper in front, "CRYPT MARKET" near the top |
 
 ### 6.4 Night Map
 - Background: a plain ordered-dither fade, light at the top (`N3`) to dark at the bottom

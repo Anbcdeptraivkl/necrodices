@@ -109,6 +109,9 @@ func _connect_input() -> void:
 	%Main.pressed.connect(_on_main)
 	_top.codex_pressed.connect(func() -> void: _open(RUN_INFO_SCENE).call(&"setup", db, run))
 	_top.settings_pressed.connect(func() -> void: _open(SETTINGS_SCENE))
+	_top.dice_pressed.connect(func() -> void:
+		if not _queue.is_busy():
+			_open(INSPECTOR_SCENE).call(&"setup", db, run, ""))
 	_top.reorder_requested.connect(func(a: int, b: int) -> void:
 		if not _queue.is_busy() and RunFlow.reorder_relic(run, a, b):
 			Audio.play("click")

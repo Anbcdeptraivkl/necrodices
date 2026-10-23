@@ -1,13 +1,11 @@
 extends Control
-## Crypt Market (GAME_SPEC §7, ART_SPEC §6.3), laid out like Balatro's shop: NEXT BATTLE and
-## REROLL top-left, the player's gear and dice under them, the night's gear in the bottom-left
-## corner; item cards and coffers in two blocks in the centre; the shopkeeper's alcove right.
-## Trinkets and potions / gems owned sit in the top bar (click → SELL / USE). Names and effects
-## are tooltips. Every command goes through ShopState / ConsumableFx / RunFlow, then the run is
+## Crypt Market (GAME_SPEC §7, ART_SPEC §6.3), laid out like Balatro's shop: one frame, a 2×2
+## grid — NEXT BATTLE / REROLL | the cards tray, then the night's gear | the coffers tray — every
+## item the same compact card (price, art, BUY); the shopkeeper's alcove right. Owned trinkets
+## and potions / gems sit in the top bar (click → SELL / USE). Names and effects are tooltips. Every command goes through ShopState / ConsumableFx / RunFlow, then the run is
 ## saved, so Continue always restores what the player sees.
 
 const CARD_SCENE := "res://ui/components/shop_card.tscn"
-const COFFER_SCENE := "res://ui/components/coffer_card.tscn"
 const INSPECTOR_SCENE := "res://scenes/overlays/dice_inspector.tscn"
 const COFFER_OVERLAY := "res://scenes/overlays/coffer.tscn"
 const RUN_INFO_SCENE := "res://scenes/overlays/run_info.tscn"
@@ -17,7 +15,7 @@ var db: ContentDb
 var run: RunState
 var shop: ShopState
 var _cards: Array[ShopCard] = []
-var _coffers: Array[CofferCard] = []
+var _coffers: Array[ShopCard] = []
 var _time := 0.0
 var _coffer_overlay: Control
 @onready var _top: TopBar = %TopBar
@@ -35,15 +33,11 @@ func _ready() -> void:
 	%Title.text = db.text("title_shop")
 	%Reroll.pressed.connect(_on_reroll)
 	%Reroll.set_meta(&"tip", db.text("tip_reroll_shop"))
-	%EquipHeader.text = db.text("lbl_equipment")
-	%GearTitle.text = db.text("lbl_equipment_short")
-	%DiceTitle.text = db.text("lbl_dice")
 	%Next.text = db.text("btn_next_fight")
 	%Next.pressed.connect(func() -> void:
 		Audio.play("click")
 		Game.leave_shop())
-	%EquipBuy.text = db.text("btn_buy")
-	%EquipBuy.pressed.connect(_on_buy_equipment)
+	%Gear.buy_pressed.connect(func(_s: int) -> void: _on_buy_equipment())
 	_top.codex_pressed.connect(func() -> void: _open(RUN_INFO_SCENE).call(&"setup", db, run))
 	_top.settings_pressed.connect(func() -> void: _open(SETTINGS_SCENE))
 	_top.reorder_requested.connect(func(a: int, b: int) -> void:
@@ -60,12 +54,7 @@ func _ready() -> void:
 			Audio.play("sell")
 			_changed())
 	_build_cards()
-	InfoPanel.attach(%Equipment, func() -> Dictionary:
-		return InfoText.equipment(db, run.equipment_offer) if run.equipment_offer != "" else {})
-	%Dice.set_meta(&"tip", db.text("tip_dice_row"))
-	%Dice.gui_input.connect(func(e: InputEvent) -> void:
-		if e is InputEventMouseButton and e.pressed:
-			_open(INSPECTOR_SCENE).call(&"setup", db, run, ""))
+	_top.dice_pressed.connect(func() -> void: _open(INSPECTOR_SCENE).call(&"setup", db, run, ""))
 	Audio.music("shop")
 	_refresh()
 	if not shop.open_coffer.is_empty():
@@ -84,11 +73,10 @@ func _build_cards() -> void:
 		card.use_pressed.connect(_on_buy_use)
 		%Cards.add_child(card)
 		_cards.append(card)
-	var coffer_scene: PackedScene = load(COFFER_SCENE)
 	for i in shop.coffers.size():
-		var c: CofferCard = coffer_scene.instantiate()
+		var c: ShopCard = card_scene.instantiate()
 		c.slot = i
-		c.open_pressed.connect(_on_open_coffer)
+		c.buy_pressed.connect(_on_open_coffer)
 		%Coffers.add_child(c)
 		_coffers.append(c)
 
@@ -110,23 +98,22 @@ func _refresh() -> void:
 			and run.money >= int(item["price"]) and shop.open_coffer.is_empty())
 		_cards[i].show_item(db, item, shop.can_buy(db, run, i), can_use)
 	for i in _coffers.size():
-		_coffers[i].show_coffer(db, shop.coffers[i], shop.can_buy_coffer(db, run, i))
+		var coffer := shop.coffers[i].duplicate()
+		coffer["kind"] = ShopCard.KIND_COFFER
+		_coffers[i].show_item(db, coffer, shop.can_buy_coffer(db, run, i), false,
+			db.text("msg_opened") if coffer["sold"] else db.text("btn_open"))
 	%Reroll.text = db.text("btn_reroll_shop") % shop.reroll_cost(db, run)
 	%Reroll.disabled = not shop.can_reroll(db, run)
-	_refresh_equipment()
-	Loadout.fill_gear(%Gear, db, run)
-	Loadout.fill_dice(%Dice, run)
+	_refresh_gear()
 
 
-func _refresh_equipment() -> void:
+## The night's gear: the same card as everything else; nothing on offer hides it.
+func _refresh_gear() -> void:
 	var id := run.equipment_offer
-	%EquipIcon.texture = Art.equipment(id) if id != "" else null
-	%EquipPrice.text = "$%d" % int(db.equipment[id]["price"]) if id != "" else db.text("msg_no_equipment")
-	%EquipBuy.visible = id != "" and not run.equipment_sold
-	%EquipBuy.disabled = not ShopState.can_buy_equipment(db, run)
-	%Equipment.modulate = Color(1, 1, 1, 0.5) if run.equipment_sold else Color.WHITE
-	if run.equipment_sold:
-		%EquipPrice.text = db.text("msg_sold_out")
+	%Gear.visible = id != ""
+	if id != "":
+		%Gear.show_item(db, {"kind": ShopCard.KIND_GEAR, "id": id, "price": int(db.equipment[id]["price"]),
+			"sold": run.equipment_sold}, ShopState.can_buy_equipment(db, run), false)
 
 
 func _use_held(i: int) -> void:

@@ -3,18 +3,20 @@
 [ext_resource type="Script" path="res://ui/components/shop_card.gd" id="1"]
 
 [node name="ShopCard" type="PanelContainer"]
-custom_minimum_size = Vector2(54, 0)
-size_flags_vertical = 0
+custom_minimum_size = Vector2(56, 0)
+size_flags_horizontal = 4
+size_flags_vertical = 4
 theme_type_variation = &"CardPanel"
 script = ExtResource("1")
 
 [node name="VBox" type="VBoxContainer" parent="."]
 layout_mode = 2
 mouse_filter = 2
-theme_override_constants/separation = 3
+theme_override_constants/separation = 2
 
 [node name="Price" type="Label" parent="VBox"]
 unique_name_in_owner = true
+custom_minimum_size = Vector2(0, 9)
 layout_mode = 2
 theme_type_variation = &"GoldLabel"
 horizontal_alignment = 1
@@ -28,7 +30,7 @@ expand_mode = 1
 stretch_mode = 1
 
 [node name="Art" type="CenterContainer" parent="VBox"]
-custom_minimum_size = Vector2(0, 32)
+custom_minimum_size = Vector2(48, 34)
 layout_mode = 2
 mouse_filter = 2
 
@@ -49,24 +51,15 @@ theme_override_constants/h_separation = 0
 theme_override_constants/v_separation = 0
 columns = 3
 
-[node name="Sold" type="Label" parent="VBox"]
-unique_name_in_owner = true
-visible = false
-custom_minimum_size = Vector2(0, 16)
-layout_mode = 2
-theme_type_variation = &"MutedLabel"
-horizontal_alignment = 1
-vertical_alignment = 1
-
 [node name="Buy" type="Button" parent="VBox"]
 unique_name_in_owner = true
-custom_minimum_size = Vector2(0, 16)
+custom_minimum_size = Vector2(0, 14)
 layout_mode = 2
 mouse_default_cursor_shape = 2
 
 [node name="Use" type="Button" parent="VBox"]
 unique_name_in_owner = true
-custom_minimum_size = Vector2(0, 16)
+custom_minimum_size = Vector2(0, 14)
 layout_mode = 2
 mouse_default_cursor_shape = 2
 theme_type_variation = &"SecondaryButton"

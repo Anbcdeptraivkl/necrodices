@@ -2,13 +2,14 @@ class_name TopBar
 extends PanelContainer
 ## Top bar shared by Night Map, Battle and Market (ART_SPEC §6.1): label left; the player's
 ## loadout centred like Balatro's — a trinket block (drag to reorder when allowed) and a
-## potion / gem block; money, Codex and Settings right. Hovering an item shows its tooltip;
+## potion / gem block; money, Dice (inspector), Codex and Settings right. Hovering an item shows its tooltip;
 ## clicking one opens a small menu (USE / SELL $n) when the screen allows those actions.
 ## Emits intents only; the screen applies them through commands.
 
 signal reorder_requested(from: int, to: int)
 signal settings_pressed
 signal codex_pressed
+signal dice_pressed
 signal use_requested(index: int)
 signal sell_relic_requested(index: int)
 signal sell_consumable_requested(index: int)
@@ -33,6 +34,7 @@ var _pick_index := -1
 @onready var _coin: TextureRect = %Coin
 @onready var _settings: Button = %Settings
 @onready var _codex: Button = %Codex
+@onready var _dice: Button = %Dice
 @onready var _menu: PanelContainer = %Menu
 @onready var _use: Button = %MenuUse
 @onready var _sell: Button = %MenuSell
@@ -44,6 +46,8 @@ func _ready() -> void:
 	_settings.pressed.connect(func() -> void: settings_pressed.emit())
 	_codex.icon = Art.stat("book")
 	_codex.pressed.connect(func() -> void: codex_pressed.emit())
+	_dice.icon = Art.glyph("BONE", true)
+	_dice.pressed.connect(func() -> void: dice_pressed.emit())
 	_use.pressed.connect(func() -> void:
 		var i := _pick_index
 		close_menu()
@@ -64,6 +68,7 @@ func setup(db: ContentDb, run: RunState, label: String) -> void:
 	_label.text = label
 	_codex.set_meta(&"tip", db.text("tip_codex"))
 	_settings.set_meta(&"tip", db.text("tip_settings"))
+	_dice.set_meta(&"tip", db.text("tip_dice"))
 	refresh()
 
 
