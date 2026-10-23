@@ -20,8 +20,8 @@ var db: ContentDb
 var boot_errors: PackedStringArray = []
 var run: RunState
 var encounter: EncounterState
-## Cash-out lines of the last won encounter, shown by the shop on entry.
-var last_cash_out: Array[Dictionary] = []
+## Spoils lines of the last won encounter, shown by the shop on entry.
+var last_spoils: Array[Dictionary] = []
 var store := SaveStore.new()
 var profile := {}
 
@@ -86,9 +86,9 @@ func start_encounter() -> void:
 
 
 ## Called by the encounter screen once combat is resolved (before playback ends is fine:
-## the model already moved on). Returns the cash-out lines.
+## the model already moved on). Returns the spoils lines.
 func finish_encounter() -> Array[Dictionary]:
-	last_cash_out = RunFlow.finish_encounter(db, run, encounter)
+	last_spoils = RunFlow.finish_encounter(db, run, encounter)
 	profile["best_night"] = maxi(int(profile.get("best_night", 0)), run.night)
 	match run.phase:
 		RunState.Phase.SHOP:
@@ -99,7 +99,7 @@ func finish_encounter() -> Array[Dictionary]:
 		RunState.Phase.GAME_OVER:
 			store.delete_run()
 	save_profile()
-	return last_cash_out
+	return last_spoils
 
 
 ## After every shop command: the save always equals what the player sees.

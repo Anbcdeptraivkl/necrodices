@@ -1,10 +1,9 @@
-[gd_scene load_steps=12 format=3]
+[gd_scene load_steps=11 format=3]
 
 [ext_resource type="Script" path="res://scenes/encounter/encounter_screen.gd" id="1_screen"]
 [ext_resource type="Texture2D" path="res://assets/bg/bg_battle.png" id="2_bg"]
 [ext_resource type="PackedScene" path="res://ui/components/top_bar.tscn" id="3_top"]
 [ext_resource type="Script" path="res://ui/components/score_panel.gd" id="4_score"]
-[ext_resource type="PackedScene" path="res://ui/components/info_panel.tscn" id="5_info"]
 [ext_resource type="Script" path="res://scenes/encounter/battle_stage.gd" id="6_stage"]
 [ext_resource type="Script" path="res://ui/components/hp_bar.gd" id="7_hp"]
 [ext_resource type="Script" path="res://fx/horde_renderer.gd" id="8_horde"]
@@ -57,13 +56,13 @@ theme_override_constants/separation = 4
 
 [node name="RulePanel" type="PanelContainer" parent="Left"]
 unique_name_in_owner = true
-custom_minimum_size = Vector2(120, 40)
+custom_minimum_size = Vector2(120, 0)
 layout_mode = 2
 
 [node name="VBox" type="VBoxContainer" parent="Left/RulePanel"]
 layout_mode = 2
 mouse_filter = 2
-theme_override_constants/separation = 0
+theme_override_constants/separation = 2
 
 [node name="RuleTitle" type="Label" parent="Left/RulePanel/VBox"]
 unique_name_in_owner = true
@@ -77,6 +76,11 @@ custom_minimum_size = Vector2(110, 0)
 layout_mode = 2
 theme_type_variation = &"RuleLabel"
 autowrap_mode = 3
+
+[node name="Bounty" type="Label" parent="Left/RulePanel/VBox"]
+unique_name_in_owner = true
+layout_mode = 2
+theme_type_variation = &"GoldLabel"
 
 [node name="ScorePanel" type="PanelContainer" parent="Left"]
 unique_name_in_owner = true
@@ -96,6 +100,7 @@ theme_override_constants/separation = 2
 alignment = 1
 
 [node name="PowerBox" type="PanelContainer" parent="Left/ScorePanel/VBox/Row"]
+unique_name_in_owner = true
 custom_minimum_size = Vector2(48, 14)
 layout_mode = 2
 theme_type_variation = &"PowerBox"
@@ -111,6 +116,7 @@ layout_mode = 2
 text = "×"
 
 [node name="CountBox" type="PanelContainer" parent="Left/ScorePanel/VBox/Row"]
+unique_name_in_owner = true
 custom_minimum_size = Vector2(48, 14)
 layout_mode = 2
 theme_type_variation = &"CountBox"
@@ -125,9 +131,26 @@ horizontal_alignment = 1
 unique_name_in_owner = true
 layout_mode = 2
 theme_type_variation = &"NumberLabel"
-text = "= 0 / 0"
+text = "= 0"
 horizontal_alignment = 1
 clip_text = true
+
+[node name="ArmyRow" type="HBoxContainer" parent="Left/ScorePanel/VBox"]
+layout_mode = 2
+mouse_filter = 2
+theme_override_constants/separation = 4
+alignment = 1
+
+[node name="ArmyCaption" type="Label" parent="Left/ScorePanel/VBox/ArmyRow"]
+unique_name_in_owner = true
+layout_mode = 2
+theme_type_variation = &"MutedLabel"
+text = "ARMY"
+
+[node name="Army" type="Label" parent="Left/ScorePanel/VBox/ArmyRow"]
+unique_name_in_owner = true
+layout_mode = 2
+text = "0 / 0"
 
 [node name="Essence" type="HBoxContainer" parent="Left"]
 unique_name_in_owner = true
@@ -136,21 +159,40 @@ layout_mode = 2
 theme_override_constants/separation = 2
 alignment = 1
 
-[node name="Items" type="HBoxContainer" parent="Left"]
-custom_minimum_size = Vector2(120, 20)
-layout_mode = 2
-theme_override_constants/separation = 4
-
-[node name="Consumables" type="HBoxContainer" parent="Left/Items"]
-unique_name_in_owner = true
-layout_mode = 2
-size_flags_horizontal = 3
-theme_override_constants/separation = 4
-
-[node name="InfoPanel" parent="Left" instance=ExtResource("5_info")]
-unique_name_in_owner = true
+[node name="Loadout" type="PanelContainer" parent="Left"]
 layout_mode = 2
 size_flags_vertical = 3
+
+[node name="VBox" type="VBoxContainer" parent="Left/Loadout"]
+layout_mode = 2
+theme_override_constants/separation = 3
+
+[node name="GearTitle" type="Label" parent="Left/Loadout/VBox"]
+unique_name_in_owner = true
+layout_mode = 2
+theme_type_variation = &"MutedLabel"
+text = "GEAR"
+
+[node name="Gear" type="GridContainer" parent="Left/Loadout/VBox"]
+unique_name_in_owner = true
+layout_mode = 2
+theme_override_constants/h_separation = 2
+theme_override_constants/v_separation = 2
+columns = 6
+
+[node name="DiceTitle" type="Label" parent="Left/Loadout/VBox"]
+unique_name_in_owner = true
+layout_mode = 2
+theme_type_variation = &"MutedLabel"
+text = "DICE"
+
+[node name="Dice" type="GridContainer" parent="Left/Loadout/VBox"]
+unique_name_in_owner = true
+layout_mode = 2
+mouse_default_cursor_shape = 2
+theme_override_constants/h_separation = 2
+theme_override_constants/v_separation = 2
+columns = 6
 
 [node name="Stage" type="Control" parent="."]
 unique_name_in_owner = true
@@ -175,57 +217,19 @@ anchors_preset = 5
 anchor_left = 0.5
 anchor_right = 0.5
 offset_left = -20.0
-offset_top = -6.0
+offset_top = 42.0
 offset_right = 20.0
-offset_bottom = 34.0
+offset_bottom = 82.0
 grow_horizontal = 2
 mouse_filter = 2
-
-[node name="PedestalTop" type="ColorRect" parent="Stage"]
-layout_mode = 1
-anchors_preset = 5
-anchor_left = 0.5
-anchor_right = 0.5
-offset_left = -24.0
-offset_top = 28.0
-offset_right = 24.0
-offset_bottom = 29.0
-grow_horizontal = 2
-mouse_filter = 2
-color = Color(0.341176, 0.270588, 0.466667, 1)
-
-[node name="Pedestal" type="ColorRect" parent="Stage"]
-layout_mode = 1
-anchors_preset = 5
-anchor_left = 0.5
-anchor_right = 0.5
-offset_left = -24.0
-offset_top = 29.0
-offset_right = 24.0
-offset_bottom = 34.0
-grow_horizontal = 2
-mouse_filter = 2
-color = Color(0.231373, 0.172549, 0.333333, 1)
-
-[node name="Enemy" type="TextureRect" parent="Stage"]
-unique_name_in_owner = true
-material = SubResource("enemy_mat")
-layout_mode = 1
-anchors_preset = 5
-anchor_left = 0.5
-anchor_right = 0.5
-offset_left = -16.0
-offset_right = 16.0
-offset_bottom = 32.0
-grow_horizontal = 2
 
 [node name="EnemyName" type="Label" parent="Stage"]
 unique_name_in_owner = true
 layout_mode = 1
 anchors_preset = 10
 anchor_right = 1.0
-offset_top = 35.0
-offset_bottom = 44.0
+offset_top = 1.0
+offset_bottom = 10.0
 grow_horizontal = 2
 text = "ENEMY"
 horizontal_alignment = 1
@@ -237,9 +241,9 @@ anchors_preset = 5
 anchor_left = 0.5
 anchor_right = 0.5
 offset_left = -80.0
-offset_top = 47.0
+offset_top = 12.0
 offset_right = 80.0
-offset_bottom = 54.0
+offset_bottom = 19.0
 grow_horizontal = 2
 mouse_filter = 2
 script = ExtResource("7_hp")
@@ -249,12 +253,38 @@ unique_name_in_owner = true
 layout_mode = 1
 anchors_preset = 10
 anchor_right = 1.0
-offset_top = 55.0
-offset_bottom = 64.0
+offset_top = 20.0
+offset_bottom = 29.0
 grow_horizontal = 2
 theme_type_variation = &"BodyLabel"
 text = "0 HP"
 horizontal_alignment = 1
+
+[node name="Shadow" type="ColorRect" parent="Stage"]
+layout_mode = 1
+anchors_preset = 5
+anchor_left = 0.5
+anchor_right = 0.5
+offset_left = -12.0
+offset_top = 79.0
+offset_right = 12.0
+offset_bottom = 81.0
+grow_horizontal = 2
+mouse_filter = 2
+color = Color(0.0509804, 0.0392157, 0.0784314, 1)
+
+[node name="Enemy" type="TextureRect" parent="Stage"]
+unique_name_in_owner = true
+material = SubResource("enemy_mat")
+layout_mode = 1
+anchors_preset = 5
+anchor_left = 0.5
+anchor_right = 0.5
+offset_left = -16.0
+offset_top = 48.0
+offset_right = 16.0
+offset_bottom = 80.0
+grow_horizontal = 2
 
 [node name="Battlefield" type="Control" parent="Stage"]
 unique_name_in_owner = true
@@ -263,7 +293,7 @@ layout_mode = 1
 anchors_preset = 15
 anchor_right = 1.0
 anchor_bottom = 1.0
-offset_top = 70.0
+offset_top = 84.0
 offset_bottom = -28.0
 grow_horizontal = 2
 grow_vertical = 2
@@ -279,8 +309,8 @@ visible = false
 layout_mode = 1
 anchors_preset = 10
 anchor_right = 1.0
-offset_top = 58.0
-offset_bottom = 84.0
+offset_top = 86.0
+offset_bottom = 112.0
 grow_horizontal = 2
 theme_type_variation = &"NumberLabel"
 theme_override_colors/font_color = Color(0.956863, 0.937255, 0.894118, 1)
@@ -291,6 +321,25 @@ theme_override_constants/shadow_offset_y = 2
 theme_override_constants/outline_size = 4
 theme_override_font_sizes/font_size = 24
 text = "0"
+horizontal_alignment = 1
+
+[node name="Banner" type="Label" parent="Stage"]
+unique_name_in_owner = true
+visible = false
+layout_mode = 1
+anchors_preset = 10
+anchor_right = 1.0
+offset_top = 88.0
+offset_bottom = 104.0
+grow_horizontal = 2
+theme_type_variation = &"TitleLabel"
+theme_override_colors/font_color = Color(1, 0.878431, 0.4, 1)
+theme_override_colors/font_shadow_color = Color(0.788235, 0.541176, 0.0901961, 1)
+theme_override_colors/font_outline_color = Color(0.0509804, 0.0392157, 0.0784314, 1)
+theme_override_constants/shadow_offset_x = 0
+theme_override_constants/shadow_offset_y = 1
+theme_override_constants/outline_size = 4
+text = "TRIO"
 horizontal_alignment = 1
 
 [node name="Tray" type="HBoxContainer" parent="Stage"]
@@ -346,42 +395,61 @@ layout_mode = 2
 text = "REROLLS 2"
 horizontal_alignment = 1
 
-[node name="Pending" type="PanelContainer" parent="Right"]
-custom_minimum_size = Vector2(120, 100)
+[node name="PickPanel" type="PanelContainer" parent="Right"]
+unique_name_in_owner = true
+custom_minimum_size = Vector2(120, 0)
 layout_mode = 2
+theme_type_variation = &"CardPanel"
 
-[node name="VBox" type="VBoxContainer" parent="Right/Pending"]
+[node name="VBox" type="VBoxContainer" parent="Right/PickPanel"]
 layout_mode = 2
+mouse_filter = 2
 theme_override_constants/separation = 2
 
-[node name="Header" type="Label" parent="Right/Pending/VBox"]
+[node name="PickTitle" type="Label" parent="Right/PickPanel/VBox"]
 unique_name_in_owner = true
 layout_mode = 2
-theme_type_variation = &"MutedLabel"
-text = "GROUPS"
+text = "PICK 3-5 DICE"
+horizontal_alignment = 1
+clip_text = true
 
-[node name="Chips" type="VBoxContainer" parent="Right/Pending/VBox"]
+[node name="PickSlots" type="HBoxContainer" parent="Right/PickPanel/VBox"]
 unique_name_in_owner = true
+custom_minimum_size = Vector2(0, 23)
 layout_mode = 2
+mouse_filter = 2
 theme_override_constants/separation = 2
+alignment = 1
 
-[node name="Hint" type="PanelContainer" parent="Right"]
+[node name="PickPreview" type="Label" parent="Right/PickPanel/VBox"]
+unique_name_in_owner = true
+layout_mode = 2
+theme_type_variation = &"GoldLabel"
+horizontal_alignment = 1
+clip_text = true
+
+[node name="SquadsPanel" type="PanelContainer" parent="Right"]
 layout_mode = 2
 size_flags_vertical = 3
 
-[node name="HintLabel" type="Label" parent="Right/Hint"]
-unique_name_in_owner = true
-custom_minimum_size = Vector2(110, 0)
+[node name="VBox" type="VBoxContainer" parent="Right/SquadsPanel"]
 layout_mode = 2
-size_flags_vertical = 1
-theme_type_variation = &"BodyLabel"
-autowrap_mode = 3
+theme_override_constants/separation = 2
 
-[node name="Actions" type="GridContainer" parent="Right"]
+[node name="Header" type="Label" parent="Right/SquadsPanel/VBox"]
+unique_name_in_owner = true
 layout_mode = 2
-theme_override_constants/h_separation = 4
-theme_override_constants/v_separation = 4
-columns = 2
+theme_type_variation = &"MutedLabel"
+text = "SQUADS"
+
+[node name="Chips" type="VBoxContainer" parent="Right/SquadsPanel/VBox"]
+unique_name_in_owner = true
+layout_mode = 2
+theme_override_constants/separation = 2
+
+[node name="Actions" type="HBoxContainer" parent="Right"]
+layout_mode = 2
+theme_override_constants/separation = 4
 
 [node name="Reroll" type="Button" parent="Right/Actions"]
 unique_name_in_owner = true
@@ -391,27 +459,12 @@ mouse_default_cursor_shape = 2
 theme_type_variation = &"SecondaryButton"
 text = "REROLL"
 
-[node name="Bind" type="Button" parent="Right/Actions"]
+[node name="Main" type="Button" parent="Right/Actions"]
 unique_name_in_owner = true
 custom_minimum_size = Vector2(58, 24)
 layout_mode = 2
 mouse_default_cursor_shape = 2
-theme_type_variation = &"SecondaryButton"
-text = "BIND"
-
-[node name="Summon" type="Button" parent="Right/Actions"]
-unique_name_in_owner = true
-custom_minimum_size = Vector2(58, 24)
-layout_mode = 2
-mouse_default_cursor_shape = 2
-text = "SUMMON"
-
-[node name="Attack" type="Button" parent="Right/Actions"]
-unique_name_in_owner = true
-custom_minimum_size = Vector2(58, 24)
-layout_mode = 2
-mouse_default_cursor_shape = 2
-text = "ATTACK!"
+text = "ROLL"
 
 [node name="Queue" type="Node" parent="."]
 unique_name_in_owner = true

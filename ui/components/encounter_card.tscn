@@ -71,6 +71,12 @@ layout_mode = 2
 theme_type_variation = &"BodyLabel"
 horizontal_alignment = 1
 
+[node name="Bounty" type="Label" parent="VBox"]
+unique_name_in_owner = true
+layout_mode = 2
+theme_type_variation = &"GoldLabel"
+horizontal_alignment = 1
+
 [node name="RuleChip" type="PanelContainer" parent="VBox"]
 layout_mode = 2
 mouse_filter = 2

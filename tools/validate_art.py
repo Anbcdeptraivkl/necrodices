@@ -8,11 +8,12 @@ Checks:
   - mode RGBA, alpha in {0, 255}
   - every opaque pixel in Hallow32 (files flagged `mask`: mask key colours + #0d0a14 only;
     files flagged `tint` may also use pure white)
-  - colour-count limits: units/legion 7, minis 4, enemies/shopkeeper 12, icons 6, backgrounds 16
+  - colour-count limits: units/legion 7, legends 12, minis 4, enemies/shopkeeper 12, icons 6, digits 3,
+    backgrounds 16
   - 16x16 icons: 1 px transparent border
   - units (+ legion banner): lowest opaque pixel on row 15 in every frame; `floating` units:
     row 15 is a single N0 shadow run 4-6 px wide
-  - enemies (+ shopkeeper): lowest opaque pixel on row 31 in every frame
+  - legends, enemies (+ shopkeeper): lowest opaque pixel on row 31 in every frame
   - no fully transparent frames
   - palette files: hallow32.png is the palette strip (33x1) in palette order, hallow32.gpl exists
 """
@@ -32,12 +33,12 @@ PALETTE_PNG = "assets/palette/hallow32.png"
 PALETTE_GPL = ASSETS / "palette" / "hallow32.gpl"
 
 COLOUR_LIMITS = {
-    "unit": 7, "legion": 7, "mini": 4, "enemy": 12, "shopkeeper": 12,
-    "relic_icon": 6, "consumable_base": 6, "consumable_icon": 6, "equipment_icon": 6, "stat_icon": 6,
+    "unit": 7, "legion": 7, "legend": 12, "mini": 4, "enemy": 12, "shopkeeper": 12,
+    "relic_icon": 6, "consumable_icon": 6, "coffer_icon": 6, "equipment_icon": 6, "stat_icon": 6, "num": 3,
     "bg": 16,
 }
-BORDER_ICONS = {"relic_icon", "consumable_base", "consumable_icon", "equipment_icon"}
-FEET_ROW = {"unit": 15, "legion": 15, "enemy": 31, "shopkeeper": 31}
+BORDER_ICONS = {"relic_icon", "consumable_icon", "coffer_icon", "equipment_icon"}
+FEET_ROW = {"unit": 15, "legion": 15, "legend": 31, "enemy": 31, "shopkeeper": 31}
 N0 = hex_to_rgb(HALLOW32["N0"])
 WHITE = hex_to_rgb(TINT_WHITE)
 

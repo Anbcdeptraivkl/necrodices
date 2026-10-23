@@ -90,9 +90,13 @@ def build() -> tuple[list[dict], dict[str, str]]:
         entries.append(e)
 
     S = "assets/sprites"
-    # Units (19) — WISP -> wisp_mask
+    # Units (32) — WISP -> wisp_mask; Quintet legends are 32x32
     for uid in ids.UNITS:
         fname = ids.MASK_UNITS.get(uid, uid.lower())
+        if uid in ids.LEGEND_UNITS:
+            r, a = ids.UNIT_ART[uid]
+            add(f"{S}/units/{fname}.png", 64, 32, "legend", frame_w=32, name=uid, ramp=r, accent=a)
+            continue
         flags = []
         if uid in ids.MASK_UNITS:
             flags.append("mask")
@@ -123,8 +127,11 @@ def build() -> tuple[list[dict], dict[str, str]]:
         add(f"{D}/glyph8_{el.lower()}.png", 8, 8, "glyph8", ramp=r, tag_text=el[:2])
     for el in ids.ELEMENTS:
         add(f"{D}/pip_{el.lower()}.png", 6, 6, "pip", ramp=el, tag_text=el[:2])
-    for mod, col in ids.MODIFIERS.items():
-        add(f"{D}/mod_{mod}.png", 5, 5, "mod", ramp=col, tag_text=mod[:2].upper())
+    for rune, col in ids.RUNES.items():
+        add(f"{D}/die_body_{rune}.png", 20, 20, "dice", ramp=col, tag_text=rune[:2].upper())
+        add(f"{D}/face_tile_{rune}.png", 16, 16, "dice_overlay", ramp=col, tag_text=rune[:2].upper())
+    for n in range(1, 10):
+        add(f"{D}/num_{n}.png", 7, 9, "num", ramp="N7", tag_text=str(n))
     add(f"{D}/die_select.png", 22, 22, "dice_overlay", ramp="G1", tag_text="SE")
     add(f"{D}/die_bound.png", 22, 22, "dice_overlay", flags=["tint"], ramp="WHITE", tag_text="BN")
     add(f"{D}/die_shackle.png", 20, 20, "dice_overlay", ramp="METAL", accent="N0", tag_text="SH")
@@ -133,14 +140,14 @@ def build() -> tuple[list[dict], dict[str, str]]:
     for rid in ids.RELICS:
         add(f"assets/icons/relics/{rid.lower()}.png", 16, 16, "relic_icon", name=rid,
             ramp="N4", accent=ids.RELIC_RARITY[rid])
-    add("assets/icons/bases/tome_base.png", 16, 16, "consumable_base", ramp="N3", tag_text="TB")
-    add("assets/icons/bases/sigil_base.png", 16, 16, "consumable_base", ramp="N4", tag_text="SG")
     for cid in ids.CONSUMABLES:
-        kind, _, rest = cid.partition("_")
+        _, _, rest = cid.partition("_")
         accent = rest if rest in ids.ELEMENTS else None
-        ramp = {"TOME": "N3", "SIGIL": "N4"}.get(kind, "N4")
+        ramp = "I1" if cid in ids.GEMS else "N4"
         add(f"assets/icons/consumables/{cid.lower()}.png", 16, 16, "consumable_icon", name=cid,
             ramp=ramp, accent=accent)
+    for kid in ids.COFFERS:
+        add(f"assets/icons/coffers/{kid.lower()}.png", 16, 16, "coffer_icon", name=kid, ramp="B0")
     for qid in ids.EQUIPMENT:
         add(f"assets/icons/equipment/{qid.lower()}.png", 16, 16, "equipment_icon", name=qid, ramp="N4")
     for st, col in ids.STAT_ICONS.items():

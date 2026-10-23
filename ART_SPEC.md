@@ -1,4 +1,4 @@
-# ROLL THE BONES — Art Spec v1.0
+# ROLL THE BONES — Art Spec v2.0
 
 > Companion to `GAME_SPEC.md`. IDs used here (units, relics, enemies…) are defined there and must not be renamed.
 > Audience: artists, AI-image pipelines, and LLM coding agents integrating assets.
@@ -124,7 +124,9 @@ Semantic mapping:
 - Sheet: `32×16` = 2 idle frames. Idle at 3 fps (frame 2 = 1 px squash or flicker/blink).
 - Pivot: bottom-centre `(8, 16)`; lowest opaque pixel on row `y = 15` (floating units: shadow pixel row at y=15 in `N0`, 4–6 px wide).
 - Max 7 colours including outline. Single-element units: own ramp + `N0` + ≤ 2 accent colours (eyes/glow) covering ≤ 10% of pixels. Hybrids: primary element ramp ~60% of pixels, secondary ~30%.
-- T3 units: may use the full 16×16 and must have a tier mark (crown, halo or aura pixels in `G1`).
+- Ritual, Elite and Parade units (GAME_SPEC §6.2, single bodies) may use the full 16×16; Elites carry a
+  `G1` crown or horn mark.
+- Legends (Quintet) are **32×32** (§4.2b).
 
 | ID | Concept | Ramps |
 |---|---|---|
@@ -147,6 +149,21 @@ Semantic mapping:
 | HEADLESS_HORSEMAN | Headless rider on a tiny skeletal horse, holding a flaming pumpkin | Bone / Fire / Leaf |
 | STITCHED_GOLEM | Hulking patchwork golem with metal plates and lightning in its stitches. **No flat-top head, no neck bolts** (IP, §12) | Metal / Volt / Bone |
 | WITCH_QUEEN | Tall witch queen, crown of thorny vines, frost gown, lightning orb in hand | Ice / Leaf / Volt |
+| CLOCKWORK_KRAKEN | Brass / steel clockwork octopus, ice-blue eye, fire boiler glow (ritual) | Metal / Ice / Fire |
+| HELLHOUND | Black-red hound with a flaming mane, `G1` horns (elite) | Fire |
+| FROST_WRAITH | Floating hooded wraith, `G1` crown (elite, floating) | Ice |
+| MANDRAKE_BRUTE | Hulking root creature, leaf crown, `S0` roots (elite) | Leaf |
+| THUNDER_GHOUL | Hunched ghoul crackling with sparks (elite) | Volt |
+| GARGOYLE | Stone / iron gargoyle with folded wings (elite) | Metal |
+| PHANTOM_PARADE | Candle-lit procession of 3 tiny ghosts in element colours (rainbow, floating) | mixed |
+
+### 4.2b Legends — 32×32 (Quintet)
+- Sheet `64×32`, 2 frames (idle + breathing squash), lowest opaque row `y = 31`, max 12 colours,
+  same outline / light rules. They must read grander than any 16×16 unit.
+- BONE_DRAGON (skeletal dragon, `R1` eyes) · EMBER_COLOSSUS (molten rock giant) · FROST_WYRM
+  (serpentine ice dragon) · ELDER_HOLLOW (walking dead tree, glowing face) · STORM_TITAN (giant
+  gripping a bolt) · IRON_JUGGERNAUT (armoured war machine, `R1` eye slit).
+- Source: `tools/art/legends.py`.
 
 ### 4.3 Mask sprites (runtime palette swap)
 `units/wisp_mask.png` (32×16, 2 frames) uses key colours only:
@@ -163,7 +180,8 @@ A palette-swap shader (`fx/palette_swap.gdshader`) receives 6 target colours. Sa
 Used when the army exceeds 60 visible sprites (GAME_SPEC §11.2).
 - Sheet `16×8`, 2 frames, pivot `(4, 8)`, max 4 colours.
 - One per element + Wisp mask: `mini_bone` (tiny skull), `mini_fire` (flame imp), `mini_ice` (snow bat), `mini_leaf` (pumpkin), `mini_volt` (spark ghost), `mini_metal` (helmet), `mini_wisp_mask`.
-- A unit uses the mini of the **first element of its recipe key** (e.g. SHIELD_SKELETON → `mini_bone`, TESLA_SPIDER → `mini_volt`).
+- Only horde units (T1, hybrids, Wisp) have minis: the `mini` field of their data row. Single units and legends
+  are always drawn full size.
 - LEGION banner (> 240): `units/legion_banner.png` 16×16, a tattered flag on a bone pole, `N3`/`N5` cloth; the unit icon is drawn on it at runtime.
 
 ### 4.5 Enemies — 32×32
@@ -197,11 +215,12 @@ Used when the army exceeds 60 visible sprites (GAME_SPEC §11.2).
 | `dice/glyph_<element>.png` ×6 + `glyph_wild.png` | 12×12 | Face glyph, drawn centred on face area at offset `(4, 3)`. Element ramp colours + `N0` outline |
 | `dice/glyph8_<element>.png` ×6 + `glyph8_wild.png` | 8×8 | Small glyph for icons, essence pips, recipe book |
 | `dice/pip_<element>.png` ×6 | 6×6 | Essence pip (simplified glyph in a dot) |
-| `dice/mod_<sharp|swarm|hex|gold>.png` | 5×5 | Modifier badge, top-right of die at `(14, 1)` |
-| `dice/die_select.png` | 22×22 | 1 px `G1` outline ring (drawn at die −1,−1). Selected die is also raised 3 px |
-| `dice/die_bound.png` | 22×22 | 1 px white ring, tinted at runtime with group colour (§3) |
+| `dice/die_body_<rune>.png` ×8 | 20×20 | The die's **material** while a rune face is up (§4.6b); same silhouette and side as `die_body` |
+| `dice/num_1..9.png` | 7×9 | Points badge: `N0` rounded badge, `N7` digit; drawn at `(13, 11)` on the die |
+| `dice/die_select.png` | 22×22 | 1 px `G1` outline ring (drawn at die −1,−1). A picked die is also raised 3 px |
+| `dice/die_bound.png` | 22×22 | (unused in v2) 1 px white ring, tintable |
 | `dice/die_shackle.png` | 20×20 | Chain overlay `M0/M1`; die dimmed via `N0` 50% checker pattern (no alpha) |
-| `dice/face_tile.png` | 16×16 | Face square for Dice Inspector; glyph8 drawn centred |
+| `dice/face_tile.png`, `face_tile_<rune>.png` ×8 | 16×16 | Face square for the Dice Inspector / market dice: glyph8 at (2, 2), points digit bottom-right |
 
 Glyph shapes (must differ in silhouette):
 
@@ -215,7 +234,23 @@ Glyph shapes (must differ in silhouette):
 | METAL | Hex nut (hexagon with hole) |
 | WILD | Open eye with star pupil, `G1` + `N7` |
 
-Modifier badges: SHARP = tiny blade `R1`; SWARM = 3 dots `L2`; HEX = spiral `N5/N7`; GOLD = coin `G1`.
+### 4.6b Runes (GAME_SPEC §4.6) — the die body changes material
+A rune lives on one face; while that face is up the whole die body shows its material, like a
+Balatro enhancement changes the card background. Rune details stay where the glyph and the points
+badge leave the body visible. Source: `tools/art/dice_runes.py`.
+
+| Rune | Material |
+|---|---|
+| SHARP | bone die with blood-red `R1` serrated / notched edges |
+| SWARM | bone die speckled with green `L1` moss spots |
+| WILD | prismatic diagonal bands of element colours |
+| GLASS | pale `I2` glass, `I1` shade, `N7` highlight streak and one crack |
+| IRON | `M1` steel plate, `M0` corner rivets, `M2` highlight |
+| TOMB | `N5`/`N4` stone slab with a carved cross — no glyph, no points drawn |
+| GILDED | `G1` gold, `G0` shade, `F2`/`N7` shine |
+| LUCKY | `L2` green, `L1` shade, tiny four-leaf clover in a corner |
+
+*(stretch)* Die finishes (Ivory / Spectral / Cursed) would be a rim on the body; marks a stamp in a corner.
 
 ---
 
@@ -223,47 +258,32 @@ Modifier badges: SHARP = tiny blade `R1`; SWARM = 3 dots `L2`; HEX = spiral `N5/
 
 - 1 px transparent margin (live area 14×14), `N0` outline, max 6 colours, centred, top-left light.
 - One readable idea per icon; no text inside icons.
-- Consumables are **composed** by the placeholder/assembly script from bases + glyph8 (artist draws bases once).
+- Each item kind has one family look (designer request 2026-10-23): **trinkets** = small charms and
+  curios, **potions** = bottles, **gems** = cut gems, **gear** = equipment / tools, **coffers** = small
+  coffins. Sources: `tools/art/icons.py` (trinkets, gear) and `tools/art/items.py` (potions, gems,
+  coffers).
 
-### 5.1 Relics (25) — `icons/relics/<id_lowercase>.png`
+### 5.1 Trinkets (30) — `icons/relics/<id_lowercase>.png`
+The v1 relic concepts stay for the kept ids (RATTLE_DRUM … ELEMENTAL_CONVERGENCE). New:
+TRIO_TOTEM (carved three-face totem), MOON_CHARM (crescent on a cord), LOADED_BONE (knucklebone
+with a lead weight), GILDED_TOOTH (gold tooth), LAST_RITES (candle on a skull), BLOOD_MOON (red
+moon, replaces FULL_MOON).
 
-| ID | Icon concept |
-|---|---|
-| RATTLE_DRUM | Drum with bone sticks |
-| EMBER_JAR | Glass jar with embers |
-| FROST_LANTERN | Lantern with blue flame |
-| MOSS_CHARM | Mossy stone amulet |
-| LIGHTNING_ROD | Iron rod with spark |
-| IRON_NAIL | Big bent nail |
-| GRAVEDIGGER_LAMP | Oil lamp, warm glow |
-| WISP_JAR | Jar with tiny wisp inside |
-| GRAVE_ROBBER | Sack with coin spilling |
-| BONE_SAW | Saw with bone handle |
-| DEEP_FREEZE | Ice cube with skull inside |
-| COLD_HEARTH | Extinguished fireplace with snow |
-| BONE_PILE | Small heap of bones |
-| GRAND_PROCESSION | Tiny banner with marching dots |
-| THRIFTY_GHOST | Ghost holding a coin |
-| HYBRID_VIGOR | Two-coloured potion |
-| COPYCAT_COFFIN | Two identical coffins |
-| OVERGROWTH | Vine sprouting from skull |
-| SPIRIT_BOARD | Wooden board with planchette (no real brand marks) |
-| PIGGY_COFFIN | Piggy bank shaped like a coffin |
-| TACTICIAN_SKULL | Skull with war helmet |
-| CROWN_OF_THE_LICH | Spiked crown, gold |
-| FULL_MOON | Full moon with face |
-| BLACK_GRIMOIRE | Black book with eye clasp |
-| ELEMENTAL_CONVERGENCE | Ring of 6 coloured dots |
+### 5.2 Potions (17) and gems (8) — `icons/consumables/<id_lowercase>.png`
+- Potions: ELIXIR_<E> share one round flask with the element ramp as liquid; every other potion
+  has its own bottle shape (tall vial, whetstone oil, bubbling swarm brew, rainbow wild spirits,
+  cracked glass draught, metal flask, dust vial, liquid gold, clover, mirror, dark hermit bottle).
+- Gems: a different cut each — OPAL milky, GARNET red, AMBER gold, PRISM rainbow, MOONSTONE pale
+  blue, OBSIDIAN black glass, EMERALD green square, BLOODSTONE spotted red.
 
-### 5.2 Consumables (18) — `icons/consumables/<id_lowercase>.png`
-| Base (artist-drawn) | Composition |
-|---|---|
-| `icons/bases/tome_base.png` (closed book, `N3` cover) | TOME_<E> = base + `glyph8_<e>` on cover at (4,4) |
-| `icons/bases/sigil_base.png` (rune stone, `N4`) | SIGIL_<E> = base + `glyph8_<e>` centre |
-| Unique: INK_WILD (ink bottle + eye), INK_SHARP (whetstone), INK_SWARM (seed pouch), INK_HEX (voodoo doll), INK_GOLD (gold leaf), SPARE_DIE (die with + sign) | drawn directly |
+### 5.2b Coffers (12) — `icons/coffers/<id_lowercase>.png`
+Upright coffins with an emblem of their content (bottle / gem / charm / die). Normal = small,
+JUMBO = bigger with dark lid bands, MEGA = biggest with `G1` trim.
 
-### 5.3 Equipment (8) — `icons/equipment/<id_lowercase>.png`
-BONE_POUCH (small pouch), BONE_SATCHEL (bigger bag), GRAVE_BELL (bell), LOADED_CUP (dice cup), SECOND_CUP (two cups), RELIQUARY (ornate box), POCKET_CRYPT (tiny crypt), HAGGLER_LANTERN (lantern with price tag).
+### 5.3 Gear (13) — `icons/equipment/<id_lowercase>.png`
+GRAVE_BELL / DEATH_KNELL, LOADED_CUP / SECOND_CUP, RELIQUARY / OSSUARY, HAGGLER_LANTERN /
+BLACK_MARKET, OVERSTOCK / OVERFLOWING_CRYPT, GRAVE_GOODS / DRAGON_HOARD, POCKET_CRYPT. A tier-2 icon
+is visibly the upgraded twin of its tier 1 (bigger, darker or gold-trimmed).
 
 ### 5.4 Stat icons — 8×8 (`icons/stats/`)
 `coin, power (sword, I1), count (skull, R1), reroll (circular arrows), summon (candle), hp (heart R1), lock, info (i), book (recipe book)`.
@@ -284,73 +304,73 @@ BONE_POUCH (small pouch), BONE_SATCHEL (bigger bag), GRAVE_BELL (bell), LOADED_C
   centre column, extra **height** goes to the battlefield (Encounter), the info panel and the
   card area. Backgrounds are 640×300, centred (§11).
 - Safe margins: 4 px on every side. Min touch / click target: 20×20 virtual.
-- Primary input is the mouse (Web desktop, D-A10): hover may open tooltips, but every
-  tooltip is also shown by click / tap in the docked **info panel** (left column), so touch
-  still works without hover.
+- Primary input is the mouse (Web desktop, D-A10). No docked info panel and no hint text
+  (D-R16): buttons say what they do, and **items** (trinkets, potions, gems, gear, coffers,
+  market cards, rune faces, squads, Codex rows) explain themselves in a hover tooltip. Hunters,
+  rule panels and plain numbers have no tooltip. Clicking an owned item opens its small action
+  menu (USE / SELL), which is also the touch path.
+- **Top bar loadout** (Balatro): a trinket block (drag to reorder) and, after a divider, the
+  potion / gem block, centred in the top bar on every run screen.
 - Spacing grid: multiples of 2 px; default gap 4 px.
 - Modal overlays: dim layer = `N0` at 70% alpha (the only alpha-blended UI layer allowed).
 
-### 6.2 Encounter screen
+### 6.2 Battle screen (v2)
 
 ```
 y   0 ┌──────────────┬──────────────────────────────────────┬────────────────────┐
-      │ NIGHT 3·BOSS │        [R1][R2][R3][R4][R5]          │          $12  ⚙    │ Top bar (24)
+      │ NIGHT 3·BOSS │        [T1][T2][T3][T4][T5]          │          $12  📖 ⚙ │ Top bar (24)
 y  28 ├──────────────┼──────────────────────────────────────┼────────────────────┤
-      │ BOSS RULE    │            ▓▓ enemy ▓▓               │ [SUMMONS 2][REROLL]│
-      │ Holy Water…  │            ▀▀pedestal▀▀              ├────────────────────┤
-      │[⚔70]×[💀36]  │           THE EXORCIST               │ 1 Skeleton Warrior │
-      │= 2,520/1,200 │    ██████████████░░░░  1,200 HP      │ 2 Wisp  (pending)  │
-      │●5 ●1 ●1 ●0 … ├──────────────────────────────────────┤                    │
-      │[C1][C2]  [📖]│                                      ├────────────────────┤
-      │ INFO PANEL   │           BATTLEFIELD (army)         │ HINT               │
-      │ (docked      │      extra width + height go here    ├─────────┬──────────┤
-      │  tooltip)    │                                      │ REROLL 1│  BIND    │
-      │              │   [d][d][d][d][d][d][d][d]           │ SUMMON  │ ATTACK!  │
-y 270 └──────────────┴──────────────────────────────────────┴─────────┴──────────┘
+      │ BOSS RULE    │            ▓▓ hunter ▓▓              │ [SUMMON 2][REROLL 2]│
+      │ Holy Water…  │           THE EXORCIST               ├────────────────────┤
+      │[⚔73]×[💀2]   │    ██████████████░░░░  1,200 HP      │  Duo Pact  Lv1     │
+      │ = 146        │        COMBO BANNER / SLAM           │ [d][d][d][d][d]    │ Pick tray
+      │ ARMY 210/1.2K│                                      │  73 × 2 = 146      │
+      │●1 ●2 ●0 …    │           BATTLEFIELD (army)         ├────────────────────┤
+      │[P1][P2]      │      squads in centred columns       │ SQUADS             │
+      │ INFO PANEL   │                                      │ [icon Rabble   64] │
+      │              │   [d][d][d][d][d][d][d][d]           │ hint               │
+      │              │                                      │ [REROLL][ROLL/SUMMON]│
+y 270 └──────────────┴──────────────────────────────────────┴────────────────────┘
 ```
-
-| Element | Rect (x, y, w, h) | Notes |
-|---|---|---|
-| Top bar | 0, 0, 480, 24 | Left x 4: Night + encounter label. Centre: relic bar. Right: coin + money (`G1`), then two 16×16 icon buttons: the Recipe **Codex** (book) and Settings (gear), both with tooltips. Shared by Night Map, Encounter and Shop |
-| Relic bar | centred, y 2, slots 20×20, gap 4 | 5 slots = 116 px (6 with Reliquary = 140). Drag to reorder. Disabled relic: `N0` checker dim |
-| Rule panel | 4, 28, 120, 40 | Boss: rule short text `F2` (full text in the info panel); Mob / Champion: role + reward |
-| Score panel | 4, 72, 120, 40 | Power box 48×14 at (8, 76) `I1`, `×`, Count box 48×14 at (68, 76) `R1`; line 2 at y 94 (numbers font): `= projected / HP`, projected ≥ HP → `L2` |
-| Essence row | 4, 116, 120, 12 | 6 pips 6×6 + 1-digit count, pitch 20; zero essence dimmed |
-| Consumables + book | y 132: slots 20×20 at x 8, 32 (56 with Pocket Crypt); recipe book 20×20 at x 100 | |
-| Info panel | 4, 156, 120, 110 (+ extra height) | Docked tooltip: header (icon ×2 + name), kind / rarity line, body `N6`. Shows the hovered or last clicked item |
-| Enemy sprite | x c−16, y 28, 32×32 | `c` = centre of the centre column (240 at base). Pedestal 48×6 at (c−24, 56), `N3`/`N4` stone |
-| Enemy name | centred on c, y 64, h 9 | `N7` |
-| HP bar | c−80, 76, 160, 7 | Projected damage shown as `G1` segment from the right end |
-| HP text | centred on c, y 85, h 9 | `1,200 HP` |
-| Battlefield | 128, 98, 224, 140 (+ extra width and height) | Groups in columns left→right; Count badge above each cluster; units lunge **up** to the enemy |
-| Dice row | centred on c, y 244, dice 20×20, gap 6 | Up to 8 dice = 202 px. Selected die raised 3 px. Anchored bottom |
-| Counters | 356, 28: Summons 58×20; Rerolls 58×20 at x 418 | icon + number |
-| Pending groups | 356, 52, 120, 100 | Chips 116×20, gap 2, from y 62 (max 4): group colour number + unit icon 16×16 + short name; click = unbind |
-| Hint | 356, 156, 120, 50 (+ extra height) | Context text: "No recipe for these 3", bind preview "→ Lich (T3)" |
-| Action buttons | 2×2 at (356, 210), (418, 210), (356, 238), (418, 238); each 58×24 | Row 1 REROLL / BIND = secondary; row 2 SUMMON / ATTACK = primary. Anchored bottom-right |
-
-### 6.3 Shop screen
-The screen is dark (`N0`); only the right-column corner is decorated (D-R12). Every panel sits
-on one grid: columns **A** x 4–124, **B** x 128–352 (flexes with the canvas), **C** x 356–476;
-rows **1** y 28–148, **2** y 152–266. Shared edges, 4 px gaps, nothing hand-offset.
 
 | Element | Rect | Notes |
 |---|---|---|
-| Top bar + relic bar | as Encounter | Click relic → info panel with SELL ($x); Codex / Settings icons |
-| Equipment card | A1: 4, 28, 120, 120 | `panel_card`: "EQUIPMENT", icon ×2, name + price, effect, BUY (one offer per night) |
-| Item cards ×3 | B1: 128 / 204 / 280, 28, each 72×120 | `panel_card`; rarity stripe 4 px top; icon ×2; name 2 lines; price `G1`; BUY; consumables also BUY & USE. Cards share column B's width evenly |
-| Info panel | A2: 4, 152, 120, 114 | Hover / click details; USE and SELL actions for owned items |
-| Your loadout | B2: 128, 152, 224, 114 | Rows: ITEMS (held consumable slots), DICE (click → Dice Inspector), GEAR (owned equipment icons with info) |
-| Decor | C1: 356, 28, 120, 182 | `assets/bg/shop_decor.png`: arched alcove, shelf (skulls, candle, coins); the shopkeeper sprite stands in front at the bottom; "CRYPT MARKET" title above the arch |
-| Reroll shop | 356, 214, 120, 24 | "REROLL $4" secondary, tooltip |
-| Continue | 356, 242, 120, 24 | primary "NEXT FIGHT" |
+| Top bar | 0, 0, 480, 24 | As v1: label, trinket bar (drag to reorder), money, Codex + Settings |
+| Rule panel | 4, 28, 120, auto | Role (muted), one line per rule (`F2`; "No special rule" muted), "Bounty $n" (`G1`) on its own line |
+| Score panel | 4, 72, 120, ~50 | The squad being picked / scored: Power box `I1` × Count box `R1`, `= strength`; line ARMY `a / HP` (gold while a preview, `L2` once ≥ HP). Boxes bounce when their number changes |
+| Element pips | under the score panel | Scored dice per element this battle (+ the preview) |
+| Loadout | left column, rest of the height | GEAR (owned gear icons) and DICE (one face tile per die: its rune face, else its best non-BONE face; click → Dice Inspector) |
+| Hunter | centre: name y 1, HP bar y 12 (160×7), HP text y 20; the 32×32 hunter stands **on the ground** below them (feet at stage y 80, a 24×2 `N0` shadow), never on the village roofline | HP bar shows army + preview as the `G1` segment |
+| Banner / slam | centred, just above the army (stage y ~88) | Combo banner "TRIO Lv2" (`G1`), strength slam "P × C = S", result banners |
+| Battlefield | centre, between HP text and tray | Squads in columns, centred when they do not fill it; horde squads = soldiers, single / legend = one body + aura |
+| Dice tray | bottom of the centre column, dice 20×23, gap 6 | All dice (5–8). Picked dice raised with the `G1` ring; shackled dice dimmed |
+| Counters | 356, 28 | SUMMON n / REROLL n chips |
+| Pick tray | 356, ~52, 120 | Combo + level (or "PICK 3-5 DICE"), the picked dice in pick order, preview `P × C = S` (`G1`) |
+| Squads | below, flexible | One chip per summoned squad: unit icon, combo, strength (no hint text) |
+| Actions | bottom right, 2 × 58×24 | REROLL (secondary) · ROLL / SUMMON (primary, same button by phase) |
+
+### 6.3 Shop screen (Balatro layout, D-R16)
+The screen is dark (`N0`); only the right column is decorated (D-R12). Every block sits on one
+grid: columns **A** x 4–124, **B** x 128–352 (flexes with the canvas), **C** x 356–476.
+
+| Element | Rect | Notes |
+|---|---|---|
+| Top bar | as Battle | Trinket block + potion / gem block; click an owned item → USE / SELL $n menu |
+| NEXT BATTLE | A: 4, 28, 120×24 | primary |
+| REROLL $n | A: 4, 56, 120×24 | secondary, tooltip |
+| Your gear and dice | A: under REROLL, flexible | GEAR icons; DICE face tiles (click → Dice Inspector) |
+| Gear of the night | A, bottom-left corner | `panel_card`: caption, icon ×2, price `G1`, BUY; one offer per night |
+| Cards block | B, top (≥ 120 tall) | Compact cards in a centred, top-aligned row: price tag `G1`, 2 px rarity stripe (trinkets), icon ×2 or a die's six face tiles, BUY, BUY+USE for potions / gems. No names: the tooltip carries name + effect |
+| Coffers block | B, bottom (110 tall) | Compact coffers: price tag, coffin icon ×2, OPEN; the Coffer overlay lists the choices as compact cards with TAKE |
+| Decor | C: 356, 28 → bottom | `assets/bg/shop_decor.png` alcove anchored bottom, the shopkeeper in front, "CRYPT MARKET" title near the top |
 
 ### 6.4 Night Map
 - Background: a plain ordered-dither fade, light at the top (`N3`) to dark at the bottom
   (`N0`), no scenery (D-R12): the cards carry the information.
 - Top bar as Encounter (Night label "NIGHT 3 / 8", relics, money, Codex, Settings).
 - 3 encounter cards side by side: x 8 / 164 / 320, y 32, 152×192 (`panel_card`): enemy sprite ×1
-  on pedestal at the top centre, name, role, HP, reward, rule chip (boss); hover → tooltip.
+  on pedestal at the top centre, name, role, HP, "Bounty $n" on its own line, rule chip (boss);
+  no tooltip (the card already shows everything).
   Current card has `G1` 1 px border; defeated cards stamped "DEFEATED" (`R1`, pre-drawn stamp).
 - FIGHT button: centred, y 236, 160×24 primary.
 
@@ -373,9 +393,10 @@ rows **1** y 28–148, **2** y 152–266. Shared edges, 4 px gaps, nothing hand-
 | Overlay | Panel size | Content |
 |---|---|---|
 | Tooltip (floating) | max w 140, padding 4 | Only over overlays, where the info panel is covered. Header (icon ×2 + name), kind line, body `N6` |
-| Dice Inspector | 300 × 232 | One row per die: index + 6 `face_tile` 16×16 with glyph8 + badge; select up to N faces (`G1` ring); Confirm / Cancel |
-| Cash-out | 200 × 160 | Lines (label left, `$` right `G1`), total, CONTINUE |
-| Run Info / Recipe book | 456 × 246 | Left: 6×6 pair matrix (cell 20×20 + glyph8 header row/col); right: triple list + level table |
+| Dice Inspector | 300 × 232 | One row per die: index + 6 face tiles 16×16 (rune material, glyph8, points); pick up to N faces in order (`G1` ring + order number); Confirm / Cancel |
+| Spoils | 200 × 160 | Lines (label left, `$` right `G1`), total, CONTINUE |
+| Codex | 456 × 246 | Left: combos best first (name, pattern, level, P × C at that level, gold when levelled); right: the 4 rituals (unit + glyphs, core twice) and the 8 runes |
+| Coffer | 300 × 170 | The opened coffer's choices as market cards with TAKE, "Choose n", SKIP |
 | Game Over / Victory | full canvas | Title text large, stats list, buttons |
 | Settings | 220 × 200 | Toggles / sliders built from button 9-slices |
 | Confirm | 200 × 80 | Message + two buttons |
@@ -488,6 +509,11 @@ Counters tick by interpolating displayed value over the step duration (GAME_SPEC
 | Damage slam | Numbers font ×2, drop 8 px with bounce, colour `N7` with `R1` shadow |
 | Screen shake | Max 3 px, 200 ms, disabled by setting |
 | Reduce motion | No clone burst beyond 1 per group, no shake, no flashes; tween durations ×0.5 |
+| Dice roll (v2) | Every die tumbles; each lands at its own random time 0.35–0.9 s, one die always last; a small hop and a click per landing |
+| Number pop (v2) | Each scored die / rune / trinket step pops its label (`+5 Power` `I1`, `+3 Count` `R1`) above the die or trinket, rising 10 px and fading |
+| Aura tiers (v2) | Single units and legends: Count ≥ 10 → `vfx/aura` ring tinted with the element light colour; ≥ 40 → + `vfx/flame` crown; ≥ 160 → flame ×2 |
+| Charge (v2) | One squad at a time flies at the hunter (3 waves), impact flash + shake, the HP bar drains by that squad's share, `-damage` pops |
+| Result (v2) | Win: dissolve, `$` burst, banner "THE HUNTER FALLS!"; loss: the hunter laughs (fast idle), the army drifts and fades, banner "THE HUNTERS PREVAIL" |
 
 VFX sprites (`vfx/`):
 
@@ -499,7 +525,8 @@ VFX sprites (`vfx/`):
 | `coin.png` | 24×6 (4 × 6×6) | Spinning coin |
 | `soul.png` | 12×6 (2 × 6×6) | Soul wisp for SUMMON counters |
 | `impact_ring.png` | 48×16 (3 × 16×16) | Impact ring |
-| `aura.png` | 160×40 (4 × 40×40) | Enraged boss aura, `R1/R0` |
+| `aura.png` | 160×40 (4 × 40×40) | Enraged boss aura, `R1/R0`; also the tinted unit aura |
+| `flame.png` | 128×32 (4 × 32×32) | Flame crown in `N7/N6/N5`, tinted per element at runtime |
 
 ---
 
@@ -507,7 +534,8 @@ VFX sprites (`vfx/`):
 
 | Category | Path pattern | Size (sheet) | Frames | Count |
 |---|---|---|---|---|
-| Units | `assets/sprites/units/<unit_id>.png` (WISP → `wisp_mask.png`) | 32×16 | 2 | 19 |
+| Units | `assets/sprites/units/<unit_id>.png` (WISP → `wisp_mask.png`) | 32×16 | 2 | 26 |
+| Legends | `assets/sprites/units/<unit_id>.png` | 64×32 | 2 | 6 |
 | Legion banner | `assets/sprites/units/legion_banner.png` | 16×16 | 1 | 1 |
 | Crowd minis | `assets/sprites/minis/mini_<element>.png`, `mini_wisp_mask.png` | 16×8 | 2 | 7 |
 | Enemies | `assets/sprites/enemies/<enemy_id>.png` | 96×32 | 3 | 9 |
@@ -516,17 +544,18 @@ VFX sprites (`vfx/`):
 | Glyphs 12 | `assets/sprites/dice/glyph_<element|wild>.png` | 12×12 | 1 | 7 |
 | Glyphs 8 | `assets/sprites/dice/glyph8_<element|wild>.png` | 8×8 | 1 | 7 |
 | Essence pips | `assets/sprites/dice/pip_<element>.png` | 6×6 | 1 | 6 |
-| Modifier badges | `assets/sprites/dice/mod_<sharp|swarm|hex|gold>.png` | 5×5 | 1 | 4 |
-| Dice overlays | `die_select`, `die_bound`, `die_shackle`, `face_tile` | 22/22/20/16 | 1 | 4 |
-| Relic icons | `assets/icons/relics/<relic_id>.png` | 16×16 | 1 | 25 |
-| Consumable bases | `assets/icons/bases/tome_base.png`, `sigil_base.png` | 16×16 | 1 | 2 |
-| Consumable icons | `assets/icons/consumables/<consumable_id>.png` (12 composed + 6 drawn) | 16×16 | 1 | 18 |
-| Equipment icons | `assets/icons/equipment/<equipment_id>.png` | 16×16 | 1 | 8 |
+| Rune bodies | `assets/sprites/dice/die_body_<rune>.png` | 20×20 | 1 | 8 |
+| Points badges | `assets/sprites/dice/num_<1..9>.png` | 7×9 | 1 | 9 |
+| Dice overlays | `die_select`, `die_bound`, `die_shackle`, `face_tile`, `face_tile_<rune>` ×8 | 22/22/20/16 | 1 | 12 |
+| Trinket icons | `assets/icons/relics/<relic_id>.png` | 16×16 | 1 | 30 |
+| Potion / gem icons | `assets/icons/consumables/<id>.png` | 16×16 | 1 | 25 |
+| Coffer icons | `assets/icons/coffers/<coffer_id>.png` | 16×16 | 1 | 12 |
+| Gear icons | `assets/icons/equipment/<equipment_id>.png` | 16×16 | 1 | 13 |
 | Stat icons | `assets/icons/stats/<name>.png` | 8×8 | 1 | 9 |
 | UI 9-slices & parts | `assets/ui/*.png` (§7) | various | 1 | 22 |
 | Backgrounds | `assets/bg/bg_title.png`, `bg_map.png`, `bg_battle.png` | 640×300 (largest canvas), drawn centred; the 480×270 centre at (80, 15) is the safe area | 1 | 3 |
 | Shop decor | `assets/bg/shop_decor.png` | 120×182 (shop column C1) | 1 | 1 |
-| VFX | `assets/vfx/*.png` (§10) | various | various | 7 |
+| VFX | `assets/vfx/*.png` (§10) | various | various | 8 |
 | Logo | `assets/ui/logo.png` | 160×48 | 1 | 1 |
 | App icon | `assets/icon/app_icon_32.png` → exported ×16 to 512×512 | 32×32 | 1 | 1 |
 | Palette | `assets/palette/hallow32.gpl`, `hallow32.png` | 32×1 | – | 2 |

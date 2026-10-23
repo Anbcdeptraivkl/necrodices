@@ -1,288 +1,320 @@
 {
-  "version": 1,
-  "tier_rank": {
-    "T3": 3,
-    "T2": 2,
-    "T1": 1,
-    "WISP": 0
-  },
-  "wisp_keys": [
-    "BONE+ICE",
-    "BONE+VOLT",
-    "FIRE+VOLT",
-    "FIRE+METAL",
-    "ICE+METAL",
-    "LEAF+VOLT",
-    "LEAF+METAL"
-  ],
+  "version": 2,
   "units": [
     {
       "id": "SKELETON_WARRIOR",
       "name": "Skeleton Warrior",
-      "tier": "T1",
-      "recipe": [
-        "BONE",
+      "kind": "T1",
+      "elements": [
         "BONE"
       ],
-      "base_p": 10,
-      "base_c": 2,
-      "grow_p": 8,
-      "grow_c": 1,
+      "display": "horde",
       "mini": "bone"
     },
     {
       "id": "FIRE_IMP",
       "name": "Fire Imp",
-      "tier": "T1",
-      "recipe": [
-        "FIRE",
+      "kind": "T1",
+      "elements": [
         "FIRE"
       ],
-      "base_p": 6,
-      "base_c": 3,
-      "grow_p": 6,
-      "grow_c": 1,
+      "display": "horde",
       "mini": "fire"
     },
     {
       "id": "FROST_BAT",
       "name": "Frost Bat",
-      "tier": "T1",
-      "recipe": [
-        "ICE",
+      "kind": "T1",
+      "elements": [
         "ICE"
       ],
-      "base_p": 14,
-      "base_c": 1,
-      "grow_p": 10,
-      "grow_c": 1,
+      "display": "horde",
       "mini": "ice"
     },
     {
       "id": "PUMPKINLING",
       "name": "Pumpkinling",
-      "tier": "T1",
-      "recipe": [
-        "LEAF",
+      "kind": "T1",
+      "elements": [
         "LEAF"
       ],
-      "base_p": 8,
-      "base_c": 2,
-      "grow_p": 8,
-      "grow_c": 1,
+      "display": "horde",
       "mini": "leaf"
     },
     {
       "id": "VOLT_GHOST",
       "name": "Volt Ghost",
-      "tier": "T1",
-      "recipe": [
-        "VOLT",
+      "kind": "T1",
+      "elements": [
         "VOLT"
       ],
-      "base_p": 12,
-      "base_c": 2,
-      "grow_p": 8,
-      "grow_c": 1,
+      "display": "horde",
       "mini": "volt"
     },
     {
       "id": "HAUNTED_ARMOR",
       "name": "Haunted Armor",
-      "tier": "T1",
-      "recipe": [
-        "METAL",
+      "kind": "T1",
+      "elements": [
         "METAL"
       ],
-      "base_p": 18,
-      "base_c": 1,
-      "grow_p": 12,
-      "grow_c": 1,
+      "display": "horde",
       "mini": "metal"
     },
     {
       "id": "FLAME_SKULL",
       "name": "Flame Skull",
-      "tier": "T2",
-      "recipe": [
+      "kind": "HYBRID",
+      "elements": [
         "BONE",
         "FIRE"
       ],
-      "base_p": 15,
-      "base_c": 3,
-      "grow_p": 10,
-      "grow_c": 1,
+      "display": "horde",
       "mini": "bone"
     },
     {
       "id": "SCARECROW",
       "name": "Scarecrow",
-      "tier": "T2",
-      "recipe": [
+      "kind": "HYBRID",
+      "elements": [
         "BONE",
         "LEAF"
       ],
-      "base_p": 16,
-      "base_c": 3,
-      "grow_p": 10,
-      "grow_c": 1,
+      "display": "horde",
       "mini": "bone"
     },
     {
       "id": "SHIELD_SKELETON",
       "name": "Shield Skeleton",
-      "tier": "T2",
-      "recipe": [
+      "kind": "HYBRID",
+      "elements": [
         "BONE",
         "METAL"
       ],
-      "base_p": 20,
-      "base_c": 2,
-      "grow_p": 10,
-      "grow_c": 1,
+      "display": "horde",
       "mini": "bone"
     },
     {
       "id": "STEAM_SLIME",
       "name": "Steam Slime",
-      "tier": "T2",
-      "recipe": [
+      "kind": "HYBRID",
+      "elements": [
         "FIRE",
         "ICE"
       ],
-      "base_p": 10,
-      "base_c": 4,
-      "grow_p": 8,
-      "grow_c": 1,
+      "display": "horde",
       "mini": "fire"
     },
     {
       "id": "JACK_O_LANTERN",
       "name": "Jack-o'-Lantern",
-      "tier": "T2",
-      "recipe": [
+      "kind": "HYBRID",
+      "elements": [
         "FIRE",
         "LEAF"
       ],
-      "base_p": 12,
-      "base_c": 4,
-      "grow_p": 8,
-      "grow_c": 1,
+      "display": "horde",
       "mini": "fire"
     },
     {
       "id": "BOG_WITCH",
       "name": "Bog Witch",
-      "tier": "T2",
-      "recipe": [
+      "kind": "HYBRID",
+      "elements": [
         "ICE",
         "LEAF"
       ],
-      "base_p": 12,
-      "base_c": 3,
-      "grow_p": 10,
-      "grow_c": 1,
+      "display": "horde",
       "mini": "ice"
     },
     {
       "id": "STORM_BANSHEE",
       "name": "Storm Banshee",
-      "tier": "T2",
-      "recipe": [
+      "kind": "HYBRID",
+      "elements": [
         "ICE",
         "VOLT"
       ],
-      "base_p": 22,
-      "base_c": 2,
-      "grow_p": 12,
-      "grow_c": 1,
+      "display": "horde",
       "mini": "ice"
     },
     {
       "id": "TESLA_SPIDER",
       "name": "Tesla Spider",
-      "tier": "T2",
-      "recipe": [
+      "kind": "HYBRID",
+      "elements": [
         "VOLT",
         "METAL"
       ],
-      "base_p": 14,
-      "base_c": 3,
-      "grow_p": 10,
-      "grow_c": 1,
+      "display": "horde",
       "mini": "volt"
     },
     {
       "id": "WISP",
       "name": "Wisp",
-      "tier": "WISP",
-      "recipe": [],
-      "fallback": true,
-      "base_p": 5,
-      "base_c": 1,
-      "grow_p": 3,
-      "grow_c": 1,
+      "kind": "WISP",
+      "elements": [],
+      "display": "horde",
       "mini": "wisp"
-    },
-    {
-      "id": "LICH",
-      "name": "Lich",
-      "tier": "T3",
-      "recipe": [
-        "BONE",
-        "BONE",
-        "BONE"
-      ],
-      "base_p": 40,
-      "base_c": 8,
-      "grow_p": 20,
-      "grow_c": 2,
-      "mini": "bone"
     },
     {
       "id": "HEADLESS_HORSEMAN",
       "name": "Headless Horseman",
-      "tier": "T3",
-      "recipe": [
+      "kind": "RITUAL",
+      "elements": [
         "BONE",
         "FIRE",
         "LEAF"
       ],
-      "base_p": 60,
-      "base_c": 6,
-      "grow_p": 20,
-      "grow_c": 2,
-      "mini": "bone"
+      "display": "single"
     },
     {
       "id": "STITCHED_GOLEM",
       "name": "Stitched Golem",
-      "tier": "T3",
-      "recipe": [
+      "kind": "RITUAL",
+      "elements": [
         "BONE",
         "VOLT",
         "METAL"
       ],
-      "base_p": 80,
-      "base_c": 4,
-      "grow_p": 25,
-      "grow_c": 2,
-      "mini": "bone"
+      "display": "single"
     },
     {
       "id": "WITCH_QUEEN",
       "name": "Witch Queen",
-      "tier": "T3",
-      "recipe": [
+      "kind": "RITUAL",
+      "elements": [
         "ICE",
         "LEAF",
         "VOLT"
       ],
-      "base_p": 45,
-      "base_c": 7,
-      "grow_p": 20,
-      "grow_c": 2,
-      "mini": "ice"
+      "display": "single"
+    },
+    {
+      "id": "CLOCKWORK_KRAKEN",
+      "name": "Clockwork Kraken",
+      "kind": "RITUAL",
+      "elements": [
+        "FIRE",
+        "ICE",
+        "METAL"
+      ],
+      "display": "single"
+    },
+    {
+      "id": "LICH",
+      "name": "Lich",
+      "kind": "ELITE",
+      "elements": [
+        "BONE"
+      ],
+      "display": "single"
+    },
+    {
+      "id": "HELLHOUND",
+      "name": "Hellhound",
+      "kind": "ELITE",
+      "elements": [
+        "FIRE"
+      ],
+      "display": "single"
+    },
+    {
+      "id": "FROST_WRAITH",
+      "name": "Frost Wraith",
+      "kind": "ELITE",
+      "elements": [
+        "ICE"
+      ],
+      "display": "single"
+    },
+    {
+      "id": "MANDRAKE_BRUTE",
+      "name": "Mandrake Brute",
+      "kind": "ELITE",
+      "elements": [
+        "LEAF"
+      ],
+      "display": "single"
+    },
+    {
+      "id": "THUNDER_GHOUL",
+      "name": "Thunder Ghoul",
+      "kind": "ELITE",
+      "elements": [
+        "VOLT"
+      ],
+      "display": "single"
+    },
+    {
+      "id": "GARGOYLE",
+      "name": "Gargoyle",
+      "kind": "ELITE",
+      "elements": [
+        "METAL"
+      ],
+      "display": "single"
+    },
+    {
+      "id": "BONE_DRAGON",
+      "name": "Bone Dragon",
+      "kind": "LEGEND",
+      "elements": [
+        "BONE"
+      ],
+      "display": "legend"
+    },
+    {
+      "id": "EMBER_COLOSSUS",
+      "name": "Ember Colossus",
+      "kind": "LEGEND",
+      "elements": [
+        "FIRE"
+      ],
+      "display": "legend"
+    },
+    {
+      "id": "FROST_WYRM",
+      "name": "Frost Wyrm",
+      "kind": "LEGEND",
+      "elements": [
+        "ICE"
+      ],
+      "display": "legend"
+    },
+    {
+      "id": "ELDER_HOLLOW",
+      "name": "Elder Hollow",
+      "kind": "LEGEND",
+      "elements": [
+        "LEAF"
+      ],
+      "display": "legend"
+    },
+    {
+      "id": "STORM_TITAN",
+      "name": "Storm Titan",
+      "kind": "LEGEND",
+      "elements": [
+        "VOLT"
+      ],
+      "display": "legend"
+    },
+    {
+      "id": "IRON_JUGGERNAUT",
+      "name": "Iron Juggernaut",
+      "kind": "LEGEND",
+      "elements": [
+        "METAL"
+      ],
+      "display": "legend"
+    },
+    {
+      "id": "PHANTOM_PARADE",
+      "name": "Phantom Parade",
+      "kind": "PARADE",
+      "elements": [],
+      "display": "single"
     }
   ]
 }

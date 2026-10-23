@@ -1,36 +1,37 @@
 class_name EncounterState
 extends RefCounted
-## One encounter (GAME_SPEC §4.2–§4.4): the summon-turn state machine, its legality table
-## (`can`), the player commands, the projected damage and the combat result.
-## Pattern: flat FSM + legality table; previews run the same Scorer on a shadow copy of the
-## commit, so the projection equals the combat result for the same army.
+## One battle (GAME_SPEC §4.2–§4.5): the summon state machine, its legality table (`can`), the
+## player commands, the squad preview / projected damage and the resolution.
+## Pattern: flat FSM + legality table. Previews run the same Scorer on copies of the trinkets
+## (counters applied to copies, no luck), so the preview equals the summon without luck.
 ## Views call commands and read state; every command emits `changed`.
 
 signal changed
 signal rolled(indices: PackedInt32Array)
 
-enum Phase { AWAIT_INPUT, DONE }
-enum Verb { SELECT, REROLL, BIND, UNBIND, SUMMON, ATTACK, USE_CONSUMABLE }
+enum Phase { AWAIT_ROLL, PICK, DONE }
+enum Verb { ROLL, SELECT, REROLL, SUMMON, USE_CONSUMABLE }
 
 var db: ContentDb
 var run: RunState
 var entry: Dictionary
 var rules: PackedStringArray = []
 var hp := 0.0
-var phase: Phase = Phase.AWAIT_INPUT
+var phase: Phase = Phase.AWAIT_ROLL
 var summons_left := 0
 var rerolls_left := 0
-var turn := 0
-var tray_size := 0
-var top: PackedInt32Array = []        # top face index per tray die
-var selected: PackedByteArray = []    # 1 = selected
-var bound: PackedInt32Array = []      # pending group index, -1 = free
-var shackled := -1
-var pending: Array[Group] = []
-var army: Array[Group] = []
-var result: ScoreResult
-var win := false
 var summons_used := 0
+var tray_size := 0
+var top: PackedInt32Array = []        # top face index per die, -1 = still in the cup
+var picked: PackedInt32Array = []     # tray indices in pick order
+var shackled := -1
+var squads: Array[Squad] = []
+var resolution: ResolveResult
+var win := false
+var gilded := 0                       # GILDED faces held after the last summon (§4.8)
+var started := false
+var _seen_units := {}
+var _battle_elements := {}
 
 
 func _init(p_db: ContentDb, p_run: RunState) -> void:
@@ -45,65 +46,73 @@ func _init(p_db: ContentDb, p_run: RunState) -> void:
 		summons -= 1
 	summons_left = maxi(int(e["min_summons"]), summons)
 	rerolls_left = int(e["base_rerolls"]) + run.equipment_bonus("rerolls", db)
+	tray_size = run.dice.size()
+	top.resize(tray_size)
+	top.fill(-1)
 
 
-## Starts turn 1. Separate from _init so the run can be saved before the first roll (§12.1).
+## Separate from _init so the run can be saved before anything happens (§13).
 func begin() -> void:
 	for r in run.relics:
 		r.disabled = false
 	if rules.has("WITCH_HUNTER") and not run.relics.is_empty():
 		run.relics[0].disabled = true
-	_turn_start()
+	started = true
+	changed.emit()
 
 
 func can(verb: Verb, arg: int = -1) -> bool:
-	if phase != Phase.AWAIT_INPUT:
+	if phase == Phase.DONE:
 		return false
 	match verb:
+		Verb.ROLL:
+			return phase == Phase.AWAIT_ROLL
 		Verb.SELECT:
-			return arg >= 0 and arg < tray_size and bound[arg] == -1 and arg != shackled
+			return phase == Phase.PICK and arg >= 0 and arg < tray_size and arg != shackled \
+				and (picked.has(arg) or picked.size() < int(db.economy["pick_max"]))
 		Verb.REROLL:
-			return rerolls_left > 0 and selected_count() >= 1
-		Verb.BIND:
-			var n := selected_count()
-			return n >= 2 and n <= 3 and not bind_preview().is_empty()
-		Verb.UNBIND:
-			return arg >= 0 and arg < pending.size()
-		Verb.SUMMON, Verb.USE_CONSUMABLE:
+			return phase == Phase.PICK and rerolls_left > 0 and not picked.is_empty()
+		Verb.SUMMON:
+			return phase == Phase.PICK and picked.size() >= int(db.economy["pick_min"]) \
+				and picked.size() <= int(db.economy["pick_max"])
+		Verb.USE_CONSUMABLE:
 			return true
-		Verb.ATTACK:
-			return army.size() + pending.size() >= 1
 	return false
 
 
+## The face showing on die i, or null while the dice are in the cup.
 func face_at(i: int) -> Face:
-	return run.dice[i].faces[top[i]]
+	return run.dice[i].faces[top[i]] if top[i] >= 0 else null
 
 
-func selected_count() -> int:
-	return selected.count(1)
+func is_picked(i: int) -> bool:
+	return picked.has(i)
 
 
-func selected_indices() -> PackedInt32Array:
-	var out: PackedInt32Array = []
+func roll() -> bool:
+	if not can(Verb.ROLL):
+		return false
+	var all: PackedInt32Array = []
 	for i in tray_size:
-		if selected[i] == 1:
-			out.append(i)
-	return out
-
-
-## What BIND would make from the current selection: {unit, elements} or {}.
-func bind_preview() -> Dictionary:
-	var faces: Array[Face] = []
-	for i in selected_indices():
-		faces.append(face_at(i))
-	return Recipes.resolve(db, faces, run.levels)
+		top[i] = run.rng.roll_face()
+		all.append(i)
+	_roll_trinkets()
+	picked.clear()
+	_shackle()
+	phase = Phase.PICK
+	rolled.emit(all)
+	changed.emit()
+	return true
 
 
 func toggle_select(i: int) -> bool:
 	if not can(Verb.SELECT, i):
 		return false
-	selected[i] = 1 - selected[i]
+	var at := picked.find(i)
+	if at >= 0:
+		picked.remove_at(at)
+	else:
+		picked.append(i)
 	changed.emit()
 	return true
 
@@ -111,210 +120,233 @@ func toggle_select(i: int) -> bool:
 func reroll() -> bool:
 	if not can(Verb.REROLL):
 		return false
-	var idx := selected_indices()
+	var idx := picked.duplicate()
 	for i in idx:
 		top[i] = run.rng.roll_face()
 	rerolls_left -= 1
-	_clear_selection()
+	picked.clear()
 	_shackle()
 	rolled.emit(idx)
 	changed.emit()
 	return true
 
 
-func bind() -> bool:
-	if not can(Verb.BIND):
-		return false
-	var idx := selected_indices()
-	pending.append(_make_group(idx))
-	for i in idx:
-		bound[i] = pending.size() - 1
-	_clear_selection()
-	changed.emit()
-	return true
-
-
-func unbind(k: int) -> bool:
-	if not can(Verb.UNBIND, k):
-		return false
-	pending.remove_at(k)
-	_reindex_bound()
-	changed.emit()
-	return true
-
-
-## SUMMON (§4.3): commits the pending groups (possibly none — the UI confirms that).
+## SUMMON (§4.5): luck → counters → score → commit → join the army → resolve when won or out
+## of summons.
 func summon() -> bool:
 	if not can(Verb.SUMMON):
 		return false
-	_commit()
-	if summons_left == 0:
-		_combat()
+	var squad := make_squad(picked)
+	_roll_luck(squad)
+	var ctx := _ctx(squad)
+	_apply_counters(ctx, run.relics)
+	squad.result = Scorer.score_squad(db, squad, run.relics, run.levels, ctx, rules)
+	_commit(squad)
+	squads.append(squad)
+	summons_left -= 1
+	summons_used += 1
+	_seen_units[squad.unit_id] = true
+	for e in squad.scored_elements():
+		_battle_elements[e] = true
+	picked.clear()
+	shackled = -1
+	var res := army_resolution()
+	if res.damage >= hp or summons_left <= 0:
+		_finish(res, squad)
 	else:
-		_turn_start()
+		phase = Phase.AWAIT_ROLL
 	changed.emit()
 	return true
 
 
-## ATTACK NOW: commit as a normal summon, then fight with the summons that remain unused.
-func attack_now() -> bool:
-	if not can(Verb.ATTACK):
-		return false
-	_commit()
-	_combat()
-	changed.emit()
-	return true
-
-
-## Uses a held consumable mid-turn (§4.8); faces already showing update, pending groups whose
-## faces changed are re-resolved (or unbound when no longer valid).
+## Potions / gems mid-battle (§4.5): faces showing update at once; the pick is re-read.
 func use_consumable(index: int, targets: Array[Vector2i]) -> bool:
 	if not can(Verb.USE_CONSUMABLE):
 		return false
 	if not ConsumableFx.use_held(db, run, index, targets):
 		return false
-	_refresh_pending()
 	changed.emit()
 	return true
 
 
-## Essence per element over army + pending (what the scorer will count).
-func preview_essence() -> Dictionary:
-	var all: Array[Group] = []
-	all.append_array(army)
-	all.append_array(pending)
-	return ScoreCtx.build(all, 0, 0, 0, 0).essence
-
-
-## Damage if the pending groups were summoned now and combat followed (§4.3 projected damage).
-func projected() -> ScoreResult:
-	var shadow_relics: Array[RelicInstance] = []
+## The squad the current pick would summon, scored without luck (null when the pick is not
+## legal). Counters are applied to trinket copies, so the run never changes.
+func preview() -> Squad:
+	if not can(Verb.SUMMON):
+		return null
+	var squad := make_squad(picked)
+	var shadow: Array[RelicInstance] = []
 	for r in run.relics:
-		shadow_relics.append(r.copy())
-	var shadow_army: Array[Group] = []
-	for g in army:
-		shadow_army.append(g)
-	var money_gain := 0
-	for g in pending:
-		var c := g.copy()
-		c.summon_index = shadow_army.size()
-		shadow_army.append(c)
-		money_gain += _commit_effects(c, shadow_relics)
-	var ctx := ScoreCtx.build(shadow_army, run.money + money_gain, rerolls_left, maxi(0, summons_left - 1),
-		run.bosses_defeated)
-	return Scorer.score(db, shadow_army, shadow_relics, run.levels, ctx, rules)
+		shadow.append(r.copy())
+	var ctx := _ctx(squad)
+	_apply_counters(ctx, shadow)
+	squad.result = Scorer.score_squad(db, squad, shadow, run.levels, ctx, rules)
+	return squad
 
 
-func _turn_start() -> void:
-	turn += 1
-	tray_size = run.dice.size()
-	top.resize(tray_size)
-	selected.resize(tray_size)
-	bound.resize(tray_size)
-	pending.clear()
-	var all: PackedInt32Array = []
-	for i in tray_size:
-		top[i] = run.rng.roll_face()
-		bound[i] = -1
-		all.append(i)
-	_clear_selection()
-	shackled = -1
-	_shackle()
-	rolled.emit(all)
-
-
-## Bell Ringer (§4.3): after every roll / reroll one random free die is shackled for the turn.
-func _shackle() -> void:
-	if not rules.has("BELL_RINGER"):
-		return
-	shackled = -1
-	var free: Array = []
-	for i in tray_size:
-		if bound[i] == -1:
-			free.append(i)
-	if free.is_empty():
-		return
-	shackled = run.rng.pick("BOSS", free)
-	selected[shackled] = 0
-
-
-func _clear_selection() -> void:
-	for i in tray_size:
-		selected[i] = 0
-
-
-func _make_group(idx: PackedInt32Array) -> Group:
+## Combo the current pick forms (for the pick panel before it is legal): {} when empty.
+func pick_combo() -> Dictionary:
+	if picked.is_empty():
+		return {}
 	var faces: Array[Face] = []
+	for i in picked:
+		faces.append(face_at(i))
+	return Combos.detect(db, faces)
+
+
+## Army damage so far, plus the previewed squad when the pick is legal (§5.4).
+func projected() -> ResolveResult:
+	var strengths := _strengths()
+	var p := preview()
+	if p != null:
+		strengths.append(p.result.strength)
+	return Scorer.resolve(db, strengths, run.relics, _resolve_ctx())
+
+
+func army_resolution() -> ResolveResult:
+	return Scorer.resolve(db, _strengths(), run.relics, _resolve_ctx())
+
+
+func make_squad(idx: PackedInt32Array) -> Squad:
+	var squad := Squad.new()
+	squad.dice = idx.duplicate()
 	for i in idx:
-		faces.append(face_at(i).copy())
-	var res := Recipes.resolve(db, faces, run.levels)
-	var g := Group.new()
-	g.unit_id = res["unit"]
-	g.faces = faces
-	g.elements = res["elements"]
-	g.die_indices = idx
-	return g
-
-
-func _reindex_bound() -> void:
+		squad.faces.append(face_at(i).copy())
+	var m := Combos.detect(db, squad.faces)
+	squad.combo = m["combo"]
+	squad.unit_id = m["unit"]
+	squad.unit_elements = m["unit_elements"]
+	squad.elements = m["elements"]
+	squad.scored = m["scored"]
 	for i in tray_size:
-		bound[i] = -1
-	for k in pending.size():
-		for i in pending[k].die_indices:
-			bound[i] = k
+		if not idx.has(i) and top[i] >= 0:
+			squad.held.append(i)
+			squad.held_faces.append(face_at(i).copy())
+	return squad
 
 
-func _refresh_pending() -> void:
-	var keep: Array[Group] = []
-	for g in pending:
-		var faces: Array[Face] = []
-		for i in g.die_indices:
-			faces.append(face_at(i))
-		if Recipes.can_bind(db, faces, run.levels):
-			keep.append(_make_group(g.die_indices))
-	pending = keep
-	_reindex_bound()
+func _strengths() -> Array[float]:
+	var out: Array[float] = []
+	for s in squads:
+		out.append(s.result.strength)
+	return out
 
 
-## Commit-time effects of one group (§4.3 COMMIT): SUMMON relic counters and GOLD faces.
-## Mutates `relics` (the run's or a shadow copy); returns the money it pays.
-func _commit_effects(g: Group, relics: Array[RelicInstance]) -> int:
-	var money := 0
-	for f in g.faces:
-		if f.modifier == "GOLD":
-			money += int(db.economy["modifiers"]["GOLD"]["value"])
-	var one: Array[Group] = [g]
-	var ctx := ScoreCtx.build(one, run.money, rerolls_left, summons_left, run.bosses_defeated)
+func _ctx(squad: Squad) -> ScoreCtx:
+	var ctx := ScoreCtx.new()
+	ctx.money = run.money
+	ctx.rerolls_left = rerolls_left
+	ctx.summons_left = summons_left - 1
+	ctx.squads_before = squads.size()
+	ctx.bosses_defeated = run.bosses_defeated
+	ctx.seen_units = _seen_units.duplicate()
+	ctx.battle_elements = _battle_elements.duplicate()
+	ctx.squad = squad
+	return ctx
+
+
+func _resolve_ctx() -> ScoreCtx:
+	var ctx := ScoreCtx.new()
+	ctx.money = run.money
+	ctx.rerolls_left = rerolls_left
+	ctx.summons_left = summons_left
+	ctx.squads_before = squads.size()
+	ctx.bosses_defeated = run.bosses_defeated
+	return ctx
+
+
+## ROLL trinkets (Loaded Bone): after a roll with no `element` showing, one die that has such a
+## face (ROLL stream) turns to it.
+func _roll_trinkets() -> void:
+	for r in run.relics:
+		if r.disabled:
+			continue
+		for block: Dictionary in RulesRegistry.relic_blocks(db.relics[r.id]):
+			if block["trigger"] != "ROLL":
+				continue
+			for effect: Dictionary in block["effects"]:
+				if effect["op"] == "ensure_face":
+					_ensure_face(effect["element"])
+
+
+func _ensure_face(element: String) -> void:
+	var candidates: Array = []
+	for i in tray_size:
+		var f := face_at(i)
+		if f.element == element and not f.is_tomb():
+			return
+		if run.dice[i].face_of(element) >= 0:
+			candidates.append(i)
+	if candidates.is_empty():
+		return
+	var i: int = run.rng.pick("ROLL", candidates)
+	top[i] = run.dice[i].face_of(element)
+
+
+## Bell Ringer (§6.11): after every roll / reroll one random die is shackled.
+func _shackle() -> void:
+	shackled = -1
+	if rules.has("BELL_RINGER"):
+		var all: Array = []
+		for i in tray_size:
+			all.append(i)
+		shackled = run.rng.pick("BOSS", all)
+
+
+## LUCKY faces roll their luck before scoring (LUCK stream; previews never do).
+func _roll_luck(squad: Squad) -> void:
+	var row: Dictionary = db.economy["runes"]["LUCKY"]
+	for k in squad.scored:
+		if squad.faces[k].rune == "LUCKY":
+			squad.luck[k] = {"count": run.rng.one_in("LUCK", int(row["one_in"])),
+				"money": run.rng.one_in("LUCK", int(row["money_one_in"]))}
+
+
+## SUMMON counters (Overgrowth) before scoring, so the squad being summoned counts.
+func _apply_counters(ctx: ScoreCtx, relics: Array[RelicInstance]) -> void:
 	for r in relics:
 		if r.disabled:
 			continue
 		var row: Dictionary = db.relics[r.id]
-		if row.has("counter") and RelicEval.cond(row["counter"]["cond"], g, 0, ctx, db):
+		if row.has("counter") and RelicEval.cond(row["counter"]["cond"], ctx):
 			r.counter += int(row["counter"]["inc"])
-		for block: Dictionary in RulesRegistry.relic_blocks(row):
-			if block["trigger"] != "SUMMON" or not RelicEval.cond(block["cond"], g, 0, ctx, db):
+
+
+## Commit effects (§5.3): SUMMON trinket money, lucky money, glass breaks, stats.
+func _commit(squad: Squad) -> void:
+	var ctx := _ctx(squad)
+	var money := 0
+	for r in run.relics:
+		if r.disabled:
+			continue
+		for block: Dictionary in RulesRegistry.relic_blocks(db.relics[r.id]):
+			if block["trigger"] != "SUMMON" or not RelicEval.cond(block["cond"], ctx):
 				continue
 			for effect: Dictionary in block["effects"]:
-				if effect["op"] == "add_money":
-					money += int(RelicEval.value(effect["value"], r.counter, ctx))
-	return money
+				money += int(RelicEval.value(effect["value"], r.counter, ctx))
+	var runes: Dictionary = db.economy["runes"]
+	for k: int in squad.luck:
+		if squad.luck[k]["money"]:
+			money += int(runes["LUCKY"]["money"])
+	for k in squad.scored:
+		if squad.faces[k].rune != "GLASS" or not run.rng.one_in("LUCK", int(runes["GLASS"]["break_one_in"])):
+			continue
+		var tray := squad.dice[k]
+		var face := face_at(tray)
+		if face.rune == "GLASS":
+			face.rune = ""
+			squad.broken.append(tray)
+	squad.money = money
+	run.money += money
+	run.record_summon(squad.unit_id, squad.result.strength)
 
 
-func _commit() -> void:
-	for g in pending:
-		g.summon_index = army.size()
-		army.append(g)
-		run.money += _commit_effects(g, run.relics)
-		run.record_summon(g.unit_id)
-	pending.clear()
-	summons_left -= 1
-	summons_used += 1
-	_reindex_bound()
-
-
-func _combat() -> void:
-	var ctx := ScoreCtx.build(army, run.money, rerolls_left, summons_left, run.bosses_defeated)
-	result = Scorer.score(db, army, run.relics, run.levels, ctx, rules)
-	win = result.damage >= hp
-	run.stats["best_damage"] = maxf(float(run.stats["best_damage"]), result.damage)
+func _finish(res: ResolveResult, last: Squad) -> void:
+	resolution = res
+	win = res.damage >= hp
+	gilded = 0
+	for f in last.held_faces:
+		if f.rune == "GILDED":
+			gilded += 1
+	run.stats["best_damage"] = maxf(float(run.stats["best_damage"]), res.damage)
 	phase = Phase.DONE

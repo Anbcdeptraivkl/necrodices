@@ -1,6 +1,6 @@
 class_name RunFlow
 extends RefCounted
-## Run-phase transitions (GAME_SPEC §3, §4.5, §7): the only code that changes RunState.phase.
+## Run-phase transitions (GAME_SPEC §3, §4.8, §7): the only code that changes RunState.phase.
 ## Pattern: flat FSM over RunState.Phase — NIGHT_MAP → ENCOUNTER → (win) SHOP → NIGHT_MAP …,
 ## (lose) GAME_OVER, (Night 8 boss) VICTORY. Screens call these and route on the result.
 
@@ -11,7 +11,7 @@ static func new_run(db: ContentDb, run_seed: String) -> RunState:
 	run.rng = RngStreams.create(run_seed)
 	run.money = int(db.economy["start_money"])
 	for i in int(db.economy["start_dice"]):
-		run.dice.append(Die.standard())
+		run.dice.append(Die.random(run.rng.stream("DICE")))
 	run.night = 1
 	NightGen.generate(db, run)
 	run.phase = RunState.Phase.NIGHT_MAP
@@ -26,10 +26,10 @@ static func start_encounter(db: ContentDb, run: RunState) -> EncounterState:
 	return EncounterState.new(db, run)
 
 
-## After combat: applies the outcome and moves the run on. Returns the cash-out lines
-## (empty on a loss). Win → SHOP (or VICTORY after the Night 8 boss); lose → GAME_OVER.
+## After the battle resolved: applies the outcome and moves the run on. Returns the spoils
+## lines (empty on a loss). Win → SHOP (or VICTORY after the Night 8 boss); lose → GAME_OVER.
 static func finish_encounter(db: ContentDb, run: RunState, enc: EncounterState) -> Array[Dictionary]:
-	assert(enc.phase == EncounterState.Phase.DONE, "encounter not resolved")
+	assert(enc.phase == EncounterState.Phase.DONE, "battle not resolved")
 	for r in run.relics:
 		r.disabled = false
 	var lines: Array[Dictionary] = []
@@ -37,7 +37,7 @@ static func finish_encounter(db: ContentDb, run: RunState, enc: EncounterState) 
 		run.phase = RunState.Phase.GAME_OVER
 		return lines
 	var role: String = enc.entry["role"]
-	lines = Economy.cash_out_lines(db, run, role, enc.summons_left)
+	lines = Economy.spoils_lines(db, run, enc)
 	run.money += Economy.total(lines)
 	run.stats["wins"] = int(run.stats["wins"]) + 1
 	if role == "BOSS":
@@ -50,18 +50,19 @@ static func finish_encounter(db: ContentDb, run: RunState, enc: EncounterState) 
 	else:
 		run.encounter_index += 1
 	run.shop = ShopState.open(db, run)
+	run.shop_visits += 1
 	run.phase = RunState.Phase.SHOP
 	return lines
 
 
-## SHOP → NIGHT_MAP (Continue / NEXT FIGHT).
+## SHOP → NIGHT_MAP (NEXT BATTLE).
 static func leave_shop(run: RunState) -> void:
 	assert(run.phase == RunState.Phase.SHOP, "leave_shop from %s" % run.phase)
 	run.shop = null
 	run.phase = RunState.Phase.NIGHT_MAP
 
 
-## Relic order is the trigger order (§8): one command moves a relic.
+## Trinket order is the trigger order: one command moves a trinket.
 static func reorder_relic(run: RunState, from: int, to: int) -> bool:
 	if from < 0 or from >= run.relics.size() or to < 0 or to >= run.relics.size() or from == to:
 		return false

@@ -1,8 +1,8 @@
 # Implementation Plan — Roll the Bones (NecroDices)
 
-Status: **2026-10-20 — M0–M7 implemented** (full game loop, final code-generated art, audio,
-balance tuned by sim). Open: Web export needs the 4.6.3 templates, itch.io page, human
-playtest, real-device performance check — see §10.
+Status: **2026-10-23 — v2 (gameplay rework) implemented to playable** — see §11. v1 (M0–M7,
+2026-10-20) below is history: its rules were replaced by GAME_SPEC v2.0 after the first designer
+playtest.
 Sources: [GAME_SPEC.md](../GAME_SPEC.md) (rules, normative), [ART_SPEC.md](../ART_SPEC.md)
 (look and layout, normative), [DECISIONS.md](../DECISIONS.md) (deviations / resolved ambiguity).
 This plan says **what gets built, in which order, by which class, and how we know it works**.
@@ -351,3 +351,36 @@ once M2 lands (separate files: `fx/` vs `scenes/overlays/`).
    friction, and whether Bell Ringer / Inquisitor HP still feels fair.
 3. Draft itch.io page; QA in Chrome / Firefox / Edge / Safari; check audio unlock and saves in the iframe.
 4. Performance check of `horde` preset in a browser; MultiMesh only if < 55 fps.
+
+---
+
+## 11. v2 — gameplay rework (2026-10-23)
+
+Why: the first designer playtest (2026-10-23) found the soldier count incoherent (one combined
+hand per fight), "4 dice, take 2" too easy, relics written for per-group triggers that the flow
+did not have, and no anticipation in the roll / confirm / combat beats. GAME_SPEC v2.0 + D-G06…
+D-G13 are the answer; the designer approved the draft with changes (all dice rolled every summon,
+2 rerolls / 3 summons, Balatro money first, runes as face upgrades, no poker words).
+
+```text
+Player promise: roll a handful of bone dice, pick the ones that make a combo, watch the squad
+  rise and its numbers bounce as dice and trinkets fire left to right, then send the army
+  crashing into the hunter.
+Biggest untested assumption: three squads + one resolve feel like one exciting fight, not three
+  disconnected scores.
+Smallest playable test: Night 1-2 with the v2 rules and placeholder-quality new art. Pass: a
+  playtester can say why a squad was big and wants to roll again.
+```
+
+| M | Delivered | Evidence | Left |
+| --- | --- | --- | --- |
+| V2-M1 core | faces with points + runes, `Combos.detect` (WILD / TOMB), `Squad`, squad scorer + resolve, battle FSM (ROLL / PICK / DONE, auto-resolve), luck / glass / counters at commit, spoils, market (cards, coffers, open coffer saved), potions / gems, gear, data v2, `tools/check_data.py` v2 | 58 headless cases green (§5.6 worked example 1,441; every trinket isolated; preview = summon over 30 seeds; determinism; save round trip) | — |
+| V2-M2 battle screen | pick tray, squads list, ROLL / SUMMON button, REROLL, element pips, banner / slam, number pops | `ui_test win_loop` drives ROLL → pick → SUMMON → spoils through the buttons; captures `cup`, `encounter`, `summoning` | human playtest |
+| V2-M3 market | card kinds, coffers + Coffer overlay, gear card, loadout | `ui_test coffer_take`; captures `shop`, `shop_coffer` | — |
+| V2-M4 art | 13 units (6 legends 32×32), 30 trinkets, 17 potions, 8 gems, 12 coffers, 13 gear, 8 rune bodies + tiles, points badges, flame VFX, how-to pages re-captured | `ART OK (233 files)` | designer repaint |
+| V2-M5 juice | staggered roll landing, per-die / rune / trinket bounce + pops, clone bursts, aura tiers, one charge per squad with HP drain, win / lose banners | captures `summoning`, `charge`, `horde`, `result` | frame-time check in a browser |
+| V2-M6 balance | curve + boss multipliers by bot (D-G13) | 1,000 runs: 60.2% Night 4, 3.4% win; Night 1 Mob 97% | human playtest, web export |
+
+Next (in order): human playtest of Nights 1–3 with the playtest record (game-design-review);
+decide keep / change / cut on the money lines (+$2 / +$1 idea) and on die finishes / marks;
+web export and browser frame-time check; designer repaint of the new art, then the atlas pack.

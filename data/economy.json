@@ -1,31 +1,33 @@
 {
-  "version": 1,
+  "version": 2,
   "start_money": 4,
-  "start_dice": 4,
+  "start_dice": 5,
+  "max_dice": 8,
+  "pick_min": 3,
+  "pick_max": 5,
+  "base_summons": 3,
+  "base_rerolls": 2,
+  "min_summons": 1,
   "reward_mob": 3,
   "reward_champion": 4,
   "reward_boss": 5,
+  "reward_final": 8,
   "unused_summon_bonus": 1,
   "interest_per": 5,
   "interest_amount": 1,
   "interest_cap": 5,
-  "shop_reroll_base": 4,
-  "shop_reroll_step": 1,
-  "shop_reroll_min": 0,
   "relic_slots": 5,
   "consumable_slots": 2,
-  "max_dice": 8,
-  "base_summons": 3,
-  "base_rerolls": 2,
-  "min_summons": 1,
-  "shop_item_slots": 3,
-  "shop_equipment_slots": 1,
-  "shop_category_weights": {
-    "RELIC": 40,
-    "TOME": 25,
-    "SIGIL": 20,
-    "INK": 10,
-    "DIE": 5
+  "shop_card_slots": 2,
+  "shop_coffer_slots": 2,
+  "shop_reroll_base": 5,
+  "shop_reroll_step": 1,
+  "shop_reroll_min": 0,
+  "shop_card_weights": {
+    "TRINKET": 20,
+    "POTION": 4,
+    "GEM": 4,
+    "DIE": 2
   },
   "relic_rarity_weights": {
     "COMMON": 70,
@@ -34,31 +36,62 @@
   },
   "sell_relic_divisor": 2,
   "sell_consumable": 1,
-  "modifiers": {
+  "die_price": 8,
+  "die_rune_price": 3,
+  "die_rune_chance": 0.3,
+  "die_rune_weights": {
+    "SHARP": 4,
+    "SWARM": 4,
+    "WILD": 2,
+    "GLASS": 2,
+    "IRON": 2,
+    "TOMB": 2,
+    "GILDED": 2,
+    "LUCKY": 3
+  },
+  "former_bone_points": 3,
+  "max_points": 9,
+  "runes": {
     "SHARP": {
+      "when": "SCORED",
       "op": "add_power",
-      "value": 10,
-      "when": "GROUP"
+      "value": 30
     },
     "SWARM": {
+      "when": "SCORED",
       "op": "add_count",
-      "value": 2,
-      "when": "GROUP"
-    },
-    "HEX": {
-      "op": "mul_count",
-      "value": 1.5,
-      "when": "GROUP"
-    },
-    "GOLD": {
-      "op": "add_money",
-      "value": 2,
-      "when": "COMMIT"
+      "value": 4
     },
     "WILD": {
-      "op": null,
-      "value": null,
-      "when": "RECIPE"
+      "when": "COMBO"
+    },
+    "GLASS": {
+      "when": "SCORED",
+      "op": "mul_count",
+      "value": 2,
+      "break_one_in": 4
+    },
+    "IRON": {
+      "when": "HELD",
+      "op": "mul_count",
+      "value": 1.5
+    },
+    "TOMB": {
+      "when": "SCORED",
+      "op": "add_power",
+      "value": 50
+    },
+    "GILDED": {
+      "when": "END",
+      "money": 3
+    },
+    "LUCKY": {
+      "when": "SCORED",
+      "op": "add_count",
+      "value": 10,
+      "one_in": 5,
+      "money": 20,
+      "money_one_in": 15
     }
   }
 }

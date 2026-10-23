@@ -17,7 +17,7 @@
 tools\run.cmd                         :: play windowed 960x540
 tools\test.cmd                        :: re-import + every suite
 tools\test.cmd --changed              :: suites covering changed files
-tools\test.cmd data:pair              :: one suite / cases by name part
+tools\test.cmd combos:wild           :: one suite / cases by name part
 python tools\check_data.py            :: data vs spec tables
 python tools\build_manifest.py        :: assets/manifest.json from ART_SPEC §11
 python tools\gen_placeholders.py      :: create MISSING placeholder PNGs (--only <glob> / --force to overwrite)
@@ -26,11 +26,11 @@ python tools\layout_mockup.py         :: ART_SPEC §6 wireframes -> docs/mockups
 python tools\skills_index.py --write  :: regenerate the skill index in AGENTS.md
 tools\ui_test.cmd                     :: UI smoke tests in the real game (autoloads): flows driven by buttons
 tools\screenshot.cmd encounter captures\x.png   :: capture a preset (scenes/dev/capture.gd PRESETS)
-tools\balance_sim.cmd --mode=baseline --trials=20000   :: Appendix A regression (§5.6)
-tools\balance_sim.cmd --mode=runs --trials=1000        :: Appendix B bot: reach / win / deaths by rule
+tools\balance_sim.cmd --mode=baseline --trials=2000    :: Night 1 Mob with the starting dice: damage, win rate, combo mix
+tools\balance_sim.cmd --mode=runs --trials=1000        :: GAME_SPEC §12 bot: reach / win / deaths by rule
 tools\export_web.cmd                  :: Web release → build\web + build\roll_the_bones_web.zip (needs 4.6.3 templates)
 tools\serve_web.cmd [port]            :: play the Web build at http://127.0.0.1:8060/ (opening index.html from disk fails: file:// blocks fetch)
-python tools\art\<units|enemies_dice|icons|scenery|backgrounds|ui_buttons|howto>.py [--only id | --all] [--preview out.png]   :: art generators: no flag = create missing files only (hand edits are never overwritten); --only rewrites the named ids; --all rewrites every changed id
+python tools\art\<units|legends|enemies_dice|dice_runes|icons|items|scenery|backgrounds|ui_buttons|howto>.py [--only id | --all] [--preview out.png]   :: art generators: no flag = create missing files only (hand edits are never overwritten); --only rewrites the named ids; --all rewrites every changed id
 "%GODOT_EXE%" --path . --resolution 1600x900 res://scenes/dev/display_probe.tscn  :: print scale / canvas for a window size
 ```
 
@@ -43,7 +43,7 @@ autoload/   Display, Settings, Audio, Game (preload-free; no global event bus, D
 core/       pure rules (RefCounted), headless-tested
 scenes/     boot, title, night_map, encounter, shop, end, overlays, dev
 ui/         components + theme
-fx/         presentation queue, combat player, horde renderer, shaders
+fx/         presentation queue, battle player (roll / summon / resolve beats), horde renderer, shaders
 data/       content JSON (GAME_SPEC §9)
 assets/     art per ART_SPEC §11 (manifest.json is generated)
 tools/      python + cmd tooling, balance_sim.gd

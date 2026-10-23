@@ -1,7 +1,8 @@
 extends TestSuite
-## Content loads, validates and resolves recipes (GAME_SPEC §5.1, §6).
+## Content loads and validates (GAME_SPEC §6, §9); every UI string key exists.
 
-const COVERS: Array[String] = ["data/", "core/db.gd", "core/json_util.gd", "scenes/", "ui/"]
+const COVERS: Array[String] = ["data/", "core/db.gd", "core/json_util.gd", "core/rules_registry.gd",
+	"scenes/", "ui/", "fx/"]
 
 
 func _db() -> ContentDb:
@@ -12,26 +13,30 @@ func _db() -> ContentDb:
 
 func test_counts() -> void:
 	var db := _db()
-	_eq(db.units.size(), 19, "units")
-	_eq(db.relics.size(), 25, "relics")
-	_eq(db.consumables.size(), 18, "consumables")
-	_eq(db.equipment.size(), 8, "equipment")
-	_eq(db.enemies.size(), 9, "enemies")
+	_eq(db.units.size(), 32, "units")
+	_eq(db.combos.size(), 8, "combos")
+	_eq(db.rituals.size(), 4, "rituals")
+	_eq(db.relics.size(), 30, "trinkets")
+	_eq(db.ids_of_kind(db.consumables, "POTION").size(), 17, "potions")
+	_eq(db.ids_of_kind(db.consumables, "GEM").size(), 8, "gems")
+	_eq(db.coffers.size(), 12, "coffers")
+	_eq(db.equipment.size(), 13, "gear")
+	_eq(db.enemies.size(), 9, "hunters")
 
 
-func test_pair_matrix() -> void:
+func test_unit_tables() -> void:
 	var db := _db()
-	_eq(db.recipes[ContentDb.recipe_key(["METAL", "BONE"])], "SHIELD_SKELETON", "BONE+METAL")
-	_eq(db.recipes[ContentDb.recipe_key(["ICE", "FIRE"])], "STEAM_SLIME", "FIRE+ICE")
-	_eq(db.recipes[ContentDb.recipe_key(["VOLT", "LEAF"])], "WISP", "LEAF+VOLT is wisp")
-	_eq(db.recipes[ContentDb.recipe_key(["VOLT", "LEAF", "ICE"])], "WITCH_QUEEN", "ICE+LEAF+VOLT")
-	_check(not db.recipes.has(ContentDb.recipe_key(["FIRE", "FIRE", "FIRE"])), "invalid triple")
+	_eq(db.unit_for("T1", "ICE"), "FROST_BAT", "ice trio")
+	_eq(db.unit_for("ELITE", "BONE"), "LICH", "bone quartet")
+	_eq(db.unit_for("LEGEND", "LEAF"), "ELDER_HOLLOW", "leaf quintet")
+	_eq(db.hybrid_for("METAL", "BONE"), "SHIELD_SKELETON", "hybrid key is order-free")
+	_eq(db.hybrid_for("FIRE", "VOLT"), "", "no hybrid")
 
 
 func test_whole_numbers_are_ints() -> void:
 	var db := _db()
 	_eq(typeof(db.relics["RATTLE_DRUM"]["price"]), TYPE_INT, "price narrowed to int")
-	_eq(typeof(db.economy["modifiers"]["HEX"]["value"]), TYPE_FLOAT, "1.5 stays float")
+	_eq(typeof(db.economy["runes"]["IRON"]["value"]), TYPE_FLOAT, "1.5 stays float")
 
 
 ## Every literal key passed to db.text("...") in game code exists in strings_en.json, so no UI

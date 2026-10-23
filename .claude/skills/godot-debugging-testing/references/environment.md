@@ -52,6 +52,15 @@ The dev machine is usually in use for other work while the agent runs the game.
 - Shell heredocs with GDScript escapes (`"\n"`) or nested quotes are fragile; prefer the
   editor tool, or a script file, for multi-line code edits. Re-run the suite after any
   scripted edit — the runner fails on `SCRIPT ERROR` lines even when every case passes.
+- Some agent shells wrap the command in single quotes: a heredoc whose body contains a `'`
+  (an apostrophe in a string, `Jack-o'-Lantern`) fails with "unexpected EOF while looking for
+  matching `''" even when the heredoc delimiter is quoted. Write the script to a file and run it.
+- A scripted edit can turn a `"
+"` escape inside a GDScript string into a real line break. The
+  script still parses, but in a CRLF file the string becomes `"
+"`: a split on it never
+  matches and a join inserts blank lines (seen as an empty line in every wrapped tooltip).
+  Grep for lines ending in `("` after scripted edits and keep `.gd` files LF.
 
 ## Save files
 

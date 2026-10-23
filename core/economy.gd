@@ -1,11 +1,10 @@
 class_name Economy
 extends RefCounted
-## Money and HP math (GAME_SPEC §4.5, §6.10, §6.11) — one function per table, tested line by line.
+## Money and HP math (GAME_SPEC §4.8, §6.12, §6.13) — one function per table, tested line by line.
 
 
-## Enemy HP: night base × role multiplier. A boss uses the product of its rules' multipliers
-## (each rule's multiplier prices in how much it weakens the army; Enraged multiplies its two
-## rules by its own factor) — DECISIONS D-G02.
+## Hunter HP: night base × role multiplier. A boss uses the product of its rules' multipliers
+## (each rule's multiplier prices in how much it weakens the army) — DECISIONS D-G02.
 static func hp_for(db: ContentDb, night: int, role: String, rules: Array) -> float:
 	var base: float = db.curve["night_base"][night - 1]
 	var mult: float = db.curve["role_mult"][role]
@@ -16,36 +15,46 @@ static func hp_for(db: ContentDb, night: int, role: String, rules: Array) -> flo
 	return roundf(base * mult)
 
 
-## Interest on money held before the payout: $amount per $per, capped.
-static func interest(db: ContentDb, money_before: int) -> int:
+## Interest on money held before the payout: $amount per $per, capped (gear raises the cap).
+static func interest(db: ContentDb, run: RunState, money_before: int) -> int:
 	var e := db.economy
-	return mini(int(money_before / int(e["interest_per"])) * int(e["interest_amount"]), int(e["interest_cap"]))
+	var cap := int(e["interest_cap"]) + run.equipment_bonus("interest_cap", db)
+	return mini(int(money_before / int(e["interest_per"])) * int(e["interest_amount"]), cap)
 
 
-## Cash-out lines after a won combat: [{key, amount, source}] — the screen shows and sums
-## exactly these. FIGHT_END relics (Grave Robber) add one line each.
-static func cash_out_lines(db: ContentDb, run: RunState, role: String, unused_summons: int) -> Array[Dictionary]:
+## The hunter's bounty: by role, the Night 8 boss pays `reward_final`.
+static func bounty(db: ContentDb, run: RunState, role: String) -> int:
+	if role == "BOSS" and run.night >= int(db.curve["nights"]):
+		return int(db.economy["reward_final"])
+	return int(db.economy["reward_" + role.to_lower()])
+
+
+## Spoils lines after a won battle (§4.8): [{key, amount, source}] — the overlay shows and
+## sums exactly these. Order: bounty, unused summons, interest, Gilded faces, SPOILS trinkets.
+static func spoils_lines(db: ContentDb, run: RunState, enc: EncounterState) -> Array[Dictionary]:
 	var e := db.economy
+	var role: String = enc.entry["role"]
 	var lines: Array[Dictionary] = []
-	var no_army: Array[Group] = []
-	lines.append({"key": "cashout_enemy_reward", "amount": int(e["reward_" + role.to_lower()]), "source": role})
-	if unused_summons > 0:
-		lines.append({"key": "cashout_unused_summons", "amount": unused_summons * int(e["unused_summon_bonus"]),
-			"source": str(unused_summons)})
-	var interest_amount := interest(db, run.money)
+	lines.append({"key": "spoils_bounty", "amount": bounty(db, run, role), "source": role})
+	if enc.summons_left > 0:
+		lines.append({"key": "spoils_unused_summons", "amount": enc.summons_left * int(e["unused_summon_bonus"]),
+			"source": str(enc.summons_left)})
+	var interest_amount := interest(db, run, run.money)
 	if interest_amount > 0:
-		lines.append({"key": "cashout_interest", "amount": interest_amount, "source": ""})
+		lines.append({"key": "spoils_interest", "amount": interest_amount, "source": ""})
+	if enc.gilded > 0:
+		lines.append({"key": "spoils_gilded", "amount": enc.gilded * int(e["runes"]["GILDED"]["money"]),
+			"source": str(enc.gilded)})
+	var ctx := ScoreCtx.new()
+	ctx.money = run.money
+	ctx.bosses_defeated = run.bosses_defeated
 	for r in run.relics:
 		for block: Dictionary in RulesRegistry.relic_blocks(db.relics[r.id]):
-			if block["trigger"] != "FIGHT_END":
-				continue
-			var ctx := ScoreCtx.build(no_army, run.money, 0, unused_summons, run.bosses_defeated)
-			if not RelicEval.cond(block["cond"], null, -1, ctx, db):
+			if block["trigger"] != "SPOILS" or not RelicEval.cond(block["cond"], ctx):
 				continue
 			for effect: Dictionary in block["effects"]:
-				if effect["op"] == "add_money":
-					lines.append({"key": "cashout_relics", "amount": int(RelicEval.value(effect["value"], r.counter, ctx)),
-						"source": r.id})
+				lines.append({"key": "spoils_trinket", "amount": int(RelicEval.value(effect["value"], r.counter, ctx)),
+					"source": r.id})
 	return lines
 
 
@@ -57,8 +66,17 @@ static func total(lines: Array[Dictionary]) -> int:
 
 
 static func sell_price_relic(db: ContentDb, id: String) -> int:
-	return int(db.relics[id]["price"]) / int(db.economy["sell_relic_divisor"])
+	return maxi(1, int(db.relics[id]["price"]) / int(db.economy["sell_relic_divisor"]))
 
 
 static func sell_price_consumable(db: ContentDb) -> int:
 	return int(db.economy["sell_consumable"])
+
+
+## Market price of a die: base, plus the rune price when one of its faces carries a rune.
+static func die_price(db: ContentDb, die: Die) -> int:
+	var price := int(db.economy["die_price"])
+	for f in die.faces:
+		if f.rune != "":
+			return price + int(db.economy["die_rune_price"])
+	return price

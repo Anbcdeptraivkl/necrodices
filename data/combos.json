@@ -1,0 +1,123 @@
+{
+  "version": 2,
+  "combos": [
+    {
+      "id": "RABBLE",
+      "name": "Rabble",
+      "rank": 1,
+      "base_p": 10,
+      "base_c": 1,
+      "lvl_p": 10,
+      "lvl_c": 1,
+      "text": "3+ dice, no pattern: only the highest die scores"
+    },
+    {
+      "id": "DUO_PACT",
+      "name": "Duo Pact",
+      "rank": 2,
+      "base_p": 20,
+      "base_c": 2,
+      "lvl_p": 20,
+      "lvl_c": 1,
+      "text": "2 of one element + 2 of another"
+    },
+    {
+      "id": "TRIO",
+      "name": "Trio",
+      "rank": 3,
+      "base_p": 30,
+      "base_c": 3,
+      "lvl_p": 20,
+      "lvl_c": 2,
+      "text": "3 of one element"
+    },
+    {
+      "id": "RAINBOW",
+      "name": "Rainbow",
+      "rank": 4,
+      "base_p": 35,
+      "base_c": 4,
+      "lvl_p": 30,
+      "lvl_c": 3,
+      "text": "5 different elements"
+    },
+    {
+      "id": "FULL_MOON",
+      "name": "Full Moon",
+      "rank": 5,
+      "base_p": 40,
+      "base_c": 4,
+      "lvl_p": 25,
+      "lvl_c": 2,
+      "text": "3 of one element + 2 of another"
+    },
+    {
+      "id": "RITUAL",
+      "name": "Ritual",
+      "rank": 6,
+      "base_p": 50,
+      "base_c": 5,
+      "lvl_p": 30,
+      "lvl_c": 3,
+      "text": "a ritual's 3 elements with its core twice"
+    },
+    {
+      "id": "QUARTET",
+      "name": "Quartet",
+      "rank": 7,
+      "base_p": 60,
+      "base_c": 7,
+      "lvl_p": 30,
+      "lvl_c": 3,
+      "text": "4 of one element"
+    },
+    {
+      "id": "QUINTET",
+      "name": "Quintet",
+      "rank": 8,
+      "base_p": 120,
+      "base_c": 12,
+      "lvl_p": 35,
+      "lvl_c": 3,
+      "text": "5 of one element"
+    }
+  ],
+  "rituals": [
+    {
+      "unit": "HEADLESS_HORSEMAN",
+      "elements": [
+        "BONE",
+        "FIRE",
+        "LEAF"
+      ],
+      "core": "BONE"
+    },
+    {
+      "unit": "STITCHED_GOLEM",
+      "elements": [
+        "BONE",
+        "VOLT",
+        "METAL"
+      ],
+      "core": "VOLT"
+    },
+    {
+      "unit": "WITCH_QUEEN",
+      "elements": [
+        "ICE",
+        "LEAF",
+        "VOLT"
+      ],
+      "core": "ICE"
+    },
+    {
+      "unit": "CLOCKWORK_KRAKEN",
+      "elements": [
+        "FIRE",
+        "ICE",
+        "METAL"
+      ],
+      "core": "METAL"
+    }
+  ]
+}

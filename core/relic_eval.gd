@@ -1,41 +1,54 @@
 class_name RelicEval
 extends RefCounted
-## Interpreter of the relic DSL (GAME_SPEC §9.1). Conditions read the group and the ScoreCtx;
-## values may scale with a source; ops change the running totals. Every × rounds half up at
-## once (§5.3) so totals stay integer-valued and reproducible by hand.
+## Interpreter of the trinket DSL (GAME_SPEC §9.1). Conditions read the squad, the die being
+## scored (DIE trigger) and the ScoreCtx; values may scale with a source; ops change the
+## running totals. Every × rounds half up at once (§5.1) so totals stay integer-valued and
+## reproducible by hand.
 
 
 static func round_half_up(x: float) -> float:
 	return floorf(x + 0.5)
 
 
-## group may be null for FINAL / FIGHT_END; group_index is its index in the army (-1 if none).
-static func cond(c: Dictionary, group: Group, group_index: int, ctx: ScoreCtx, db: ContentDb) -> bool:
+## `k` = the scored position for DIE blocks (-1 otherwise). `squads` = army size for RESOLVE.
+static func cond(c: Dictionary, ctx: ScoreCtx, k: int = -1, squads: int = 0) -> bool:
+	var sq := ctx.squad
 	match c["type"]:
 		"always":
 			return true
-		"group_has_element":
-			return group != null and group.has_element(c["element"])
-		"group_tier":
-			return group != null and db.unit_tier(group.unit_id) == c["tier"]
-		"group_unit":
-			return group != null and group.unit_id == c["unit"]
-		"group_is_first":
-			return group_index == 0
-		"group_unit_repeated":
-			return group != null and ctx.seen_units.has(group.unit_id)
-		"essence_gte":
-			return ctx.essence[c["element"]] >= c["n"]
-		"essence_eq":
-			return ctx.essence[c["element"]] == c["n"]
-		"distinct_elements_gte":
-			return ctx.distinct_elements() >= c["n"]
-		"all_elements_present":
-			return ctx.distinct_elements() == RulesRegistry.ELEMENTS.size()
-		"groups_gte":
-			return ctx.groups >= c["n"]
+		"die_element":
+			return k >= 0 and sq.elements[k] == c["element"]
+		"die_points_lte":
+			return k >= 0 and not sq.faces[k].is_tomb() and sq.faces[k].points <= int(c["n"])
+		"squad_combo":
+			return sq != null and sq.combo == c["combo"]
+		"squad_combo_in":
+			return sq != null and (c["combos"] as Array).has(sq.combo)
+		"squad_has_element":
+			return sq != null and sq.has_element(c["element"])
+		"squad_element_count_gte":
+			return sq != null and sq.scored_count(c["element"]) >= int(c["n"])
+		"squad_all_points_gte":
+			return sq != null and _all_points_gte(sq, int(c["n"]))
+		"squad_is_first":
+			return ctx.squads_before == 0
+		"squad_is_last":
+			return ctx.summons_left == 0
+		"squad_unit_repeated":
+			return sq != null and ctx.seen_units.has(sq.unit_id)
+		"battle_distinct_elements_gte":
+			return ctx.distinct_elements() >= int(c["n"])
+		"squads_gte":
+			return squads >= int(c["n"])
 	push_error("unknown condition %s" % c["type"])
 	return false
+
+
+static func _all_points_gte(sq: Squad, n: int) -> bool:
+	for k in sq.scored:
+		if sq.faces[k].is_tomb() or sq.faces[k].points < n:
+			return false
+	return not sq.scored.is_empty()
 
 
 static func value(v: Variant, counter: int, ctx: ScoreCtx) -> float:
@@ -44,7 +57,7 @@ static func value(v: Variant, counter: int, ctx: ScoreCtx) -> float:
 	return float(v)
 
 
-## Applies a scoring op to ctx.p / ctx.c; returns the trace op name of GAME_SPEC §5.4.
+## Applies a squad scoring op to ctx.p / ctx.c; returns the trace op name (§5.5).
 static func apply(op: String, v: float, ctx: ScoreCtx) -> String:
 	match op:
 		"add_power":
@@ -59,7 +72,7 @@ static func apply(op: String, v: float, ctx: ScoreCtx) -> String:
 		"mul_count":
 			ctx.c = round_half_up(ctx.c * v)
 			return "mul_c"
-	push_error("op %s is not a scoring op" % op)
+	push_error("op %s is not a squad scoring op" % op)
 	return "none"
 
 

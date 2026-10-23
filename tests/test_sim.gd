@@ -1,14 +1,18 @@
 extends TestSuite
-## Statistical regression of recipes + scorer (GAME_SPEC §5.6): the Appendix A bot over a fixed
-## seed must stay within ±6% of the reference (smaller sample than the 20k acceptance run).
+## The balance bot plays through the real commands without errors, and the Night 1 Mob stays
+## beatable with the starting dice (GAME_SPEC §12). Numbers are tunable: this checks ranges.
 
-const COVERS: Array[String] = ["core/recipes.gd", "core/scorer.gd", "core/encounter_state.gd",
-	"tools/sim/", "data/units.json"]
-const TRIALS := 3000
+const COVERS: Array[String] = ["core/combos.gd", "core/scorer.gd", "core/encounter_state.gd",
+	"core/shop_state.gd", "tools/sim/", "data/"]
 
 
-func test_baseline_distribution() -> void:
-	var r := BalanceSimStats.baseline(Fixtures.db(), TRIALS, "REG")
-	_check(absf(r["mean"] / 1590.0 - 1.0) <= 0.06, "mean %s ≈ 1590" % r["mean"])
-	_check(absf(r["median"] / 1530.0 - 1.0) <= 0.06, "median %s ≈ 1530" % r["median"])
-	_check(absf(r["groups_per_encounter"] / 5.2 - 1.0) <= 0.06, "groups %s ≈ 5.2" % r["groups_per_encounter"])
+func test_baseline_night1() -> void:
+	var r := BalanceSimStats.baseline(Fixtures.db(), 300, "REG")
+	_check(r["mean"] > 0.0, "army deals damage")
+	_check(r["night1_mob_win"] >= 0.8, "night 1 mob beatable (%s)" % r["night1_mob_win"])
+
+
+func test_runs_complete() -> void:
+	var r := BalanceSimStats.runs(Fixtures.db(), 20, "REGRUN")
+	_eq(r["runs"], 20, "all runs ended")
+	_check(r["reach_night4"] >= 0.0, "stats computed")

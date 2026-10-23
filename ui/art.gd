@@ -17,8 +17,6 @@ const PALETTE := {
 	"S0": Color("#a8643c"), "S1": Color("#f0b896"), "K0": Color("#000000"),
 }
 const ELEMENT_RAMP := {"BONE": "B", "FIRE": "F", "ICE": "I", "LEAF": "L", "VOLT": "V", "METAL": "M"}
-## Group bind colours, cycled by pending index (ART_SPEC §3; G1 is kept for selection, D-R06).
-const GROUP_COLOURS: PackedStringArray = ["I2", "L2", "F2", "N7"]
 const MASK_KEYS := {
 	Color("#ff0000"): 0, Color("#ff6060"): 1, Color("#ffc0c0"): 2,
 	Color("#0000ff"): 3, Color("#6060ff"): 4, Color("#c0c0ff"): 5,
@@ -43,10 +41,6 @@ static func element_colour(element: String, step: int = 1) -> Color:
 	return PALETTE["%s%d" % [ELEMENT_RAMP[element], step]]
 
 
-static func group_colour(index: int) -> Color:
-	return PALETTE[GROUP_COLOURS[index % GROUP_COLOURS.size()]]
-
-
 static func tex(path: String) -> Texture2D:
 	if not _cache.has(path):
 		var t: Texture2D = load(path)
@@ -67,18 +61,20 @@ static func frame(path: String, frame_w: int, index: int) -> Texture2D:
 	return _cache[key]
 
 
-## Unit sprite frame (16×16). WISP needs its two elements (recipe order) for the swap.
+## Unit sprite frame: 16×16, or 32×32 for Quintet legends (the frame is as wide as the sheet
+## is tall). WISP needs its two elements for the swap.
 static func unit(unit_id: String, index: int = 0, elements: PackedStringArray = []) -> Texture2D:
 	if unit_id == "WISP":
 		return _wisp(elements, index, "res://assets/sprites/units/wisp_mask.png", 16)
-	return frame("res://assets/sprites/units/%s.png" % unit_id.to_lower(), 16, index)
+	var path := "res://assets/sprites/units/%s.png" % unit_id.to_lower()
+	return frame(path, tex(path).get_height(), index)
 
 
-## Crowd mini (8×8) for a unit: the first element of its recipe (§4.4).
+## Crowd mini (8×8) for a horde unit: its `mini` element (§4.4).
 static func mini(db: ContentDb, unit_id: String, index: int = 0, elements: PackedStringArray = []) -> Texture2D:
 	if unit_id == "WISP":
 		return _wisp(elements, index, "res://assets/sprites/minis/mini_wisp_mask.png", 8)
-	var element: String = db.units[unit_id]["mini"]
+	var element: String = db.units[unit_id].get("mini", "bone")
 	return frame("res://assets/sprites/minis/mini_%s.png" % element, 8, index)
 
 
@@ -94,18 +90,35 @@ static func glyph(element: String, small: bool = false) -> Texture2D:
 	return tex("res://assets/sprites/dice/%s_%s.png" % ["glyph8" if small else "glyph", element.to_lower()])
 
 
+## Glyph shown on a face: TOMB faces show none (the tomb body carries the cross).
 static func face_glyph(face: Face, small: bool = false) -> Texture2D:
-	return glyph("WILD" if face.is_wild() else face.element, small)
+	if face.is_tomb():
+		return null
+	return glyph(face.element, small)
 
 
 static func pip(element: String) -> Texture2D:
 	return tex("res://assets/sprites/dice/pip_%s.png" % element.to_lower())
 
 
-static func modifier(mod: String) -> Texture2D:
-	if mod == "" or mod == "WILD":
+## Die body for the face showing: its rune's material, or plain bone.
+static func die_body(face: Face) -> Texture2D:
+	if face == null or face.rune == "":
+		return dice("die_body")
+	return dice("die_body_" + face.rune.to_lower())
+
+
+static func face_tile(face: Face) -> Texture2D:
+	if face == null or face.rune == "":
+		return dice("face_tile")
+	return dice("face_tile_" + face.rune.to_lower())
+
+
+## Points badge (7×9); TOMB faces have none.
+static func points_badge(face: Face) -> Texture2D:
+	if face == null or face.is_tomb():
 		return null
-	return tex("res://assets/sprites/dice/mod_%s.png" % mod.to_lower())
+	return dice("num_%d" % clampi(face.points, 1, 9))
 
 
 static func dice(name: String) -> Texture2D:
@@ -118,6 +131,10 @@ static func relic(id: String) -> Texture2D:
 
 static func consumable(id: String) -> Texture2D:
 	return tex("res://assets/icons/consumables/%s.png" % id.to_lower())
+
+
+static func coffer(id: String) -> Texture2D:
+	return tex("res://assets/icons/coffers/%s.png" % id.to_lower())
 
 
 static func equipment(id: String) -> Texture2D:

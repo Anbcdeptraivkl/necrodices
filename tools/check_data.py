@@ -1,78 +1,63 @@
 #!/usr/bin/env python3
-"""Validate content JSON under data/ against GAME_SPEC.md (sections 6 and 9).
+"""Validate content JSON under data/ against GAME_SPEC.md v2 (sections 4, 6 and 9).
 
 Usage: python tools/check_data.py
 Prints "DATA OK" or the list of problems (exit code 1).
+
+Checks ids (shared with the art pipeline via tools/art_ids.py), the trinket DSL vocabulary,
+cross references (rituals, gear prerequisites, boss rules) and the shape of tunables. Tunable
+numbers (prices, HP, weights) are checked by range, never by value, so balance passes never
+break this checker. The game repeats the vocabulary check at boot (core/rules_registry.gd).
 """
-import itertools
 import json
 import os
 import sys
+
+sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
+import art_ids  # noqa: E402
 
 ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 DATA = os.path.join(ROOT, "data")
 
 ELEMENTS = ["BONE", "FIRE", "ICE", "LEAF", "VOLT", "METAL"]
-TIERS = {"T1", "T2", "T3", "WISP"}
-
-# spec 9.1 DSL vocabulary
-TRIGGERS = {"GROUP", "FINAL", "SUMMON", "FIGHT_END"}
-OPS = {"add_power", "add_count", "mul_power", "mul_count", "add_money"}
-SOURCES = {"money", "rerolls_left", "summons_left", "groups", "bosses_defeated", "counter"} | {
-    f"essence:{e}" for e in ELEMENTS
+COMBOS = ["RABBLE", "DUO_PACT", "TRIO", "RAINBOW", "FULL_MOON", "RITUAL", "QUARTET", "QUINTET"]
+RUNES = {"SHARP", "SWARM", "WILD", "GLASS", "IRON", "TOMB", "GILDED", "LUCKY"}
+UNIT_KINDS = {"T1", "HYBRID", "RITUAL", "ELITE", "LEGEND", "PARADE", "WISP"}
+DISPLAY_OF = {"T1": "horde", "HYBRID": "horde", "WISP": "horde", "RITUAL": "single", "ELITE": "single",
+              "PARADE": "single", "LEGEND": "legend"}
+RARITIES = {"COMMON", "UNCOMMON", "RARE"}
+TRIGGER_OPS = {
+    "ROLL": {"ensure_face"},
+    "DIE": {"add_power", "add_count", "mul_power", "mul_count"},
+    "SQUAD": {"add_power", "add_count", "mul_power", "mul_count"},
+    "RESOLVE": {"mul_damage", "add_damage"},
+    "SUMMON": {"add_money"},
+    "SPOILS": {"add_money"},
 }
+SOURCES = {"money", "rerolls_left", "summons_left", "squads_before", "bosses_defeated", "counter", "scored_dice"} | {
+    f"{p}:{e}" for p in ("scored", "held") for e in ELEMENTS}
 CONDS = {
-    "always": set(),
-    "group_has_element": {"element"},
-    "group_tier": {"tier"},
-    "group_unit": {"unit"},
-    "group_is_first": set(),
-    "group_unit_repeated": set(),
-    "essence_gte": {"element", "n"},
-    "essence_eq": {"element", "n"},
-    "distinct_elements_gte": {"n"},
-    "all_elements_present": set(),
-    "groups_gte": {"n"},
+    "always": set(), "die_element": {"element"}, "die_points_lte": {"n"}, "squad_combo": {"combo"},
+    "squad_combo_in": {"combos"}, "squad_has_element": {"element"}, "squad_element_count_gte": {"element", "n"},
+    "squad_all_points_gte": {"n"}, "squad_is_first": set(), "squad_is_last": set(), "squad_unit_repeated": set(),
+    "battle_distinct_elements_gte": {"n"}, "squads_gte": {"n"},
 }
-
-# Spec expectations (spec 6.3/spec 6.4 recipes, spec 6.5–spec 6.7 prices, spec 6.8 enemies, spec 6.9 rules)
-EXPECTED_RECIPES = {
-    "BONE+BONE": "SKELETON_WARRIOR", "FIRE+FIRE": "FIRE_IMP", "ICE+ICE": "FROST_BAT",
-    "LEAF+LEAF": "PUMPKINLING", "VOLT+VOLT": "VOLT_GHOST", "METAL+METAL": "HAUNTED_ARMOR",
-    "BONE+FIRE": "FLAME_SKULL", "BONE+LEAF": "SCARECROW", "BONE+METAL": "SHIELD_SKELETON",
-    "FIRE+ICE": "STEAM_SLIME", "FIRE+LEAF": "JACK_O_LANTERN", "ICE+LEAF": "BOG_WITCH",
-    "ICE+VOLT": "STORM_BANSHEE", "VOLT+METAL": "TESLA_SPIDER",
-    "BONE+BONE+BONE": "LICH", "BONE+FIRE+LEAF": "HEADLESS_HORSEMAN",
-    "BONE+VOLT+METAL": "STITCHED_GOLEM", "ICE+LEAF+VOLT": "WITCH_QUEEN",
-}
-EXPECTED_WISP = {"BONE+ICE", "BONE+VOLT", "FIRE+VOLT", "FIRE+METAL", "ICE+METAL", "LEAF+VOLT", "LEAF+METAL"}
-RELIC_PRICE_BY_RARITY = {"COMMON": 4, "UNCOMMON": 6, "RARE": 8}
-EXPECTED_RELICS = [
-    "RATTLE_DRUM", "EMBER_JAR", "FROST_LANTERN", "MOSS_CHARM", "LIGHTNING_ROD", "IRON_NAIL",
-    "GRAVEDIGGER_LAMP", "WISP_JAR", "GRAVE_ROBBER", "BONE_SAW", "DEEP_FREEZE", "COLD_HEARTH",
-    "BONE_PILE", "GRAND_PROCESSION", "THRIFTY_GHOST", "HYBRID_VIGOR", "COPYCAT_COFFIN",
-    "OVERGROWTH", "SPIRIT_BOARD", "PIGGY_COFFIN", "TACTICIAN_SKULL", "CROWN_OF_THE_LICH",
-    "FULL_MOON", "BLACK_GRIMOIRE", "ELEMENTAL_CONVERGENCE",
-]
-CONSUMABLE_PRICE_BY_KIND = {"TOME": 3, "SIGIL": 3, "INK": 4, "DIE": 5}
-CONSUMABLE_TARGETS_BY_KIND = {"TOME": 0, "SIGIL": 2, "INK": 1, "DIE": 0}
-MODIFIERS = {"SHARP", "SWARM", "HEX", "GOLD", "WILD"}
-EQUIPMENT_PRICE = 10
-EXPECTED_EQUIPMENT = {
-    "BONE_POUCH": None, "BONE_SATCHEL": "BONE_POUCH", "GRAVE_BELL": None, "LOADED_CUP": None,
-    "SECOND_CUP": "LOADED_CUP", "RELIQUARY": None, "POCKET_CRYPT": None, "HAGGLER_LANTERN": None,
-}
-# HP multipliers and the night curve are tunable (GAME_SPEC §6.9-§6.10, DECISIONS D-G02):
-# check ids and sane ranges, not the numbers.
-EXPECTED_RULES = {"EXORCIST", "WITCH_HUNTER", "BELL_RINGER", "INQUISITOR", "ENRAGED"}
-ROLES = {"MOB", "CHAMPION", "BOSS"}
-ECONOMY_KEYS = {
-    "start_money": 4, "reward_mob": 3, "reward_champion": 4, "reward_boss": 5,
-    "unused_summon_bonus": 1, "interest_per": 5, "interest_cap": 5,
-    "shop_reroll_base": 4, "shop_reroll_step": 1, "relic_slots": 5, "consumable_slots": 2,
-    "max_dice": 8, "base_summons": 3, "base_rerolls": 2,
-}
-FILES = ["elements", "units", "relics", "consumables", "equipment", "enemies", "curve", "economy", "strings_en"]
+DIE_CONDS = {"die_element", "die_points_lte"}
+POTION_ACTIONS = {"element", "points", "rune", "mirror", "money_double"}
+COFFER_KINDS = {"POTION", "GEM", "TRINKET", "BONE"}
+COFFER_SIZES = {"NORMAL", "JUMBO", "MEGA"}
+GEAR_EFFECTS = {"summons", "rerolls", "relic_slots", "consumable_slots", "shop_reroll_discount", "shop_card_slots",
+                "interest_cap"}
+GEAR_PAIRS = {"DEATH_KNELL": "GRAVE_BELL", "SECOND_CUP": "LOADED_CUP", "OSSUARY": "RELIQUARY",
+              "BLACK_MARKET": "HAGGLER_LANTERN", "OVERFLOWING_CRYPT": "OVERSTOCK", "DRAGON_HOARD": "GRAVE_GOODS"}
+BOSS_RULES = {"EXORCIST", "WITCH_HUNTER", "BELL_RINGER", "INQUISITOR", "ENRAGED"}
+ECONOMY_INTS = ["start_money", "start_dice", "max_dice", "pick_min", "pick_max", "base_summons", "base_rerolls",
+                "min_summons", "reward_mob", "reward_champion", "reward_boss", "reward_final", "unused_summon_bonus",
+                "interest_per", "interest_amount", "interest_cap", "relic_slots", "consumable_slots", "shop_card_slots",
+                "shop_coffer_slots", "shop_reroll_base", "shop_reroll_step", "sell_relic_divisor", "sell_consumable",
+                "die_price", "die_rune_price", "former_bone_points", "max_points"]
+FILES = ["elements", "combos", "units", "relics", "consumables", "coffers", "equipment", "enemies", "curve",
+         "economy", "strings_en"]
 
 problems: list[str] = []
 
@@ -82,290 +67,229 @@ def err(msg: str) -> None:
 
 
 def load(name: str):
-    path = os.path.join(DATA, name + ".json")
+    path = os.path.join(DATA, f"{name}.json")
     try:
         with open(path, encoding="utf-8") as f:
             return json.load(f)
-    except Exception as e:  # noqa: BLE001
-        err(f"{name}.json: cannot load ({e})")
+    except (OSError, json.JSONDecodeError) as e:
+        err(f"{name}.json: {e}")
         return None
 
 
-def key_of(elems) -> str:
-    return "+".join(sorted(elems, key=ELEMENTS.index))
+def ids_match(what: str, rows: list, expected: list) -> None:
+    ids = [r.get("id") for r in rows]
+    if len(ids) != len(set(ids)):
+        err(f"{what}: duplicate ids")
+    if set(ids) != set(expected):
+        err(f"{what}: ids differ from GAME_SPEC §6 (missing {sorted(set(expected) - set(ids))}, "
+            f"extra {sorted(set(ids) - set(expected))})")
 
 
-def check_version(name, d):
-    if name != "strings_en" and d.get("version") != 1:
-        err(f"{name}.json: missing \"version\": 1")
-
-
-def check_elements(d):
-    ids = [e.get("id") for e in d.get("elements", [])]
-    if ids != ELEMENTS:
-        err(f"elements: order {ids} != {ELEMENTS}")
-    for i, e in enumerate(d.get("elements", [])):
-        if e.get("index") != i:
-            err(f"elements: {e.get('id')} index {e.get('index')} != {i}")
-
-
-def check_units(d):
-    units = d.get("units", [])
-    if len(units) != 19:
-        err(f"units: expected 19, got {len(units)}")
-    recipes: dict[str, str] = {}
-    ids = set()
-    for u in units:
-        uid = u.get("id")
-        ids.add(uid)
-        if u.get("tier") not in TIERS:
-            err(f"units: {uid} bad tier {u.get('tier')}")
-        for k in ("base_p", "base_c", "grow_p", "grow_c"):
-            if not isinstance(u.get(k), (int, float)):
-                err(f"units: {uid} missing numeric {k}")
-        rec = u.get("recipe")
-        if u.get("tier") == "WISP":
-            if rec != [] or u.get("fallback") is not True or u.get("mini") != "wisp":
-                err(f"units: WISP must have recipe [], fallback true, mini 'wisp'")
+def check_units(d) -> set:
+    rows = d.get("units", [])
+    ids_match("units", rows, list(art_ids.UNITS))
+    per_kind: dict[str, set] = {}
+    for u in rows:
+        kind = u.get("kind")
+        if kind not in UNIT_KINDS:
+            err(f"unit {u.get('id')}: kind {kind}")
             continue
-        if not isinstance(rec, list) or any(e not in ELEMENTS for e in rec):
-            err(f"units: {uid} bad recipe {rec}")
-            continue
-        if rec != sorted(rec, key=ELEMENTS.index):
-            err(f"units: {uid} recipe not in canonical order")
-        if u.get("mini") != rec[0].lower():
-            err(f"units: {uid} mini {u.get('mini')} != {rec[0].lower()}")
-        k = key_of(rec)
-        if k in recipes:
-            err(f"units: duplicate recipe {k}")
-        recipes[k] = uid
-        size = len(rec)
-        if (u["tier"] == "T3") != (size == 3):
-            err(f"units: {uid} tier {u['tier']} vs recipe size {size}")
-    if [u.get("id") for u in units if u.get("tier") == "WISP"] != ["WISP"]:
-        err("units: exactly one WISP unit required")
-    same = [k for k in recipes if k.count("+") == 1 and len(set(k.split("+"))) == 1]
-    hybrid = [k for k in recipes if k.count("+") == 1 and len(set(k.split("+"))) == 2]
-    triples = [k for k in recipes if k.count("+") == 2]
-    if (len(same), len(hybrid), len(triples)) != (6, 8, 4):
-        err(f"units: same/hybrid/triple = {len(same)}/{len(hybrid)}/{len(triples)}, expected 6/8/4")
-    if recipes != EXPECTED_RECIPES:
-        err(f"units: recipe table mismatch vs spec spec 6.3/spec 6.4: {set(recipes.items()) ^ set(EXPECTED_RECIPES.items())}")
-    wisp = set(d.get("wisp_keys", []))
-    if wisp != EXPECTED_WISP or len(d.get("wisp_keys", [])) != 7:
-        err(f"units: wisp_keys {sorted(wisp)} != spec")
-    for k in wisp:
-        if k in recipes:
-            err(f"units: wisp key {k} also has a recipe")
-    for a, b in itertools.combinations_with_replacement(ELEMENTS, 2):
-        k = key_of([a, b])
-        if k not in recipes and k not in wisp:
-            err(f"units: pair {k} does not resolve")
-    return ids
+        if u.get("display") != DISPLAY_OF[kind]:
+            err(f"unit {u['id']}: display {u.get('display')} != {DISPLAY_OF[kind]}")
+        if u.get("display") == "horde" and "mini" not in u:
+            err(f"unit {u['id']}: horde unit needs a mini")
+        if kind in ("T1", "ELITE", "LEGEND"):
+            per_kind.setdefault(kind, set()).add(u["elements"][0])
+    for kind in ("T1", "ELITE", "LEGEND"):
+        if per_kind.get(kind) != set(ELEMENTS):
+            err(f"units: every element needs one {kind}")
+    return {u["id"] for u in rows}
 
 
-def check_cond(where, c, unit_ids):
-    if not isinstance(c, dict) or c.get("type") not in CONDS:
-        err(f"{where}: illegal cond {c}")
+def check_combos(d, unit_ids: set) -> None:
+    rows = sorted(d.get("combos", []), key=lambda r: r.get("rank", 0))
+    if [r.get("id") for r in rows] != COMBOS:
+        err(f"combos: ids in rank order must be {COMBOS}")
+    for r in rows:
+        if not all(isinstance(r.get(k), (int, float)) and r[k] > 0 for k in ("base_p", "base_c", "lvl_p", "lvl_c")):
+            err(f"combo {r.get('id')}: base / level numbers must be > 0")
+    rituals = d.get("rituals", [])
+    if len(rituals) != 4:
+        err("combos: 4 rituals")
+    for r in rituals:
+        els = r.get("elements", [])
+        if r.get("unit") not in unit_ids or len(set(els)) != 3 or r.get("core") not in els:
+            err(f"ritual {r.get('unit')}: 3 distinct elements with the core among them")
+
+
+def check_cond(where: str, c: dict, trigger: str) -> None:
+    t = c.get("type")
+    if t not in CONDS:
+        err(f"{where}: condition {t}")
         return
-    need = CONDS[c["type"]]
-    extra = set(c) - {"type"} - need
-    if set(need) - set(c) or extra:
-        err(f"{where}: cond {c['type']} params {sorted(set(c) - {'type'})} != {sorted(need)}")
+    if set(c) - {"type"} != CONDS[t]:
+        err(f"{where}: condition {t} params {sorted(set(c) - {'type'})}")
+    if t in DIE_CONDS and trigger != "DIE":
+        err(f"{where}: die condition {t} in {trigger}")
+    if t.startswith("squad_") or t == "battle_distinct_elements_gte":
+        if trigger in ("ROLL", "RESOLVE", "SPOILS"):
+            err(f"{where}: squad condition {t} in {trigger}")
     if "element" in c and c["element"] not in ELEMENTS:
-        err(f"{where}: unknown element {c['element']}")
-    if "tier" in c and c["tier"] not in TIERS:
-        err(f"{where}: unknown tier {c['tier']}")
-    if "unit" in c and c["unit"] not in unit_ids:
-        err(f"{where}: unknown unit {c['unit']}")
-    if "n" in c and not isinstance(c["n"], (int, float)):
-        err(f"{where}: n must be numeric")
+        err(f"{where}: element {c['element']}")
+    for combo in [c.get("combo")] + list(c.get("combos", [])):
+        if combo is not None and combo not in COMBOS:
+            err(f"{where}: combo {combo}")
 
 
-def check_effects(where, effs, has_counter):
-    if not isinstance(effs, list) or not effs:
-        err(f"{where}: effects must be non-empty list")
+def check_value(where: str, v) -> None:
+    if isinstance(v, (int, float)):
         return
-    for e in effs:
-        if e.get("op") not in OPS:
-            err(f"{where}: illegal op {e.get('op')}")
-        v = e.get("value")
-        if isinstance(v, dict):
-            if set(v) != {"base", "per", "step"}:
-                err(f"{where}: value object keys {sorted(v)}")
-            if v.get("per") not in SOURCES:
-                err(f"{where}: illegal source {v.get('per')}")
-            if v.get("per") == "counter" and not has_counter:
-                err(f"{where}: uses counter source without counter")
-        elif not isinstance(v, (int, float)) or isinstance(v, bool):
-            err(f"{where}: bad value {v}")
+    if not isinstance(v, dict) or v.get("per") not in SOURCES or set(v) != {"base", "per", "step"}:
+        err(f"{where}: value {v}")
 
 
-def check_block(where, b, unit_ids, has_counter):
-    if b.get("trigger") not in TRIGGERS:
-        err(f"{where}: illegal trigger {b.get('trigger')}")
-    check_cond(where, b.get("cond"), unit_ids)
-    check_effects(where, b.get("effects"), has_counter)
-
-
-def check_relics(d, unit_ids):
-    relics = d.get("relics", [])
-    ids = [r.get("id") for r in relics]
-    if len(relics) != 25:
-        err(f"relics: expected 25, got {len(relics)}")
-    if ids != EXPECTED_RELICS:
-        err("relics: ids/order differ from spec 6.5")
-    for r in relics:
-        rid = r.get("id")
-        for k in ("name", "rarity", "price", "text"):
-            if k not in r:
-                err(f"relics: {rid} missing {k}")
-        if RELIC_PRICE_BY_RARITY.get(r.get("rarity")) != r.get("price"):
-            err(f"relics: {rid} price {r.get('price')} / rarity {r.get('rarity')} mismatch")
-        has_counter = "counter" in r
-        if has_counter:
-            c = r["counter"]
-            if c.get("on") not in TRIGGERS or not isinstance(c.get("inc"), (int, float)):
-                err(f"relics: {rid} bad counter {c}")
-            check_cond(f"relics:{rid}.counter", c.get("cond"), unit_ids)
-        if "blocks" in r:
-            if any(k in r for k in ("trigger", "cond", "effects")):
-                err(f"relics: {rid} mixes blocks with flat form")
-            for i, b in enumerate(r["blocks"]):
-                check_block(f"relics:{rid}.blocks[{i}]", b, unit_ids, has_counter)
-        else:
-            check_block(f"relics:{rid}", r, unit_ids, has_counter)
-
-
-def check_consumables(d):
-    cons = d.get("consumables", [])
-    if len(cons) != 18:
-        err(f"consumables: expected 18, got {len(cons)}")
-    seen_mods = set()
-    for c in cons:
-        cid, kind = c.get("id"), c.get("kind")
-        if kind not in CONSUMABLE_PRICE_BY_KIND:
-            err(f"consumables: {cid} bad kind {kind}")
-            continue
-        if c.get("price") != CONSUMABLE_PRICE_BY_KIND[kind]:
-            err(f"consumables: {cid} price {c.get('price')}")
-        if c.get("max_targets") != CONSUMABLE_TARGETS_BY_KIND[kind]:
-            err(f"consumables: {cid} max_targets {c.get('max_targets')}")
-        if kind in ("TOME", "SIGIL"):
-            if c.get("element") not in ELEMENTS or cid != f"{kind}_{c.get('element')}":
-                err(f"consumables: {cid} element {c.get('element')}")
-        if kind == "INK":
-            if c.get("modifier") not in MODIFIERS or cid != f"INK_{c.get('modifier')}":
-                err(f"consumables: {cid} modifier {c.get('modifier')}")
-            seen_mods.add(c.get("modifier"))
-    kinds = [c.get("kind") for c in cons]
-    if (kinds.count("TOME"), kinds.count("SIGIL"), kinds.count("INK"), kinds.count("DIE")) != (6, 6, 5, 1):
-        err("consumables: kind counts != 6/6/5/1")
-    if seen_mods != MODIFIERS:
-        err(f"consumables: ink modifiers {seen_mods}")
-
-
-def check_equipment(d):
-    eq = d.get("equipment", [])
-    if len(eq) != 8:
-        err(f"equipment: expected 8, got {len(eq)}")
-    ids = {e.get("id") for e in eq}
-    for e in eq:
-        eid = e.get("id")
-        if e.get("price") != EQUIPMENT_PRICE:
-            err(f"equipment: {eid} price {e.get('price')}")
-        req = e.get("requires")
-        if req is not None and (req not in ids or req == eid):
-            err(f"equipment: {eid} invalid requires {req}")
-        if EXPECTED_EQUIPMENT.get(eid, "?") != req:
-            err(f"equipment: {eid} requires {req} differs from spec")
-        if not isinstance(e.get("effect"), dict) or len(e["effect"]) != 1:
-            err(f"equipment: {eid} effect must be single-key object")
-    if ids != set(EXPECTED_EQUIPMENT):
-        err("equipment: ids differ from spec 6.7")
-
-
-def check_enemies(d):
-    en = d.get("enemies", [])
-    if len(en) != 9:
-        err(f"enemies: expected 9, got {len(en)}")
-    rules = {r.get("id"): r for r in d.get("boss_rules", [])}
-    if set(rules) != EXPECTED_RULES:
-        err("enemies: boss_rules ids differ from spec 6.9")
-    for rid, r in rules.items():
-        if not isinstance(r.get("hp_mult"), (int, float)) or not 0.25 <= r["hp_mult"] <= 4.0:
-            err(f"enemies: rule {rid} hp_mult out of range")
-    ids = {e.get("id") for e in en}
-    roles = [e.get("role") for e in en]
-    if (roles.count("MOB"), roles.count("CHAMPION"), roles.count("BOSS")) != (3, 2, 4):
-        err("enemies: role counts != 3/2/4")
-    for e in en:
-        if e.get("role") not in ROLES:
-            err(f"enemies: {e.get('id')} bad role")
-        rule = e.get("rule")
-        if e.get("role") == "BOSS":
-            if rule not in rules or rule == "ENRAGED" or rules[rule].get("boss") != e.get("id"):
-                err(f"enemies: {e.get('id')} invalid rule {rule}")
-        elif rule is not None:
-            err(f"enemies: non-boss {e.get('id')} has rule {rule}")
-    for rid, r in rules.items():
-        b = r.get("boss")
-        if rid == "ENRAGED":
-            if b is not None:
-                err("enemies: ENRAGED boss must be null")
-        elif b not in ids:
-            err(f"enemies: rule {rid} boss {b} unknown")
+def check_relics(d) -> None:
+    rows = d.get("relics", [])
+    ids_match("relics", rows, art_ids.RELICS)
+    for r in rows:
+        where = f"trinket {r.get('id')}"
+        if r.get("rarity") != art_ids.RELIC_RARITY.get(r.get("id")):
+            err(f"{where}: rarity {r.get('rarity')}")
+        if not isinstance(r.get("price"), int) or not 1 <= r["price"] <= 20:
+            err(f"{where}: price out of range")
+        blocks = r.get("blocks") or [{"trigger": r.get("trigger"), "cond": r.get("cond"), "effects": r.get("effects")}]
+        if "counter" in r:
+            if r["counter"].get("on") != "SUMMON":
+                err(f"{where}: counter on SUMMON only")
+            check_cond(where, r["counter"].get("cond", {}), "SUMMON")
+        for b in blocks:
+            trig = b.get("trigger")
+            if trig not in TRIGGER_OPS:
+                err(f"{where}: trigger {trig}")
+                continue
+            check_cond(where, b.get("cond") or {}, trig)
+            for e in b.get("effects") or []:
+                if e.get("op") not in TRIGGER_OPS[trig]:
+                    err(f"{where}: op {e.get('op')} not legal in {trig}")
+                if e.get("op") == "ensure_face" and e.get("element") not in ELEMENTS:
+                    err(f"{where}: ensure_face element")
+                check_value(where, e.get("value"))
         if not r.get("text"):
-            err(f"enemies: rule {rid} missing text")
+            err(f"{where}: text")
+
+
+def check_consumables(d) -> None:
+    rows = d.get("consumables", [])
+    ids_match("consumables", rows, art_ids.CONSUMABLES)
+    for c in rows:
+        where = f"consumable {c.get('id')}"
+        kind = c.get("kind")
+        if kind == "GEM":
+            if c.get("action") != "level" or c.get("combo") not in COMBOS:
+                err(f"{where}: gems level a combo")
+        elif kind == "POTION":
+            act = c.get("action")
+            if act not in POTION_ACTIONS:
+                err(f"{where}: action {act}")
+            if act == "element" and c.get("element") not in ELEMENTS:
+                err(f"{where}: element")
+            if act == "rune" and c.get("rune") not in RUNES:
+                err(f"{where}: rune")
+        else:
+            err(f"{where}: kind {kind}")
+        if not 0 <= c.get("min_targets", -1) <= c.get("max_targets", -1) <= 2:
+            err(f"{where}: targets {c.get('min_targets')}..{c.get('max_targets')}")
+        if not isinstance(c.get("price"), int) or c["price"] < 1:
+            err(f"{where}: price")
+    gems = {c.get("combo") for c in rows if c.get("kind") == "GEM"}
+    if gems != set(COMBOS):
+        err("consumables: one gem per combo")
+
+
+def check_coffers(d) -> None:
+    rows = d.get("coffers", [])
+    ids_match("coffers", rows, art_ids.COFFERS)
+    for k in rows:
+        if k.get("kind") not in COFFER_KINDS or k.get("size") not in COFFER_SIZES:
+            err(f"coffer {k.get('id')}: kind / size")
+        if not 1 <= k.get("picks", 0) <= k.get("choices", 0):
+            err(f"coffer {k.get('id')}: picks of choices")
+    for key, allowed in (("kind_weights", COFFER_KINDS), ("size_weights", COFFER_SIZES)):
+        w = d.get(key, {})
+        if set(w) != allowed or any(v <= 0 for v in w.values()):
+            err(f"coffers: {key} must weight every {sorted(allowed)}")
+    if d.get("first_visit_kind") not in COFFER_KINDS:
+        err("coffers: first_visit_kind")
+
+
+def check_equipment(d) -> None:
+    rows = d.get("equipment", [])
+    ids_match("equipment", rows, art_ids.EQUIPMENT)
+    for q in rows:
+        if q.get("requires") != GEAR_PAIRS.get(q.get("id")):
+            err(f"gear {q.get('id')}: requires {q.get('requires')} != {GEAR_PAIRS.get(q.get('id'))}")
+        if not q.get("effect") or set(q["effect"]) - GEAR_EFFECTS:
+            err(f"gear {q.get('id')}: effect keys")
+
+
+def check_enemies(d) -> None:
+    ids_match("enemies", d.get("enemies", []), list(art_ids.ENEMIES))
+    rules = {r.get("id"): r for r in d.get("boss_rules", [])}
+    if set(rules) != BOSS_RULES:
+        err("enemies: boss rules")
+    for r in rules.values():
+        if not 0.3 <= r.get("hp_mult", 0) <= 4.0:
+            err(f"boss rule {r.get('id')}: hp_mult out of range")
     sel = d.get("boss_selection", {})
-    if set(sel.get("night1_pool", [])) - set(rules) or sel.get("enraged_rule_count") != 2:
-        err("enemies: boss_selection invalid")
+    if not set(sel.get("night1_pool", [])) <= BOSS_RULES:
+        err("enemies: night1_pool")
 
 
-def check_curve(d):
-    base = d.get("night_base", [])
-    if d.get("nights") != 8 or len(base) != 8 or any(b <= 0 for b in base) or base != sorted(base):
-        err("curve: night_base must be 8 increasing positive values")
+def check_curve(d) -> None:
+    bases = d.get("night_base", [])
+    if len(bases) != d.get("nights") or any(b2 <= b1 for b1, b2 in zip(bases, bases[1:])):
+        err("curve: one rising base per night")
     mult = d.get("role_mult", {})
     if set(mult) != {"MOB", "CHAMPION", "BOSS"} or not (mult["MOB"] <= mult["CHAMPION"] <= mult["BOSS"]):
         err("curve: role_mult must cover MOB <= CHAMPION <= BOSS")
 
 
-def check_economy(d):
-    for k, v in ECONOMY_KEYS.items():
-        if d.get(k) != v:
-            err(f"economy: {k} = {d.get(k)} != {v}")
-    if d.get("shop_category_weights") != {"RELIC": 40, "TOME": 25, "SIGIL": 20, "INK": 10, "DIE": 5}:
-        err("economy: shop_category_weights differ from spec 4.6")
-    if d.get("relic_rarity_weights") != {"COMMON": 70, "UNCOMMON": 25, "RARE": 5}:
-        err("economy: relic_rarity_weights differ from spec 4.6")
-    mods = d.get("modifiers", {})
-    exp = {"SHARP": ("add_power", 10), "SWARM": ("add_count", 2), "HEX": ("mul_count", 1.5), "GOLD": ("add_money", 2)}
-    for m, (op, v) in exp.items():
-        if (mods.get(m, {}).get("op"), mods.get(m, {}).get("value")) != (op, v):
-            err(f"economy: modifier {m} != {op} {v}")
-
-
-def check_strings(d):
-    if not isinstance(d, dict) or not all(isinstance(v, str) for v in d.values()):
-        err("strings_en: must be flat key->string map")
+def check_economy(d) -> None:
+    for k in ECONOMY_INTS:
+        if not isinstance(d.get(k), int) or d[k] < 0:
+            err(f"economy: {k} must be a whole number >= 0")
+    if not 1 <= d.get("pick_min", 0) <= d.get("pick_max", 0) <= 5:
+        err("economy: pick_min <= pick_max <= 5")
+    if set(d.get("runes", {})) != RUNES:
+        err("economy: one row per rune")
+    if set(d.get("shop_card_weights", {})) != {"TRINKET", "POTION", "GEM", "DIE"}:
+        err("economy: shop_card_weights")
+    if set(d.get("relic_rarity_weights", {})) != RARITIES:
+        err("economy: relic_rarity_weights")
+    if set(d.get("die_rune_weights", {})) - RUNES:
+        err("economy: die_rune_weights")
 
 
 def main() -> int:
     data = {n: load(n) for n in FILES}
+    if any(v is None for v in data.values()):
+        for p in problems:
+            print("PROBLEM:", p)
+        return 1
     for n, d in data.items():
-        if d is not None:
-            check_version(n, d)
-    unit_ids = set()
-    if data["elements"]: check_elements(data["elements"])
-    if data["units"]: unit_ids = check_units(data["units"])
-    if data["relics"]: check_relics(data["relics"], unit_ids)
-    if data["consumables"]: check_consumables(data["consumables"])
-    if data["equipment"]: check_equipment(data["equipment"])
-    if data["enemies"]: check_enemies(data["enemies"])
-    if data["curve"]: check_curve(data["curve"])
-    if data["economy"]: check_economy(data["economy"])
-    if data["strings_en"] is not None: check_strings(data["strings_en"])
+        if n != "strings_en" and d.get("version") != 2:
+            err(f"{n}.json: version must be 2")
+    unit_ids = check_units(data["units"])
+    check_combos(data["combos"], unit_ids)
+    check_relics(data["relics"])
+    check_consumables(data["consumables"])
+    check_coffers(data["coffers"])
+    check_equipment(data["equipment"])
+    check_enemies(data["enemies"])
+    check_curve(data["curve"])
+    check_economy(data["economy"])
+    if not all(isinstance(v, str) for v in data["strings_en"].values()):
+        err("strings_en: must be a flat key -> string map")
     if problems:
         for p in problems:
             print("PROBLEM:", p)

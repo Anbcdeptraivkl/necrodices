@@ -1,157 +1,162 @@
 extends TestSuite
-## Every relic, consumable, equipment and boss rule proves its effect (GAME_SPEC §13 M4, §14).
-## Relic rows: the relic alone on a small army, expected damage computed by hand from §6.
+## Every trinket, potion, gem, gear and boss rule proves its effect (GAME_SPEC §6, §15).
+## Trinket rows: the trinket alone on a small squad, expected strength computed by hand.
 
 const COVERS: Array[String] = ["data/relics.json", "data/consumables.json", "data/equipment.json",
-	"data/enemies.json", "core/scorer.gd", "core/relic_eval.gd", "core/consumable_fx.gd",
-	"core/encounter_state.gd"]
+	"data/enemies.json", "data/coffers.json", "core/scorer.gd", "core/relic_eval.gd",
+	"core/consumable_fx.gd", "core/encounter_state.gd", "core/economy.gd"]
 
-const SKW := ["BONE", "BONE"]          # Skeleton Warrior 10 / 2
-## relic -> [army (face specs per group), {money, rerolls, bosses, counter}, damage with, damage without]
-const RELIC_CASES := {
-	"RATTLE_DRUM": [[SKW], {}, 40.0, 20.0],
-	"EMBER_JAR": [[["FIRE", "FIRE"]], {}, 54.0, 18.0],
-	"FROST_LANTERN": [[["ICE", "ICE"]], {}, 29.0, 14.0],
-	"MOSS_CHARM": [[["LEAF", "LEAF"]], {}, 32.0, 16.0],
-	"LIGHTNING_ROD": [[["VOLT", "VOLT"]], {}, 60.0, 24.0],
-	"IRON_NAIL": [[["METAL", "METAL"]], {}, 33.0, 18.0],
-	"GRAVEDIGGER_LAMP": [[SKW], {}, 60.0, 20.0],
-	"WISP_JAR": [[["BONE", "ICE"]], {}, 20.0, 5.0],
-	"GRAVE_ROBBER": [[SKW], {}, 20.0, 20.0],
-	"BONE_SAW": [[SKW], {}, 40.0, 20.0],
-	"DEEP_FREEZE": [[["ICE", "ICE"], ["ICE", "LEAF"]], {}, 156.0, 104.0],
-	"COLD_HEARTH": [[SKW], {}, 40.0, 20.0],
-	"BONE_PILE": [[SKW], {}, 40.0, 20.0],
-	"GRAND_PROCESSION": [[SKW, SKW], {}, 144.0, 80.0],
-	"THRIFTY_GHOST": [[SKW], {"rerolls": 2}, 100.0, 20.0],
-	"HYBRID_VIGOR": [[["BONE", "FIRE"]], {}, 90.0, 45.0],
-	"COPYCAT_COFFIN": [[SKW, SKW], {}, 160.0, 80.0],
-	"OVERGROWTH": [[SKW], {"counter": 3}, 50.0, 20.0],
-	"SPIRIT_BOARD": [[["BONE", "FIRE"], ["ICE", "LEAF"], ["VOLT", "METAL"]], {}, 738.0, 369.0],
-	"PIGGY_COFFIN": [[SKW], {"money": 10}, 60.0, 20.0],
-	"TACTICIAN_SKULL": [[SKW, SKW], {}, 160.0, 80.0],
-	"CROWN_OF_THE_LICH": [[["BONE", "BONE", "BONE"]], {}, 480.0, 320.0],
-	"FULL_MOON": [[SKW, SKW, SKW, SKW, SKW, SKW, SKW], {}, 1960.0, 980.0],
-	"BLACK_GRIMOIRE": [[SKW], {"bosses": 2}, 30.0, 20.0],
-	"ELEMENTAL_CONVERGENCE": [[["BONE", "FIRE"], ["ICE", "LEAF"], ["VOLT", "METAL"]], {}, 1107.0, 369.0],
+const F3 := ["FIRE1", "FIRE1", "FIRE1"]   # Trio: (30 + 3) × 3 = 99
+const RAINBOW := ["BONE", "FIRE1", "ICE1", "LEAF1", "VOLT1"]  # (35 + 10) × 4 = 180
+## trinket -> [pick, held, ctx opts, strength with, strength without]
+const CASES := {
+	"RATTLE_DRUM": [["BONE", "BONE", "BONE"], [], {}, 576.0, 144.0],
+	"EMBER_JAR": [F3, [], {}, 279.0, 99.0],
+	"FROST_LANTERN": [["ICE1", "ICE1", "ICE1"], [], {}, 144.0, 99.0],
+	"MOSS_CHARM": [["LEAF1", "LEAF1", "LEAF1"], [], {}, 297.0, 99.0],
+	"LIGHTNING_ROD": [["VOLT1", "VOLT1", "VOLT1"], [], {}, 378.0, 99.0],
+	"IRON_NAIL": [["METAL1", "METAL1", "METAL1"], [], {}, 189.0, 99.0],
+	"GRAVEDIGGER_LAMP": [F3, [], {}, 231.0, 99.0],
+	"TRIO_TOTEM": [F3, [], {}, 363.0, 99.0],
+	"MOON_CHARM": [["FIRE1", "FIRE1", "FIRE1", "ICE1", "ICE1"], [], {}, 630.0, 180.0],
+	"BONE_SAW": [["FIRE4", "FIRE4", "FIRE4"], [], {}, 246.0, 126.0],
+	"WISP_JAR": [["FIRE1", "ICE5", "LEAF2"], [], {}, 45.0, 15.0],
+	"DEEP_FREEZE": [["ICE1", "ICE1", "ICE1"], [], {}, 165.0, 99.0],
+	"THRIFTY_GHOST": [F3, [], {"rerolls": 2}, 297.0, 99.0],
+	"HYBRID_VIGOR": [["BONE", "FIRE1", "BONE", "FIRE1"], [], {}, 272.0, 68.0],
+	"COPYCAT_COFFIN": [F3, [], {"seen": ["FIRE_IMP"]}, 363.0, 99.0],
+	"OVERGROWTH": [F3, [], {"counter": 3}, 198.0, 99.0],
+	"SPIRIT_BOARD": [RAINBOW, [], {}, 360.0, 180.0],
+	"PIGGY_COFFIN": [F3, [], {"money": 10}, 159.0, 99.0],
+	"BONE_PILE": [F3, ["BONE", "BONE"], {}, 231.0, 99.0],
+	"COLD_HEARTH": [F3, [], {}, 234.0, 99.0],
+	"GRAND_PROCESSION": [F3, [], {"squads_before": 2}, 189.0, 99.0],
+	"TACTICIAN_SKULL": [F3, [], {}, 198.0, 99.0],
+	"CROWN_OF_THE_LICH": [["FIRE1", "FIRE1", "FIRE1", "FIRE1"], [], {}, 896.0, 448.0],
+	"LAST_RITES": [F3, [], {"summons_left": 0}, 297.0, 99.0],
+	"ELEMENTAL_CONVERGENCE": [RAINBOW, [], {"battle": ["METAL"]}, 540.0, 180.0],
 }
+## Trinkets that act outside the squad score, each with its own test below.
+const OTHER := ["GRAVE_ROBBER", "LOADED_BONE", "GILDED_TOOTH", "BLOOD_MOON", "BLACK_GRIMOIRE"]
 
 
-func _score(groups: Array, relics: Array[RelicInstance], opts: Dictionary) -> float:
-	var army: Array[Group] = []
-	for specs: Array in groups:
-		army.append(Fixtures.group(specs))
-	var ctx := ScoreCtx.build(army, opts.get("money", 0), opts.get("rerolls", 0), 0, opts.get("bosses", 0))
-	return Scorer.score(Fixtures.db(), army, relics, {}, ctx, PackedStringArray()).damage
+func _strength(pick: Array, held: Array, relic: String, opts: Dictionary) -> float:
+	var squad := Fixtures.squad_of(pick, held)
+	var relics: Array[RelicInstance] = []
+	if relic != "":
+		relics.append(RelicInstance.new(relic, opts.get("counter", 0)))
+	var ctx := ScoreCtx.new()
+	ctx.money = opts.get("money", 0)
+	ctx.rerolls_left = opts.get("rerolls", 0)
+	ctx.summons_left = opts.get("summons_left", 1)
+	ctx.squads_before = opts.get("squads_before", 0)
+	for u: String in opts.get("seen", []):
+		ctx.seen_units[u] = true
+	for e: String in opts.get("battle", []):
+		ctx.battle_elements[e] = true
+	return Scorer.score_squad(Fixtures.db(), squad, relics, {}, ctx, PackedStringArray()).strength
 
 
-func test_every_relic_has_a_case() -> void:
+func _t(items: Array) -> Array[Vector2i]:
+	var out: Array[Vector2i] = []
+	out.assign(items)
+	return out
+
+
+func test_every_trinket_has_a_case() -> void:
 	for id: String in Fixtures.db().relics:
-		_check(RELIC_CASES.has(id), "relic %s has a fixture" % id)
+		_check(CASES.has(id) or OTHER.has(id), "trinket %s has a fixture" % id)
 
 
-func test_relic_effects() -> void:
-	for id: String in RELIC_CASES:
-		var case: Array = RELIC_CASES[id]
-		var opts: Dictionary = case[1]
-		var relics: Array[RelicInstance] = [RelicInstance.new(id, opts.get("counter", 0))]
-		var none: Array[RelicInstance] = []
-		_eq(_score(case[0], relics, opts), case[2], "%s with" % id)
-		_eq(_score(case[0], none, opts), case[3], "%s without" % id)
+func test_trinket_effects() -> void:
+	for id: String in CASES:
+		var c: Array = CASES[id]
+		_eq(_strength(c[0], c[1], id, c[2]), c[3], "%s with" % id)
+		_eq(_strength(c[0], c[1], "", c[2]), c[4], "%s without" % id)
 
 
-func test_conditional_relics_stay_off() -> void:
+func test_conditional_trinkets_stay_off() -> void:
+	_eq(_strength(F3, [], "TACTICIAN_SKULL", {"squads_before": 1}), 99.0, "Tactician only on the first squad")
+	_eq(_strength(F3, [], "LAST_RITES", {"summons_left": 1}), 99.0, "Last Rites only on the last")
+	_eq(_strength(["ICE1", "ICE1", "FIRE1"], [], "DEEP_FREEZE", {}), 11.0, "Deep Freeze needs 3 ICE (rabble)")
+	_eq(_strength(["FIRE4", "FIRE4", "FIRE3"], [], "BONE_SAW", {}), 123.0, "Bone Saw needs every die 4+")
+
+
+func test_spoils_and_summon_money() -> void:
+	var enc := Fixtures.battle([], 1.0, ["GRAVE_ROBBER", "GILDED_TOOTH"])
+	Fixtures.set_tray(enc, ["BONE", "BONE", "BONE"])
+	Fixtures.pick(enc, [0, 1, 2])
+	var money := enc.run.money
+	enc.summon()
+	_eq(enc.run.money, money + 3, "Gilded Tooth: $1 per scored BONE")
+	var lines := Economy.spoils_lines(Fixtures.db(), enc.run, enc)
+	_check(lines.any(func(l: Dictionary) -> bool: return l["source"] == "GRAVE_ROBBER" and l["amount"] == 2),
+		"Grave Robber +$2")
+
+
+func test_resolve_trinkets() -> void:
+	var enc := Fixtures.battle([], 1.0e9, ["BLOOD_MOON"])
+	for n in 3:
+		Fixtures.set_tray(enc, F3)
+		Fixtures.pick(enc, [0, 1, 2])
+		enc.summon()
+		if enc.phase == EncounterState.Phase.AWAIT_ROLL:
+			enc.roll()
+	_eq(enc.resolution.army, 297.0, "three trios")
+	_eq(enc.resolution.damage, 446.0, "blood moon ×1.5 rounds half up")
+
+
+func test_potions_and_gems() -> void:
 	var db := Fixtures.db()
-	var cold: Array[RelicInstance] = [RelicInstance.new("COLD_HEARTH")]
-	_eq(_score([["BONE", "FIRE"]], cold, {}), 45.0, "Cold Hearth off with FIRE essence")
-	var freeze: Array[RelicInstance] = [RelicInstance.new("DEEP_FREEZE")]
-	_eq(_score([["ICE", "ICE"]], freeze, {}), 14.0, "Deep Freeze off below 3 ICE")
-	var moon: Array[RelicInstance] = [RelicInstance.new("FULL_MOON")]
-	_eq(_score([SKW, SKW], moon, {}), 80.0, "Full Moon off below 7 groups")
-	_check(db.relics.size() == 25, "25 relics")
-
-
-func test_grave_robber_pays_at_fight_end() -> void:
 	var run := Fixtures.run()
-	run.relics.append(RelicInstance.new("GRAVE_ROBBER"))
-	var lines := Economy.cash_out_lines(Fixtures.db(), run, "MOB", 0)
-	_check(lines.any(func(l: Dictionary) -> bool: return l["source"] == "GRAVE_ROBBER" and l["amount"] == 2), "+$2")
-
-
-func test_every_consumable() -> void:
-	var db := Fixtures.db()
+	var bone := Vector2i(0, 0)
+	var fire := Vector2i(0, 1)
+	_check(ConsumableFx.apply(db, run, "ELIXIR_ICE", _t([bone])), "elixir on the BONE face")
+	_eq([run.dice[0].faces[0].element, run.dice[0].faces[0].points], ["ICE", 3], "former BONE → 3 points")
+	_check(ConsumableFx.apply(db, run, "ELIXIR_BONE", _t([fire])), "elixir of bone")
+	_eq(run.dice[0].faces[1].points, 6, "BONE is 6")
+	_check(not ConsumableFx.can_apply(db, run, "STRENGTH_TONIC", _t([fire])), "no tonic on BONE")
+	var leaf := Vector2i(1, 3)
+	run.dice[1].faces[3].points = 8
+	_check(ConsumableFx.apply(db, run, "STRENGTH_TONIC", _t([leaf])), "tonic")
+	_eq(run.dice[1].faces[3].points, 9, "capped at 9")
+	_check(ConsumableFx.apply(db, run, "GLASS_DRAUGHT", _t([leaf])), "rune")
+	_eq(run.dice[1].faces[3].rune, "GLASS", "glass rune")
+	_check(not ConsumableFx.can_apply(db, run, "GLASS_DRAUGHT", _t([leaf, fire])), "glass: 1 face")
+	_check(ConsumableFx.apply(db, run, "MIRROR_DRAUGHT", _t([leaf, Vector2i(2, 2)])), "mirror")
+	_eq(run.dice[2].faces[2].to_dict(), run.dice[1].faces[3].to_dict(), "second face copies the first")
+	run.money = 7
+	_check(ConsumableFx.apply(db, run, "HERMIT_BREW", _t([])), "hermit")
+	_eq(run.money, 14, "doubled")
+	run.money = 50
+	ConsumableFx.apply(db, run, "HERMIT_BREW", _t([]))
+	_eq(run.money, 70, "max +$20")
+	_check(ConsumableFx.apply(db, run, "AMBER", _t([])), "gem")
+	_eq(run.level_of("TRIO"), 2, "trio level 2")
 	for id: String in db.consumables:
-		var run := Fixtures.run()
 		var row: Dictionary = db.consumables[id]
 		var targets: Array[Vector2i] = []
-		if int(row["max_targets"]) > 0:
-			targets.append(Vector2i(1, 0))
-		_check(ConsumableFx.apply(db, run, id, targets), "%s applies" % id)
-		match row["kind"]:
-			"TOME":
-				var unit: String = db.tome_targets(row["element"])[0]
-				_eq(run.level_of(unit), 2, "%s levels %s" % [id, unit])
-				_eq(run.level_of("WISP"), 2, "%s levels Wisp" % id)
-			"SIGIL":
-				_eq(run.dice[1].faces[0].element, row["element"], "%s changes the face" % id)
-			"INK":
-				_eq(run.dice[1].faces[0].modifier, row["modifier"], "%s inks the face" % id)
-			"DIE":
-				_eq(run.dice.size(), 5, "%s adds a die" % id)
+		for t in int(row["min_targets"]):
+			targets.append(Vector2i(t + 2, 4))
+		_check(ConsumableFx.can_apply(db, run, id, targets), "%s applies to its minimum targets" % id)
 
 
-func test_modifiers_in_scoring() -> void:
-	var none: Array[RelicInstance] = []
-	_eq(_score([["BONE+SHARP", "BONE"]], none, {}), 40.0, "SHARP +10 Power")
-	_eq(_score([["BONE+SWARM", "BONE"]], none, {}), 40.0, "SWARM +2 Count")
-	_eq(_score([["BONE+GOLD", "BONE"]], none, {}), 20.0, "GOLD scores nothing")
-
-
-func test_every_equipment() -> void:
+func test_gear_effects() -> void:
 	var db := Fixtures.db()
-	var expected := {"GRAVE_BELL": ["summons", 4], "LOADED_CUP": ["rerolls", 3], "SECOND_CUP": ["rerolls", 3]}
-	for id: String in db.equipment:
-		var run := Fixtures.run_with_rules([])
-		run.money = 100
-		var req: Variant = db.equipment[id]["requires"]
-		if req != null:
-			run.equipment.append(req)
-		run.equipment_offer = id
-		run.equipment_sold = false
-		var dice_before := run.dice.size()
-		_check(ShopState.buy_equipment(db, run), "buy %s" % id)
-		var enc := RunFlow.start_encounter(db, run)
-		var effect: Dictionary = db.equipment[id]["effect"]
-		if effect.has("dice"):
-			_eq(run.dice.size(), dice_before + 1, "%s adds a die" % id)
-		if effect.has("summons"):
-			_eq(enc.summons_left, 4, "%s +1 summon" % id)
-		if effect.has("rerolls"):
-			_eq(enc.rerolls_left, 2 + run.equipment_bonus("rerolls", db), "%s rerolls" % id)
-		if effect.has("relic_slots"):
-			_eq(run.relic_slots(db), 6, "%s relic slot" % id)
-		if effect.has("consumable_slots"):
-			_eq(run.consumable_slots(db), 3, "%s consumable slot" % id)
-		if effect.has("shop_reroll_discount"):
-			_eq(ShopState.open(db, run).reroll_cost(db, run), 2, "%s discount" % id)
-	_check(expected.size() == 3, "table")
+	var run := Fixtures.run_with_rules([])
+	run.equipment = PackedStringArray(["GRAVE_BELL", "LOADED_CUP", "RELIQUARY", "POCKET_CRYPT", "GRAVE_GOODS"])
+	var enc := RunFlow.start_encounter(db, run)
+	_eq(enc.summons_left, 4, "+1 summon")
+	_eq(enc.rerolls_left, 3, "+1 reroll")
+	_eq(run.relic_slots(db), 6, "+1 trinket slot")
+	_eq(run.consumable_slots(db), 3, "+1 potion slot")
+	_eq(Economy.interest(db, run, 100), 10, "interest cap +$5")
+	run.equipment.append("OVERSTOCK")
+	_eq(ShopState.open(db, run).cards.size(), 3, "+1 market card")
 
 
-func test_every_boss_rule() -> void:
+func test_boss_rules() -> void:
+	_eq(Fixtures.battle(["INQUISITOR"]).summons_left, 2, "Inquisitor")
 	var db := Fixtures.db()
-	for rule: String in db.boss_rules:
-		var r := Fixtures.run_with_rules([rule] if rule != "ENRAGED" else ["ENRAGED", "BELL_RINGER", "INQUISITOR"])
-		r.relics.append(RelicInstance.new("RATTLE_DRUM"))
-		var enc := RunFlow.start_encounter(db, r)
-		enc.begin()
-		match rule:
-			"EXORCIST":
-				_check(enc.rules.has("EXORCIST"), "exorcist active")
-			"WITCH_HUNTER":
-				_check(r.relics[0].disabled, "witch hunter disables leftmost")
-			"BELL_RINGER":
-				_check(enc.shackled >= 0, "bell ringer shackles")
-			"INQUISITOR":
-				_eq(enc.summons_left, 2, "inquisitor −1 summon")
-			"ENRAGED":
-				_check(enc.shackled >= 0 and enc.summons_left == 2, "enraged applies both rules")
+	for id: String in db.boss_rules:
+		_check(float(db.boss_rules[id]["hp_mult"]) > 0.0, "%s prices its HP" % id)

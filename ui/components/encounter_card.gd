@@ -14,7 +14,7 @@ var _enemy_id := ""
 var _time := 0.0
 
 
-func show_entry(db: ContentDb, entry: Dictionary, state: int) -> void:
+func show_entry(db: ContentDb, run: RunState, entry: Dictionary, state: int) -> void:
 	_enemy_id = entry["enemy"]
 	var role: String = entry["role"]
 	var rules: Array = entry["rules"]
@@ -22,7 +22,8 @@ func show_entry(db: ContentDb, entry: Dictionary, state: int) -> void:
 	if rules.has("ENRAGED"):
 		_name.text = db.text("rule_name_enraged") + " " + _name.text
 	_role.text = db.text("role_" + role.to_lower())
-	_hp.text = db.text("lbl_card_hp") % [Settings.fmt(entry["hp"]), int(db.economy["reward_" + role.to_lower()])]
+	_hp.text = db.text("lbl_hp") % Settings.fmt(entry["hp"])
+	%Bounty.text = db.text("lbl_bounty") % Economy.bounty(db, run, role)
 	var names: PackedStringArray = []
 	for r: String in NightGen.active_rules(entry):
 		names.append(db.text("rule_short_" + r.to_lower()))
@@ -32,7 +33,6 @@ func show_entry(db: ContentDb, entry: Dictionary, state: int) -> void:
 	_stamp.visible = state < 0
 	_current.visible = state == 0
 	modulate = Color(1, 1, 1, 0.6) if state < 0 else Color.WHITE
-	InfoPanel.attach(self, func() -> Dictionary: return InfoText.enemy(db, entry))
 
 
 func _process(delta: float) -> void:

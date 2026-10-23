@@ -1,7 +1,8 @@
 """How-to-Play images (ART_SPEC §11: howto_1..4, 200×120, "captured from game in M6").
 
     tools\\screenshot.cmd encounter captures/s_encounter.png
-    tools\\screenshot.cmd combat captures/s_combat.png
+    tools\\screenshot.cmd summoning captures/s_summoning.png
+    tools\\screenshot.cmd horde captures/s_horde.png
     tools\\screenshot.cmd shop captures/s_shop.png
     python tools/art/howto.py            # crops, snaps every pixel to Hallow32, writes howto_*.png
 
@@ -25,10 +26,10 @@ CAPTURES = ROOT / "captures"
 PALETTE = [hex_to_rgb(v) for v in HALLOW32.values()]
 # page -> (capture file, crop box x, y in the 480×270 capture)
 PAGES = {
-    "howto_1": ("s_encounter.png", (140, 150)),   # dice tray + army: roll, select, bind
-    "howto_2": ("s_encounter.png", (280, 150)),   # right column: groups, hint, actions
-    "howto_3": ("s_combat.png", (140, 140)),      # battlefield tally during playback: P × C
-    "howto_4": ("s_shop.png", (128, 26)),         # Crypt Market cards
+    "howto_1": ("s_encounter.png", (276, 46)),    # pick tray, squads, dice: roll, pick, reroll
+    "howto_2": ("s_summoning.png", (140, 56)),    # a summon playing: combo banner, P × C
+    "howto_3": ("s_horde.png", (140, 112)),        # the army against the hunter's HP
+    "howto_4": ("s_shop.png", (128, 26)),         # Crypt Market cards and coffers
 }
 
 

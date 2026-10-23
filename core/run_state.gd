@@ -1,12 +1,13 @@
 class_name RunState
 extends RefCounted
-## Everything a run owns (GAME_SPEC §4.1, §7, §12.1), as plain data. The phase is stored, so a
-## loaded save routes on it. Mutations happen through RunFlow / ShopState / EncounterState /
-## ConsumableFx commands, which validate first.
+## Everything a run owns (GAME_SPEC §4.1, §13), as plain data. The phase is stored, so a loaded
+## save routes on it. Mutations happen through RunFlow / ShopState / EncounterState /
+## ConsumableFx commands, which validate first. Code names: relics = trinkets, consumables =
+## potions and gems, equipment = gear (DECISIONS D-G12).
 
 enum Phase { NIGHT_MAP, ENCOUNTER, SHOP, GAME_OVER, VICTORY }
 
-const SAVE_VERSION := 1
+const SAVE_VERSION := 2
 
 var seed := ""
 var phase: Phase = Phase.NIGHT_MAP
@@ -14,20 +15,21 @@ var money := 0
 var dice: Array[Die] = []
 var relics: Array[RelicInstance] = []
 var consumables: PackedStringArray = []
-var levels := {}              # unit id -> level
+var levels := {}              # combo id -> level (missing = 1)
 var night := 1
 var encounter_index := 0      # 0 Mob, 1 Champion, 2 Boss within the night
-## The night's three encounters: {enemy, role, rules: Array, hp}.
+## The night's three battles: {enemy, role, rules: Array, hp}.
 var night_plan: Array[Dictionary] = []
 var equipment: PackedStringArray = []
 var equipment_offer := ""     # "" = nothing on offer this night
 var equipment_sold := false
 var bosses_defeated := 0
 var last_boss_rule := ""
+var shop_visits := 0
 var shop: ShopState            # set while phase == SHOP
-var stats := {"best_damage": 0.0, "summons": {}, "wins": 0}
+var stats := {"best_damage": 0.0, "best_squad": 0.0, "summons": {}, "wins": 0}
 var rng: RngStreams
-## Debug overrides (GAME_SPEC M3): never saved, never read by content code.
+## Debug overrides: never saved, never read by content code.
 var debug_hp_mult := 1.0
 
 
@@ -50,17 +52,18 @@ func consumable_slots(db: ContentDb) -> int:
 	return int(db.economy["consumable_slots"]) + equipment_bonus("consumable_slots", db)
 
 
-func level_of(unit_id: String) -> int:
-	return levels.get(unit_id, 1)
+func level_of(combo: String) -> int:
+	return levels.get(combo, 1)
 
 
 func has_relic(id: String) -> bool:
 	return relics.any(func(r: RelicInstance) -> bool: return r.id == id)
 
 
-func record_summon(unit_id: String) -> void:
+func record_summon(unit_id: String, strength: float) -> void:
 	var counts: Dictionary = stats["summons"]
 	counts[unit_id] = counts.get(unit_id, 0) + 1
+	stats["best_squad"] = maxf(float(stats["best_squad"]), strength)
 
 
 func most_summoned() -> String:
@@ -85,7 +88,8 @@ func to_dict() -> Dictionary:
 		"night": night, "encounter_index": encounter_index, "night_plan": night_plan.duplicate(true),
 		"equipment": Array(equipment), "equipment_offer": equipment_offer,
 		"equipment_sold": equipment_sold, "bosses_defeated": bosses_defeated,
-		"last_boss_rule": last_boss_rule, "shop": shop.to_dict() if shop != null else null,
+		"last_boss_rule": last_boss_rule, "shop_visits": shop_visits,
+		"shop": shop.to_dict() if shop != null else null,
 		"stats": stats.duplicate(true), "rng": rng.to_dict(),
 	}
 
@@ -110,6 +114,7 @@ static func from_dict(d: Dictionary) -> RunState:
 	run.equipment_sold = d["equipment_sold"]
 	run.bosses_defeated = d["bosses_defeated"]
 	run.last_boss_rule = d["last_boss_rule"]
+	run.shop_visits = d["shop_visits"]
 	if d["shop"] != null:
 		run.shop = ShopState.from_dict(d["shop"])
 	run.stats = d["stats"].duplicate(true)

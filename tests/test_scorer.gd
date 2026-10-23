@@ -1,97 +1,67 @@
 extends TestSuite
-## Scorer fixtures (GAME_SPEC §5.5, §14): worked example, order sensitivity, boss rule,
-## HEX rounding, trace contract.
+## Squad scorer and resolve (GAME_SPEC §5): the worked example, levels, runes, boss rules,
+## rounding, trinket order and the resolve multipliers.
 
 const COVERS: Array[String] = ["core/scorer.gd", "core/relic_eval.gd", "core/score_ctx.gd",
-	"core/trace_step.gd", "data/relics.json", "data/units.json"]
-
-var _db: ContentDb
-
-
-func _content() -> ContentDb:
-	if _db == null:
-		_db = ContentDb.new()
-		_check(_db.load_all(), "data loads")
-	return _db
-
-
-## A summoned group from "ELEMENT[+MOD]" face specs, resolved through the recipe table.
-func _group(specs: Array) -> Group:
-	var faces: Array[Face] = []
-	for spec: String in specs:
-		var parts := spec.split("+")
-		faces.append(Face.new(parts[0], parts[1] if parts.size() > 1 else ""))
-	var res := Recipes.resolve(_content(), faces, {})
-	var g := Group.new()
-	g.unit_id = res["unit"]
-	g.faces = faces
-	g.elements = res["elements"]
-	return g
-
-
-func _relics(ids: Array) -> Array[RelicInstance]:
-	var out: Array[RelicInstance] = []
-	for id: String in ids:
-		out.append(RelicInstance.new(id))
-	return out
-
-
-func _example_army() -> Array[Group]:
-	var army: Array[Group] = [
-		_group(["BONE+SHARP", "BONE"]),
-		_group(["FIRE", "ICE"]),
-		_group(["BONE", "BONE", "BONE"]),
-	]
-	return army
-
-
-func _score(army: Array[Group], relic_ids: Array, rules: PackedStringArray = []) -> ScoreResult:
-	var ctx := ScoreCtx.build(army, 0, 0, 0, 0)
-	return Scorer.score(_content(), army, _relics(relic_ids), {}, ctx, rules)
+	"core/trace_step.gd", "core/squad.gd", "data/relics.json", "data/economy.json"]
 
 
 func test_worked_example() -> void:
-	var army := _example_army()
-	_eq(army[0].unit_id, "SKELETON_WARRIOR", "group 1 unit")
-	_eq(army[1].unit_id, "STEAM_SLIME", "group 2 unit")
-	_eq(army[2].unit_id, "LICH", "group 3 unit")
-	var r := _score(army, ["RATTLE_DRUM", "CROWN_OF_THE_LICH", "GRAVEDIGGER_LAMP", "BONE_PILE"])
-	_eq(r.power, 70.0, "power")
-	_eq(r.count, 36.0, "count")
-	_eq(r.damage, 2520.0, "damage")
-	var steps: Array = []
+	var r := Fixtures.score(["FIRE4", "FIRE2+SHARP", "FIRE5", "ICE3"], ["EMBER_JAR", "TRIO_TOTEM"])
+	_eq(r.power, 131.0, "power")
+	_eq(r.count, 11.0, "count")
+	_eq(r.strength, 1441.0, "strength (GAME_SPEC §5.6)")
+	var kinds: Array = []
 	for s in r.trace:
-		steps.append([s.source_id, s.p_after, s.c_after])
-	_eq(steps, [
-		["SKELETON_WARRIOR", 10.0, 2.0], ["SHARP", 20.0, 2.0], ["RATTLE_DRUM", 20.0, 4.0],
-		["STEAM_SLIME", 30.0, 8.0],
-		["LICH", 70.0, 16.0], ["RATTLE_DRUM", 70.0, 18.0], ["CROWN_OF_THE_LICH", 70.0, 27.0],
-		["GRAVEDIGGER_LAMP", 70.0, 31.0], ["BONE_PILE", 70.0, 36.0], ["TOTAL", 70.0, 36.0],
-	], "trace matches the §5.5 table")
+		kinds.append(TraceStep.Kind.keys()[s.kind])
+	_eq(kinds, ["COMBO", "DIE", "TRINKET", "DIE", "RUNE", "TRINKET", "DIE", "TRINKET", "TRINKET", "STRENGTH"],
+		"trace order")
+	_eq(r.trace[-1].p_after * r.trace[-1].c_after, 1441.0, "last step = strength")
 
 
-func test_order_sensitivity() -> void:
-	var r := _score(_example_army(), ["CROWN_OF_THE_LICH", "RATTLE_DRUM", "GRAVEDIGGER_LAMP", "BONE_PILE"])
-	_eq(r.damage, 2450.0, "swapped relics")
+func test_rabble_and_levels() -> void:
+	_eq(Fixtures.score(["FIRE1", "ICE5", "LEAF2"]).strength, 15.0, "rabble: (10 + 5) × 1")
+	var r := Fixtures.score(["FIRE1", "FIRE1", "FIRE1"], [], [], {"TRIO": 2})
+	_eq([r.power, r.count], [53.0, 5.0], "trio level 2: 50 + 3 points, 3 + 2 count")
 
 
-func test_exorcist() -> void:
-	var r := _score(_example_army(), ["RATTLE_DRUM", "CROWN_OF_THE_LICH", "GRAVEDIGGER_LAMP", "BONE_PILE"],
-		PackedStringArray(["EXORCIST"]))
-	_eq(r.power, 45.0, "halved BONE base power")
-	_eq(r.damage, 1620.0, "boss fixture")
+func test_runes() -> void:
+	_eq(Fixtures.score(["FIRE1", "FIRE1", "FIRE1+SWARM"]).count, 7.0, "SWARM +4 Count")
+	_eq(Fixtures.score(["FIRE1", "FIRE1", "FIRE1+GLASS"]).count, 6.0, "GLASS ×2 Count")
+	_eq(Fixtures.score(["FIRE1", "FIRE1", "FIRE1", "TOMB"]).power, 83.0, "TOMB +50 Power, no points")
+	_eq(Fixtures.score(["FIRE1", "FIRE1", "FIRE1"], [], ["ICE2+IRON"]).count, 5.0, "held IRON ×1.5 (3 → 5)")
+	_eq(Fixtures.score(["FIRE1", "FIRE1", "FIRE1+IRON"]).count, 3.0, "IRON does nothing when scored")
+	var squad := Fixtures.squad_of(["FIRE1", "FIRE1", "FIRE1+LUCKY"])
+	var ctx := ScoreCtx.new()
+	_eq(Scorer.score_squad(Fixtures.db(), squad, [], {}, ctx, []).count, 3.0, "no luck rolled: nothing")
+	squad.luck[2] = {"count": true, "money": false}
+	_eq(Scorer.score_squad(Fixtures.db(), squad, [], {}, ScoreCtx.new(), []).count, 13.0, "lucky +10 Count")
+	_eq(Fixtures.score(["FIRE1", "ICE5+WILD", "FIRE2"]).power, 38.0, "WILD makes a trio: 30 + 1 + 5 + 2")
 
 
-func test_hex_rounds_half_up() -> void:
-	# Scarecrow (C 3) with HEX: 3 × 1.5 = 4.5 → 5.
-	var army: Array[Group] = [_group(["BONE+HEX", "LEAF"])]
-	_eq(_score(army, []).count, 5.0, "HEX 3 → 5")
+func test_exorcist_and_rounding() -> void:
+	var rules := PackedStringArray(["EXORCIST"])
+	_eq(Fixtures.score(["BONE", "BONE", "BONE"], [], [], {}, rules).power, 30.0, "holy water: BONE scores 0")
+	_eq(Fixtures.score(["ICE1", "ICE1", "ICE1"], ["DEEP_FREEZE"]).count, 5.0, "3 × 1.5 = 4.5 rounds half up to 5")
 
 
-func test_trace_ends_with_result() -> void:
-	var r := _score(_example_army(), ["TACTICIAN_SKULL", "BLACK_GRIMOIRE"])
-	var last: TraceStep = r.trace[-1]
-	_eq(last.kind, TraceStep.Kind.TOTAL, "last step is total")
-	_eq(last.value, r.damage, "total step carries the damage")
-	_check(r.trace.any(func(s: TraceStep) -> bool: return s.source_id == "BLACK_GRIMOIRE" and s.label == "×1 Count"),
-		"Black Grimoire at 0 bosses still shows ×1 Count")
+func test_trinket_order_matters() -> void:
+	var a := Fixtures.score(["FIRE1", "ICE2", "LEAF3"], ["WISP_JAR", "GRAVEDIGGER_LAMP"])
+	var b := Fixtures.score(["FIRE1", "ICE2", "LEAF3"], ["GRAVEDIGGER_LAMP", "WISP_JAR"])
+	_eq(a.count, 7.0, "×3 then +4")
+	_eq(b.count, 15.0, "+4 then ×3")
+
+
+func test_resolve_multipliers() -> void:
+	var db := Fixtures.db()
+	var relics: Array[RelicInstance] = [RelicInstance.new("BLOOD_MOON"), RelicInstance.new("BLACK_GRIMOIRE")]
+	var ctx := ScoreCtx.new()
+	ctx.bosses_defeated = 2
+	var two: Array[float] = [100.0, 50.0]
+	var r := Scorer.resolve(db, two, relics, ctx)
+	_eq(r.army, 150.0, "army sum")
+	_eq(r.damage, 225.0, "two squads: no blood moon; grimoire ×1.5")
+	var three: Array[float] = [100.0, 50.0, 50.0]
+	r = Scorer.resolve(db, three, relics, ctx)
+	_eq(r.damage, 450.0, "200 × 1.5 × 1.5")
+	_eq(r.shares, [225.0, 112.5, 112.5] as Array[float], "shares split the damage by strength")

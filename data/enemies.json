@@ -1,5 +1,5 @@
 {
-  "version": 1,
+  "version": 2,
   "enemies": [
     {
       "id": "MOB_TORCH_VILLAGER",
@@ -69,38 +69,38 @@
     {
       "id": "EXORCIST",
       "boss": "BOSS_EXORCIST",
-      "text": "Holy Water: BONE groups add only half their base Power.",
+      "text": "Holy Water: BONE dice score 0 points.",
       "hp_mult": 1.6
     },
     {
       "id": "WITCH_HUNTER",
       "boss": "BOSS_WITCH_HUNTER",
-      "text": "Confiscation: your leftmost relic is disabled.",
+      "text": "Confiscation: your leftmost trinket is disabled.",
       "hp_mult": 1.6
     },
     {
       "id": "BELL_RINGER",
       "boss": "BOSS_BELL_RINGER",
-      "text": "Toll: after every roll, 1 random die is shackled.",
-      "hp_mult": 0.75
+      "text": "Toll: after every roll and reroll, 1 random die is shackled.",
+      "hp_mult": 0.95
     },
     {
       "id": "INQUISITOR",
       "boss": "BOSS_INQUISITOR",
-      "text": "Interrogation: −1 Summon this fight.",
-      "hp_mult": 0.8
+      "text": "Interrogation: −1 Summon this battle.",
+      "hp_mult": 1.3
     },
     {
       "id": "ENRAGED",
       "boss": null,
       "text": "Enraged: two rules at once.",
-      "hp_mult": 1.25
+      "hp_mult": 1.2
     }
   ],
   "boss_selection": {
     "night1_pool": [
       "EXORCIST",
-      "BELL_RINGER"
+      "WITCH_HUNTER"
     ],
     "no_repeat": true,
     "enraged_night": 8,

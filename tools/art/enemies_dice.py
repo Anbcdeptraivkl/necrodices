@@ -1,4 +1,7 @@
-"""Final art: enemies (ART_SPEC §4.5), shopkeeper, dice, glyphs, pips, badges, overlays (§4.6).
+"""Final art: enemies (ART_SPEC §4.5), shopkeeper, dice, glyphs, pips, overlays (§4.6).
+
+Rune die bodies / face tiles and the num_<n> point badges live in tools/art/dice_runes.py and
+are merged into ASSETS here.
 
     python tools/art/enemies_dice.py                       # write changed assets
     python tools/art/enemies_dice.py --only glyph_*        # only matching ids
@@ -685,13 +688,6 @@ PIPS = {  # 4x4 marks inside a 6x6 dot
     "metal": [".uu.", "u##u", "u##u", ".uu."],
 }
 
-MODS = {
-    "sharp": ["...##", "..#R#", ".#R#.", "#R#..", "##..."],
-    "swarm": [".#.#.", "#m#m#", ".###.", ".#m#.", "..#.."],
-    "hex": [".###.", "#755#", "#5#7#", "#577#", ".###."],
-    "gold": [".###.", "#7OO#", "#OOo#", "#Ooo#", ".###."],
-}
-
 FACE_TILE = [
     ".##############.",
     "#7ccccccccccccB#",
@@ -805,10 +801,6 @@ def BASE(letter: str) -> str:
     return BASE_LEGEND[letter]
 
 
-def mod(name: str) -> Image.Image:
-    return grid(MODS[name], width=5)
-
-
 def die_select() -> Image.Image:
     return ring_of(grid(DIE_BODY), "G1")
 
@@ -877,8 +869,12 @@ for _n in GLYPHS:
     ASSETS[f"glyph8_{_n}"] = (lambda n=_n: glyph8(n))
 for _n in PIPS:
     ASSETS[f"pip_{_n}"] = (lambda n=_n: pip(n))
-for _n in MODS:
-    ASSETS[f"mod_{_n}"] = (lambda n=_n: mod(n))
+
+# Rune die bodies, rune face tiles and point badges (tools/art/dice_runes.py) are generated
+# through this module as well.
+from dice_runes import ASSETS as RUNE_ASSETS  # noqa: E402
+
+ASSETS.update(RUNE_ASSETS)
 
 
 if __name__ == "__main__":

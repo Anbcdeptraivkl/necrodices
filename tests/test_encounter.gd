@@ -1,162 +1,158 @@
 extends TestSuite
-## Encounter state machine (GAME_SPEC §4.2–§4.4, §14): guards, binding, boss rules, commit
-## effects, Attack Now, projected == final.
+## Battle state machine (GAME_SPEC §4.2–§4.6): guards, roll / pick / reroll / summon, auto
+## resolve, boss rules, commit effects (luck, glass, counters, money), preview == summon.
 
-const COVERS: Array[String] = ["core/encounter_state.gd", "core/run_flow.gd", "core/night_gen.gd"]
-
-
-func _enc(rules: Array = [], hp: float = 1000.0) -> EncounterState:
-	var run := Fixtures.run_with_rules(rules, hp)
-	var enc := RunFlow.start_encounter(Fixtures.db(), run)
-	enc.begin()
-	return enc
+const COVERS: Array[String] = ["core/encounter_state.gd", "core/run_flow.gd", "core/night_gen.gd",
+	"core/combos.gd", "core/scorer.gd"]
 
 
 func test_setup_counts() -> void:
-	var enc := _enc()
+	var enc := Fixtures.battle()
 	_eq(enc.summons_left, 3, "3 summons")
 	_eq(enc.rerolls_left, 2, "2 rerolls")
-	_eq(enc.tray_size, 4, "4 dice rolled")
-	_eq(_enc(["INQUISITOR"]).summons_left, 2, "Inquisitor −1 summon")
+	_eq(enc.tray_size, 5, "5 dice")
+	_eq(enc.phase, EncounterState.Phase.AWAIT_ROLL, "dice start in the cup")
+	_eq(Fixtures.battle(["INQUISITOR"]).summons_left, 2, "Inquisitor −1 summon")
 
 
-func test_reroll_guards() -> void:
-	var enc := _enc()
-	_check(not enc.reroll(), "no reroll without selection")
-	enc.toggle_select(0)
+func test_roll_pick_guards() -> void:
+	var enc := Fixtures.battle()
+	_check(not enc.toggle_select(0), "no pick before the roll")
+	_check(enc.roll(), "roll")
+	_check(not enc.roll(), "no second roll in PICK")
+	for i in 5:
+		_check(enc.toggle_select(i), "pick %d" % i)
+	_eq(Array(enc.picked), [0, 1, 2, 3, 4], "pick order kept")
+	_check(enc.toggle_select(2), "unpick")
+	_eq(Array(enc.picked), [0, 1, 3, 4], "die 2 left the pick")
+	Fixtures.pick(enc, [0, 1])
+	_check(not enc.can(EncounterState.Verb.SUMMON), "2 dice cannot summon")
+	Fixtures.pick(enc, [0, 1, 2])
+	_check(enc.can(EncounterState.Verb.SUMMON), "3 dice can summon")
+
+
+func test_reroll() -> void:
+	var enc := Fixtures.battle()
+	enc.roll()
+	_check(not enc.reroll(), "no reroll without a pick")
+	Fixtures.pick(enc, [0])
 	_check(enc.reroll(), "reroll one die")
-	enc.toggle_select(1)
+	_check(enc.picked.is_empty(), "pick cleared")
+	Fixtures.pick(enc, [1, 2])
 	_check(enc.reroll(), "second reroll")
-	enc.toggle_select(1)
+	Fixtures.pick(enc, [1])
 	_check(not enc.can(EncounterState.Verb.REROLL), "no rerolls left")
-	_eq(enc.rerolls_left, 0, "rerolls spent")
 
 
-func test_bind_and_unbind() -> void:
-	var enc := _enc()
-	Fixtures.set_tray(enc, ["BONE", "FIRE", "ICE", "LEAF"])
-	enc.toggle_select(0)
-	enc.toggle_select(1)
-	_check(enc.bind(), "BONE+FIRE binds")
-	_eq(enc.pending[0].unit_id, "FLAME_SKULL", "flame skull pending")
-	_check(not enc.can(EncounterState.Verb.SELECT, 0), "bound die cannot be selected")
-	enc.toggle_select(2)
-	enc.toggle_select(3)
-	_check(enc.bind(), "ICE+LEAF binds")
-	_check(enc.unbind(0), "unbind first group")
-	_eq(enc.pending.size(), 1, "one group left")
-	_eq(enc.bound[2], 0, "second group re-indexed")
-	_eq(enc.bound[0], -1, "dice of the removed group are free")
+func test_summon_cycle_and_loss() -> void:
+	var enc := Fixtures.battle()
+	for n in 3:
+		enc.roll()
+		Fixtures.pick(enc, [0, 1, 2])
+		_check(enc.summon(), "summon %d" % n)
+	_eq(enc.squads.size(), 3, "three squads")
+	_eq(enc.phase, EncounterState.Phase.DONE, "out of summons resolves")
+	_check(not enc.win, "a huge HP is not beaten")
+	_eq(enc.resolution.army, enc.squads[0].strength() + enc.squads[1].strength() + enc.squads[2].strength(),
+		"army = sum of squads")
 
 
-func test_invalid_triple_cannot_bind() -> void:
-	var enc := _enc()
-	Fixtures.set_tray(enc, ["FIRE", "FIRE", "FIRE", "ICE"])
-	for i in 3:
-		enc.toggle_select(i)
-	_check(not enc.can(EncounterState.Verb.BIND), "FIRE×3 has no recipe")
-	enc.toggle_select(2)
-	_check(enc.can(EncounterState.Verb.BIND), "a pair always binds")
+func test_auto_resolve_when_hp_reached() -> void:
+	var enc := Fixtures.battle([], 1.0)
+	enc.roll()
+	Fixtures.pick(enc, [0, 1, 2])
+	enc.summon()
+	_eq(enc.phase, EncounterState.Phase.DONE, "resolved after the first squad")
+	_check(enc.win, "won")
+	_eq(enc.summons_left, 2, "two summons left unused")
+	var enc2 := Fixtures.battle([], 1.0e9)
+	enc2.roll()
+	Fixtures.pick(enc2, [0, 1, 2])
+	enc2.summon()
+	_eq(enc2.phase, EncounterState.Phase.AWAIT_ROLL, "back to the cup")
+	_check(not enc2.can(EncounterState.Verb.SELECT, 0), "no pick before the next roll")
 
 
-func test_bell_ringer_shackles_one_die() -> void:
-	var enc := _enc(["BELL_RINGER"])
-	_check(enc.shackled >= 0 and enc.shackled < enc.tray_size, "a die is shackled")
-	_check(not enc.toggle_select(enc.shackled), "shackled die cannot be selected")
-	var free := 0 if enc.shackled != 0 else 1
-	enc.toggle_select(free)
-	enc.reroll()
-	_check(enc.shackled >= 0, "re-shackled after reroll")
+func test_preview_equals_summon() -> void:
+	for s in 30:
+		var run := Fixtures.run("PREV%02d" % s)
+		run.relics.append(RelicInstance.new("OVERGROWTH"))
+		run.relics.append(RelicInstance.new("GRAND_PROCESSION"))
+		run.night_plan[0]["hp"] = 1.0e9
+		var enc := RunFlow.start_encounter(Fixtures.db(), run)
+		enc.begin()
+		for n in 2:
+			enc.roll()
+			Fixtures.pick(enc, [0, 2, 4])
+			var p := enc.preview()
+			var projected := enc.projected().damage
+			var counter := run.relics[0].counter
+			enc.summon()
+			_eq(enc.squads[-1].strength(), p.result.strength, "seed %d summon %d: preview = result" % [s, n])
+			_eq(enc.army_resolution().damage, projected, "projected = army after the summon")
+			_check(run.relics[0].counter >= counter, "counter only moves on summon")
+
+
+func test_bell_ringer_shackles() -> void:
+	var enc := Fixtures.battle(["BELL_RINGER"])
+	enc.roll()
+	_check(enc.shackled >= 0, "a die is shackled after the roll")
+	_check(not enc.toggle_select(enc.shackled), "shackled die cannot be picked")
 
 
 func test_witch_hunter_disables_leftmost() -> void:
-	var run := Fixtures.run_with_rules(["WITCH_HUNTER"])
-	run.relics.append(RelicInstance.new("RATTLE_DRUM"))
-	run.relics.append(RelicInstance.new("GRAVEDIGGER_LAMP"))
-	var enc := RunFlow.start_encounter(Fixtures.db(), run)
-	enc.begin()
-	_check(run.relics[0].disabled and not run.relics[1].disabled, "leftmost relic disabled")
+	var enc := Fixtures.battle(["WITCH_HUNTER"], 1.0e9, ["GRAVEDIGGER_LAMP", "TRIO_TOTEM"])
+	_check(enc.run.relics[0].disabled, "leftmost disabled")
+	_check(not enc.run.relics[1].disabled, "others work")
+	Fixtures.set_tray(enc, ["FIRE1", "FIRE1", "FIRE1"])
+	Fixtures.pick(enc, [0, 1, 2])
+	_eq(enc.preview().result.count, 11.0, "only Trio Totem: 3 + 8")
 
 
-func test_summon_cycle_to_combat() -> void:
-	var enc := _enc([], 1.0)
-	for t in 3:
-		Fixtures.set_tray(enc, ["BONE", "BONE", "ICE", "ICE"])
-		enc.toggle_select(0)
-		enc.toggle_select(1)
-		enc.bind()
-		_check(enc.summon(), "summon turn %d" % t)
-	_eq(enc.phase, EncounterState.Phase.DONE, "combat after the last summon")
-	_eq(enc.army.size(), 3, "three skeleton groups")
-	_check(enc.win, "beats 1 HP")
+func test_glass_breaks_and_lucky_pays_sometimes() -> void:
+	var broke := 0
+	var paid := 0
+	for s in 60:
+		var enc := Fixtures.battle()
+		enc.run.rng = RngStreams.create("LUCK%02d" % s)
+		Fixtures.set_tray(enc, ["FIRE1+GLASS", "FIRE1+LUCKY", "FIRE1"])
+		Fixtures.pick(enc, [0, 1, 2])
+		var money := enc.run.money
+		enc.summon()
+		var sq := enc.squads[0]
+		if not sq.broken.is_empty():
+			broke += 1
+			_eq(enc.run.dice[0].faces[enc.top[0]].rune, "", "the shattered rune is gone")
+		if sq.money > 0:
+			paid += 1
+			_eq(enc.run.money, money + 20, "lucky money")
+	_check(broke > 5 and broke < 30, "glass breaks about 1 in 4 (%d / 60)" % broke)
+	_check(paid >= 1 and paid < 15, "lucky money about 1 in 15 (%d / 60)" % paid)
 
 
-func test_attack_now_counts_unused_summons() -> void:
-	var enc := _enc([], 1.0)
-	_check(not enc.can(EncounterState.Verb.ATTACK), "no attack with an empty army")
-	Fixtures.set_tray(enc, ["BONE", "BONE", "ICE", "ICE"])
-	enc.toggle_select(0)
-	enc.toggle_select(1)
-	enc.bind()
-	_check(enc.attack_now(), "attack now")
-	_eq(enc.summons_left, 2, "one summon used, two unused")
-	var lines := RunFlow.finish_encounter(Fixtures.db(), enc.run, enc)
-	var unused: Array = lines.filter(func(l: Dictionary) -> bool: return l["key"] == "cashout_unused_summons")
-	_eq(unused[0]["amount"], 2, "$1 per unused summon")
-
-
-func test_projected_equals_final() -> void:
-	for s in 30:
-		var run := Fixtures.run("PROJ%03d" % s)
-		run.relics.append(RelicInstance.new("OVERGROWTH"))
-		run.relics.append(RelicInstance.new("PIGGY_COFFIN"))
-		run.relics.append(RelicInstance.new("THRIFTY_GHOST"))
-		run.dice[0].faces[3].modifier = "GOLD"
-		run.dice[1].faces[0].modifier = "HEX"
-		var enc := RunFlow.start_encounter(Fixtures.db(), run)
-		enc.begin()
-		var projected := -1.0
-		while enc.phase == EncounterState.Phase.AWAIT_INPUT:
-			_bind_greedy(enc)
-			if enc.summons_left == 1 or s % 3 == 0:
-				projected = enc.projected().damage
-				if enc.summons_left > 1:
-					enc.attack_now() if enc.can(EncounterState.Verb.ATTACK) else enc.summon()
-				else:
-					enc.summon()
-			else:
-				enc.summon()
-		if projected >= 0.0:
-			_eq(enc.result.damage, projected, "seed %d projected == final" % s)
-
-
-func test_gold_and_counter_commit_effects() -> void:
-	var run := Fixtures.run_with_rules([])
-	run.relics.append(RelicInstance.new("OVERGROWTH"))
-	run.dice[0].faces[3].modifier = "GOLD"   # LEAF face with GOLD
-	var enc := RunFlow.start_encounter(Fixtures.db(), run)
-	enc.begin()
-	Fixtures.set_tray(enc, ["LEAF", "LEAF", "ICE", "ICE"])
-	var money := run.money
-	var before := enc.projected().damage
-	enc.toggle_select(0)
-	enc.toggle_select(1)
-	enc.bind()
-	enc.projected()
-	_eq(run.relics[0].counter, 0, "preview never increments counters")
+func test_loaded_bone_and_gilded() -> void:
+	for s in 20:
+		var enc := Fixtures.battle([], 1.0, ["LOADED_BONE"])
+		enc.run.rng = RngStreams.create("BONE%02d" % s)
+		enc.roll()
+		var bones := 0
+		for i in enc.tray_size:
+			if enc.face_at(i).element == "BONE":
+				bones += 1
+		_check(bones >= 1, "seed %d: a BONE face is showing" % s)
+	var enc := Fixtures.battle([], 1.0)
+	Fixtures.set_tray(enc, ["FIRE1", "FIRE1", "FIRE1", "ICE2+GILDED", "LEAF3+GILDED"])
+	Fixtures.pick(enc, [0, 1, 2])
 	enc.summon()
-	_eq(run.relics[0].counter, 1, "LEAF group increments Overgrowth")
-	_eq(run.money, money + 2, "GOLD face pays $2 at commit")
-	_check(before >= 0.0, "empty preview scores")
+	_eq(enc.gilded, 2, "two gilded faces held at the end")
 
 
-func _bind_greedy(enc: EncounterState) -> void:
-	for i in enc.tray_size:
-		for j in range(i + 1, enc.tray_size):
-			if enc.bound[i] != -1 or enc.bound[j] != -1 or i == enc.shackled or j == enc.shackled:
-				continue
-			enc.toggle_select(i)
-			enc.toggle_select(j)
-			if not enc.bind():
-				enc.toggle_select(i)
-				enc.toggle_select(j)
+func test_overgrowth_counts_the_current_squad() -> void:
+	var enc := Fixtures.battle([], 1.0e9, ["OVERGROWTH"])
+	Fixtures.set_tray(enc, ["LEAF1", "LEAF1", "LEAF1"])
+	Fixtures.pick(enc, [0, 1, 2])
+	_eq(enc.preview().result.count, 4.0, "preview: 3 + 1")
+	_eq(enc.run.relics[0].counter, 0, "preview leaves the counter")
+	enc.summon()
+	_eq(enc.run.relics[0].counter, 1, "summon moves it")
+	_eq(enc.squads[0].result.count, 4.0, "summoned squad counted itself")

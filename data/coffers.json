@@ -1,0 +1,125 @@
+{
+  "version": 2,
+  "coffers": [
+    {
+      "id": "COFFER_POTION",
+      "name": "Potion Coffer",
+      "kind": "POTION",
+      "size": "NORMAL",
+      "choices": 3,
+      "picks": 1,
+      "price": 4
+    },
+    {
+      "id": "COFFER_POTION_JUMBO",
+      "name": "Jumbo Potion Coffer",
+      "kind": "POTION",
+      "size": "JUMBO",
+      "choices": 5,
+      "picks": 1,
+      "price": 6
+    },
+    {
+      "id": "COFFER_POTION_MEGA",
+      "name": "Mega Potion Coffer",
+      "kind": "POTION",
+      "size": "MEGA",
+      "choices": 5,
+      "picks": 2,
+      "price": 8
+    },
+    {
+      "id": "COFFER_GEM",
+      "name": "Gem Coffer",
+      "kind": "GEM",
+      "size": "NORMAL",
+      "choices": 3,
+      "picks": 1,
+      "price": 4
+    },
+    {
+      "id": "COFFER_GEM_JUMBO",
+      "name": "Jumbo Gem Coffer",
+      "kind": "GEM",
+      "size": "JUMBO",
+      "choices": 5,
+      "picks": 1,
+      "price": 6
+    },
+    {
+      "id": "COFFER_GEM_MEGA",
+      "name": "Mega Gem Coffer",
+      "kind": "GEM",
+      "size": "MEGA",
+      "choices": 5,
+      "picks": 2,
+      "price": 8
+    },
+    {
+      "id": "COFFER_TRINKET",
+      "name": "Trinket Coffer",
+      "kind": "TRINKET",
+      "size": "NORMAL",
+      "choices": 2,
+      "picks": 1,
+      "price": 4
+    },
+    {
+      "id": "COFFER_TRINKET_JUMBO",
+      "name": "Jumbo Trinket Coffer",
+      "kind": "TRINKET",
+      "size": "JUMBO",
+      "choices": 4,
+      "picks": 1,
+      "price": 6
+    },
+    {
+      "id": "COFFER_TRINKET_MEGA",
+      "name": "Mega Trinket Coffer",
+      "kind": "TRINKET",
+      "size": "MEGA",
+      "choices": 4,
+      "picks": 2,
+      "price": 8
+    },
+    {
+      "id": "COFFER_BONE",
+      "name": "Bone Coffer",
+      "kind": "BONE",
+      "size": "NORMAL",
+      "choices": 3,
+      "picks": 1,
+      "price": 4
+    },
+    {
+      "id": "COFFER_BONE_JUMBO",
+      "name": "Jumbo Bone Coffer",
+      "kind": "BONE",
+      "size": "JUMBO",
+      "choices": 5,
+      "picks": 1,
+      "price": 6
+    },
+    {
+      "id": "COFFER_BONE_MEGA",
+      "name": "Mega Bone Coffer",
+      "kind": "BONE",
+      "size": "MEGA",
+      "choices": 5,
+      "picks": 2,
+      "price": 8
+    }
+  ],
+  "kind_weights": {
+    "POTION": 4,
+    "GEM": 4,
+    "TRINKET": 1.2,
+    "BONE": 4
+  },
+  "size_weights": {
+    "NORMAL": 4,
+    "JUMBO": 2,
+    "MEGA": 0.5
+  },
+  "first_visit_kind": "TRINKET"
+}

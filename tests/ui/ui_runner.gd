@@ -1,7 +1,7 @@
 extends Node
 ## UI smoke tests in the real game context (autoloads present), driven through the screens'
-## own buttons and signals: every script parses, a full encounter → cash-out → shop → night map
-## loop works, a loss reaches the end screen, saves restore. Prints PASS / FAIL lines and quits
+## own buttons and signals: every script parses, a full battle → spoils → market → night map
+## loop works, a coffer opens, a loss reaches the end screen, saves restore. Prints PASS / FAIL lines and quits
 ## with exit code 1 on any failure. Entry point: tools\ui_test.cmd.
 ## Saves go to user://sav_uitest (never the real profile).
 
@@ -36,14 +36,14 @@ func _run() -> void:
 	_game.store = SaveStore.new(SAVE_DIR)
 	_game.store.delete_run()
 	_game.profile = _game.store.load_profile()
-	_game.profile["tutorial"] = {"tut_first_roll": true, "tut_first_bind": true, "tut_before_summon": true,
-		"tut_first_combat": true, "tut_first_shop": true}
+	_game.profile["tutorial"] = {"tut_first_roll": true, "tut_first_summon": true, "tut_first_shop": true}
 	await _case("scripts_parse", _scripts_parse)
 	await _case("title", _title)
 	await _case("win_loop", _win_loop)
 	await _case("continue_restores_shop", _continue_restores_shop)
 	await _case("loss_reaches_end", _loss)
 	await _case("overlays_open", _overlays)
+	await _case("coffer_take", _coffer)
 	await _case("tooltip_no_flicker", _tooltip_states)
 	_game.store.delete_run()
 	print("UI %s (%d failures)" % ["PASSED" if _failures == 0 else "FAILED", _failures])
@@ -105,52 +105,62 @@ func _new_run(seed: String, hp_mult: float) -> void:
 	await _frames()
 
 
+## Presses ROLL, skips the roll playback, picks the first `n` free dice through the die views.
+func _roll_and_pick(screen: Node, n: int) -> void:
+	var enc: EncounterState = _game.encounter
+	(screen.get_node("%Main") as Button).pressed.emit()
+	await _frames(1)
+	(screen.get_node("%Queue") as PresentationQueue).skip_all()
+	await _frames(2)
+	var dice: Array = screen.get_node("%Tray").get_children()
+	var picked := 0
+	for i in dice.size():
+		if picked < n and i != enc.shackled:
+			(dice[i] as DieView).pressed.emit(i)
+			picked += 1
+	await _frames(2)
+
+
 func _win_loop() -> void:
 	await _new_run("UIWIN001", 0.001)
 	_check(_scene().name == "NightMap", "night map after new run")
 	(_scene().get_node("%Fight") as Button).pressed.emit()
 	await _frames()
-	_check(_scene().name == "Encounter", "encounter after FIGHT")
+	_check(_scene().name == "Encounter", "battle after FIGHT")
 	var screen := _scene()
 	var enc: EncounterState = _game.encounter
-	_check(enc.turn == 1 and enc.tray_size == 4, "first turn rolled")
-	# Bind the first bindable pair through the die views, then attack.
-	var dice: Array = screen.get_node("%Tray").get_children()
-	(dice[0] as DieView).pressed.emit(0)
-	(dice[1] as DieView).pressed.emit(1)
-	await _frames(1)
-	(screen.get_node("%Bind") as Button).pressed.emit()
+	_check(enc.phase == EncounterState.Phase.AWAIT_ROLL and enc.tray_size == 5, "dice in the cup")
+	await _roll_and_pick(screen, 3)
+	_check(enc.phase == EncounterState.Phase.PICK, "rolled through the ROLL button")
+	_check(enc.picked.size() == 3, "three dice picked through the die views")
+	_check((screen.get_node("%PickSlots") as Node).get_child(2).modulate.a == 1.0, "pick tray shows the third die")
+	(screen.get_node("%Main") as Button).pressed.emit()
 	await _frames(2)
-	_check(enc.pending.size() == 1, "group bound through the BIND button")
-	_check(screen.get_node("%Chips").get_child_count() == 1, "pending chip shown")
-	(screen.get_node("%Attack") as Button).pressed.emit()
-	await _frames(2)
-	_check(enc.phase == EncounterState.Phase.DONE and enc.win, "combat won")
+	_check(enc.phase == EncounterState.Phase.DONE and enc.win, "battle won by the first squad")
 	_check(_game.run.phase == RunState.Phase.SHOP, "run moved to SHOP at once")
 	(screen.get_node("%Queue") as PresentationQueue).skip_all()
 	await _frames(3)
+	_check(screen.get_node("%Chips").get_child_count() == 1, "squad chip shown")
 	var host: OverlayHost = screen.get_node("%Overlays")
-	_check(host.is_open(), "cash-out overlay open")
-	var cash := _find(host, "CashOut")
-	_check(cash != null, "cash-out found")
-	if cash != null:
-		(cash.get_node("%Continue") as Button).pressed.emit()
+	_check(host.is_open(), "spoils overlay open")
+	var spoils := _find(host, "Spoils")
+	_check(spoils != null, "spoils found")
+	if spoils != null:
+		(spoils.get_node("%Continue") as Button).pressed.emit()
 	await _frames(4)
-	_check(_scene().name == "Shop", "shop after cash-out")
+	_check(_scene().name == "Shop", "market after the spoils")
 	var shop := _scene()
-	var money_before: int = _game.run.money
 	_game.run.money = 50
 	shop.call(&"_refresh")
 	var cards: Array = shop.get_node("%Cards").get_children()
 	(cards[0] as ShopCard).buy_pressed.emit(0)
 	await _frames(2)
-	_check(_game.run.shop.items[0]["sold"] or _game.run.money < 50, "bought from card 0")
-	_check(_game.store.load_run().money == _game.run.money, "shop command saved")
+	_check(_game.run.shop.cards[0]["sold"] or _game.run.money < 50, "bought from card 0")
+	_check(_game.store.load_run().money == _game.run.money, "market command saved")
 	(shop.get_node("%Next") as Button).pressed.emit()
 	await _frames(3)
 	_check(_scene().name == "NightMap", "back to night map")
-	_check(_game.run.encounter_index == 1, "next encounter is the champion")
-	_check(money_before >= 0, "money kept")
+	_check(_game.run.encounter_index == 1, "next battle is the champion")
 
 
 func _continue_restores_shop() -> void:
@@ -158,16 +168,17 @@ func _continue_restores_shop() -> void:
 	_game.start_encounter()
 	await _frames()
 	var enc: EncounterState = _game.encounter
-	enc.toggle_select(0)
-	enc.toggle_select(1)
-	enc.bind()
-	enc.attack_now()
+	enc.roll()
+	for i in enc.tray_size:
+		if enc.picked.size() < 3 and i != enc.shackled:
+			enc.toggle_select(i)
+	enc.summon()
 	_game.finish_encounter()
 	var saved := JSON.stringify(JsonUtil.narrow(_game.run.to_dict()), "", true)
 	_game.run = null
 	_game.continue_run()
 	await _frames(3)
-	_check(_scene().name == "Shop", "continue routes to the shop")
+	_check(_scene().name == "Shop", "continue routes to the market")
 	_check(JSON.stringify(JsonUtil.narrow(_game.run.to_dict()), "", true) == saved, "identical state after continue")
 
 
@@ -177,20 +188,43 @@ func _loss() -> void:
 	await _frames()
 	var screen := _scene()
 	for t in 3:
-		(screen.get_node("%Summon") as Button).pressed.emit()
+		await _roll_and_pick(screen, 3)
+		(screen.get_node("%Main") as Button).pressed.emit()
 		await _frames(1)
-		var host: OverlayHost = screen.get_node("%Overlays")
-		var confirm := _find(host, "Confirm")
-		if confirm != null:
-			(confirm.get_node("%Yes") as Button).pressed.emit()
+		(screen.get_node("%Queue") as PresentationQueue).skip_all()
 		await _frames(2)
-	_check(_game.encounter.phase == EncounterState.Phase.DONE and not _game.encounter.win, "lost the fight")
+	_check(_game.encounter.phase == EncounterState.Phase.DONE and not _game.encounter.win, "lost the battle")
 	_check(_game.run.phase == RunState.Phase.GAME_OVER, "run over")
 	_check(not _game.store.has_run(), "run save deleted")
-	(screen.get_node("%Queue") as PresentationQueue).skip_all()
-	await get_tree().create_timer(0.8).timeout
+	await get_tree().create_timer(0.9).timeout
 	await _frames(3)
 	_check(_scene().name == "End", "end screen")
+
+
+func _coffer() -> void:
+	await _new_run("UICOFF01", 1.0)
+	var run: RunState = _game.run
+	run.shop = ShopState.open(_game.db, run)
+	run.shop.coffers[0] = {"id": "COFFER_BONE", "price": 4, "sold": false}
+	run.phase = RunState.Phase.SHOP
+	run.money = 20
+	_game.goto("shop")
+	await _frames(3)
+	var shop := _scene()
+	(shop.get_node("%Coffers").get_child(0) as CofferCard).open_pressed.emit(0)
+	await _frames(3)
+	var host: OverlayHost = shop.get_node("%Overlays")
+	var coffer := _find(host, "Coffer")
+	_check(coffer != null, "coffer overlay opens")
+	var dice := run.dice.size()
+	if coffer != null:
+		(coffer.get_node("%Choices").get_child(0) as ShopCard).buy_pressed.emit(0)
+	await _frames(3)
+	_check(run.dice.size() == dice + 1, "took a die from the bone coffer")
+	_check(run.shop.open_coffer.is_empty(), "coffer done")
+	_check(_find(host, "Coffer") == null or not host.is_open(), "overlay closed")
+	_game.goto("title")
+	await _frames()
 
 
 func _overlays() -> void:
@@ -201,16 +235,15 @@ func _overlays() -> void:
 	(screen.get_node("%TopBar").get_node("%Codex") as Button).pressed.emit()
 	await _frames(2)
 	var host: OverlayHost = screen.get_node("%Overlays")
-	_check(_find(host, "RunInfo") != null, "recipe book opens")
+	_check(_find(host, "RunInfo") != null, "codex opens")
 	host.close_all()
 	await _frames(2)
 	_check(not host.is_open(), "overlays close")
-	_game.run.consumables.append("SIGIL_FIRE")
-	screen.call(&"_on_consumable_pressed", 0)
-	screen.call(&"_use_selected_consumable", 0)
+	_game.run.consumables.append("ELIXIR_FIRE")
+	(screen.get_node("%TopBar") as TopBar).use_requested.emit(0)
 	await _frames(2)
 	var inspector := _find(host, "DiceInspector")
-	_check(inspector != null, "dice inspector opens for a sigil")
+	_check(inspector != null, "dice inspector opens for an elixir")
 	if inspector != null:
 		var tiles: Array = []
 		for row in inspector.get_node("%Rows").get_children():
@@ -221,8 +254,8 @@ func _overlays() -> void:
 		await _frames(1)
 		(inspector.get_node("%Confirm") as Button).pressed.emit()
 		await _frames(3)
-		_check(_game.run.dice[0].faces[0].element == "FIRE", "sigil applied through the inspector")
-		_check(_game.run.consumables.is_empty(), "consumable used up")
+		_check(_game.run.dice[0].faces[0].element == "FIRE", "elixir applied through the inspector")
+		_check(_game.run.consumables.is_empty(), "potion used up")
 	_game.goto("title")
 	await _frames()
 

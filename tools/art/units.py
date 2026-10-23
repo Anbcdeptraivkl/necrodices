@@ -47,6 +47,19 @@ def grounded(rows: list[str], frame2: list[str] | None = None):
     return pg.sheet([f1, f2])
 
 
+def layered(*parts: list[str]) -> "pg.Image.Image":
+    """Part grids back to front, each with its own N0 ring, so overlapping parts stay separated."""
+    out = pg.canvas(16, 16)
+    for rows in parts:
+        pg.paste(out, fill(rows), 0, 0)
+    return out
+
+
+def grounded_parts(*parts: list[str]):
+    f1 = layered(*parts)
+    return pg.sheet([f1, pg.squash(f1)])
+
+
 def _with_shadow(frame, width: int):
     bbox = frame.getbbox()
     cx = (bbox[0] + bbox[2]) // 2
@@ -436,6 +449,182 @@ WITCH_QUEEN = [
     "................",
 ]
 
+# ---------------------------------------------------------------- ritual, elites, rainbow
+
+# Ritual FIRE+ICE+METAL: steel dome with a wind-up key, brass-ringed ice eye, boiler grille.
+CLOCKWORK_KRAKEN = [
+    "......o.o.......",
+    "......ooo.......",
+    ".......o........",
+    ".....uuTTTt.....",
+    "....uuTTTTTt....",
+    "...uTToooTTTt...",
+    "...uToIIIoTTt...",
+    "...uToI#IoTTt...",
+    "...uTToooTTtt...",
+    "...tTF#F#FTtt...",
+    "..uTttttttttTt..",
+    ".uT.uT.TT.Tt.Tt.",
+    ".T..oT.Tt.To..T.",
+    ".uT.Tt.oT.tT.Tt.",
+    "..t..t..t..t..t.",
+    "................",
+]
+
+# Elites carry a G1 mark (crown or horns).
+HELLHOUND = [
+    "................",
+    "...g......O..O..",
+    "..gF..g..gORRO..",
+    "..gFg.gFgFRRRR..",
+    "...FFgFFFRRgRRR.",
+    "..gFFFFFFRRRRRR.",
+    ".g.FFFFFFrRRr##.",
+    ".gFRRRRRRRrrr...",
+    "..FRRRRRRRrrr...",
+    "...rrrrrrrrr1...",
+    "...r1rrrrrr11...",
+    "...r1.Rr.r1.Rr..",
+    "...r1.Rr.r1.Rr..",
+    "...r1.Rr.r1.Rr..",
+    "..rr.RR.rr.RR...",
+    "................",
+]
+
+FROST_WRAITH = [
+    "......O.O.O.....",
+    "......OOOOO.....",
+    ".....jjIIIIi....",
+    "....jjI1111Ii...",
+    "...jjI171171Ii..",
+    "...jI11111111i..",
+    "..jjII111111Ii..",
+    ".jjjIIIIIIIIIii.",
+    ".j.jIIIjIIIIi.i.",
+    "...jIIjIIIIIi...",
+    "...jIjIIiIIIi...",
+    "...i.ji.i.ii....",
+    "................",
+    "................",
+    "................",
+    "................",
+]
+
+MANDRAKE_BRUTE = [
+    "....m.O.m.......",
+    "...mLmOmLm......",
+    "..mLLlLlLLm.....",
+    "....LLLLLl......",
+    "....L#LL#l......",
+    "..mLLL##LLLll...",
+    ".mLLLLLLLLLLll..",
+    ".mLLmLLLLLlLLl..",
+    ".LLlmLLLLLllLl..",
+    ".Ll.LLLLLLl.Ll..",
+    ".sS.lLLLLLl.Ss..",
+    "sS.slLLLll..sSs.",
+    "....lsSlsS......",
+    "...sS....sS.....",
+    "..sS......Ss....",
+    "................",
+]
+
+THUNDER_GHOUL = [
+    "................",
+    "................",
+    "................",
+    "..wVv......wVv..",
+    ".wVVVv....wVVVv.",
+    ".VVVVVVVVVVVVVv.",
+    ".VVwVVVVVVVVVVv.",
+    ".VV.VVVVVVVVvVv.",
+    ".VV.wVwVwVwV.Vv.",
+    ".VV..444444..Vv.",
+    ".Vv..444444..Vv.",
+    ".wVw.44..44.wVw.",
+    ".w.w.VV..VV.w.w.",
+    ".....Vv..Vv.....",
+    "....VVv..VVv....",
+    "................",
+]
+
+THUNDER_GHOUL_HEAD = [
+    "................",
+    ".....O....O.....",
+    ".....wVVVVV.....",
+    ".....V#VV#v.....",
+    ".....VVVVVv.....",
+    ".....V#w#wv.....",
+    "......VVVv......",
+    "................",
+    "................",
+    "................",
+    "................",
+    "................",
+    "................",
+    "................",
+    "................",
+    "................",
+]
+
+THUNDER_GHOUL_SPARKS = [
+    "................",
+    ".w...........w..",
+    "..w.........w...",
+    ".w...........w..",
+    "................",
+    "................",
+    "................",
+    "................",
+    "................",
+    "................",
+    "................",
+    "................",
+    "................",
+    "................",
+    "................",
+    "................",
+]
+
+GARGOYLE = [
+    ".u............t.",
+    ".uT..O....O..Tt.",
+    ".uTT.uO..Ot.TTt.",
+    ".uTTuuTTTTTtTTt.",
+    ".uTTuTOTTOTtTTt.",
+    ".uT3uTTTTTTt3Tt.",
+    ".u33.uT##Tt.33t.",
+    ".u33uuTTTTTtt33.",
+    ".u3.uTTTTTTt.3t.",
+    "..t.uTuTTtTt.t..",
+    "...uTTTTTTTTt...",
+    "..uTt.TTTt.uTt..",
+    "..uTt.TTTt.uTt..",
+    "..TTt.tttt.TTt..",
+    ".uTtt......uTtt.",
+    "................",
+]
+
+# Rainbow: three tiny element ghosts in a procession, the lead one carrying a candle.
+PHANTOM_PARADE = [
+    "............O...",
+    "............O...",
+    "............7...",
+    "......7L....7...",
+    ".....7LLL..7F...",
+    "..7I.L#L#.7FFF..",
+    ".7III LLLL7F#F#.",
+    ".I#I#.LLLLFFFFF.",
+    ".IIII.LLLLFFFF..",
+    ".IIII.L.L.FFFF..",
+    ".I.I......F.F...",
+    "................",
+    "................",
+    "................",
+    "................",
+    "................",
+]
+
 LEGION_BANNER = [
     "..cc............",
     "..cB............",
@@ -555,6 +744,13 @@ ASSETS = {
     "headless_horseman": lambda: grounded(HEADLESS_HORSEMAN),
     "stitched_golem": lambda: grounded(STITCHED_GOLEM),
     "witch_queen": lambda: grounded(WITCH_QUEEN),
+    "clockwork_kraken": lambda: grounded(CLOCKWORK_KRAKEN),
+    "hellhound": lambda: grounded(HELLHOUND),
+    "frost_wraith": lambda: floating(FROST_WRAITH),
+    "mandrake_brute": lambda: grounded(MANDRAKE_BRUTE),
+    "thunder_ghoul": lambda: grounded_parts(THUNDER_GHOUL_SPARKS, THUNDER_GHOUL, THUNDER_GHOUL_HEAD),
+    "gargoyle": lambda: grounded(GARGOYLE),
+    "phantom_parade": lambda: floating(PHANTOM_PARADE),
     "legion_banner": lambda: fill(LEGION_BANNER),
     "mini_bone": lambda: mini(MINI_BONE),
     "mini_fire": lambda: mini(MINI_FIRE),

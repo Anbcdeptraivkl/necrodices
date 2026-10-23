@@ -1,6 +1,7 @@
 extends Overlay
-## Dice Inspector (GAME_SPEC §8, ART_SPEC §6.6): every die's six faces; in target mode the
-## player picks the faces a Sigil / Ink applies to. Result: Array[Vector2i] targets, or null.
+## Dice Inspector (GAME_SPEC §8, ART_SPEC §6.6): every die's six faces (element, points,
+## rune); in target mode the player picks, in order, the faces a potion applies to (Mirror
+## copies the first onto the second). Result: Array[Vector2i] targets, or null.
 ## Legality comes from ConsumableFx.can_apply — the same check the command runs.
 
 var _db: ContentDb
@@ -21,7 +22,7 @@ func setup(db: ContentDb, run: RunState, consumable: String) -> void:
 	_run = run
 	_consumable = consumable
 	_title.text = db.text("title_dice") if consumable == "" else db.consumables[consumable]["name"]
-	_hint.text = "" if consumable == "" else db.text("hint_pick_faces") % ConsumableFx.target_count(db, consumable)
+	_hint.text = "" if consumable == "" else db.consumables[consumable]["text"]
 	_confirm.visible = consumable != ""
 	_confirm.text = db.text("btn_confirm")
 	_cancel.text = db.text("btn_close") if consumable == "" else db.text("btn_cancel")
@@ -72,5 +73,7 @@ func _on_tile(die: int, face: int) -> void:
 
 func _update() -> void:
 	for tile in _tiles:
-		tile.selected = _targets.has(Vector2i(tile.die_index, tile.face_index))
+		var at := _targets.find(Vector2i(tile.die_index, tile.face_index))
+		tile.selected = at >= 0
+		tile.order = at + 1 if _targets.size() > 1 else 0
 	_confirm.disabled = _consumable == "" or not ConsumableFx.can_apply(_db, _run, _consumable, _targets)

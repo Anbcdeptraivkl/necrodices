@@ -25,7 +25,8 @@ from palette import ELEMENT_RAMP, ROOT, TINT_WHITE, ramp, rgba, write_palette_fi
 MANIFEST = ROOT / "assets" / "manifest.json"
 CLEAR = (0, 0, 0, 0)
 RARITY_KEY = {"COMMON": "I1", "UNCOMMON": "L1", "RARE": "R1"}
-T3 = {"lich", "headless_horseman", "stitched_golem", "witch_queen"}
+T3 = {"lich", "headless_horseman", "stitched_golem", "witch_queen", "clockwork_kraken", "hellhound",
+      "frost_wraith", "mandrake_brute", "thunder_ghoul", "gargoyle", "phantom_parade"}
 
 
 # ---------------------------------------------------------------------------- drawing helpers
@@ -115,15 +116,15 @@ def fit_tag(tag: str, inner_w: int, inner_h: int) -> str:
 
 
 def mid(el: str) -> str:
-    return ramp(el)[1]
+    return ramp(el)[1] if el in ELEMENT_RAMP else el
 
 
 def light(el: str) -> str:
-    return ramp(el)[2]
+    return ramp(el)[2] if el in ELEMENT_RAMP else "N7"
 
 
 def dark(el: str) -> str:
-    return ramp(el)[0]
+    return ramp(el)[0] if el in ELEMENT_RAMP else "N3"
 
 
 def colour_of(hint: str | None, step: int = 1) -> str | None:
@@ -268,8 +269,10 @@ def _die(img: Image.Image, ox: int, oy: int, size: int = 20, side: int = 3) -> N
 
 def draw_dice(e: dict) -> Image.Image:
     img = new(e["w"], e["h"])
-    if e["id"] == "die_body":
+    if e["id"].startswith("die_body"):
         _die(img, 0, 0)
+        if e["id"] != "die_body":  # rune body: the face takes the rune colour
+            _swap(img, "B2", e["ramp"])
     else:  # die_roll: 4 tumble frames, smaller die bouncing inside 20x20
         for f, (dx, dy) in enumerate(((0, 2), (2, 0), (2, 2), (0, 0))):
             _die(img, f * 20 + dx, dy, size=18, side=2 + (f % 2))
@@ -329,12 +332,22 @@ def draw_overlay(e: dict) -> Image.Image:
         for x in range(0, 20):                    # chain across the die
             put(img, x, 9, "M1" if (x // 3) % 2 == 0 else "M0")
             put(img, x, 10, "M0" if (x // 3) % 2 == 0 else "M1")
-    else:  # face_tile
+    else:  # face_tile, face_tile_<rune>
         notched_rect(img, 0, 0, 15, 15, "B2")
         fill_rect(img, 14, 2, 14, 14, "B1")
         fill_rect(img, 2, 14, 14, 14, "B1")
         outline(img)
+        if i != "face_tile":
+            _swap(img, "B2", e["ramp"])
     return img
+
+
+def _swap(img: Image.Image, src: str, dst: str) -> None:
+    a, b = rgba(src), rgba(dst)
+    for y in range(img.height):
+        for x in range(img.width):
+            if img.getpixel((x, y)) == a:
+                img.putpixel((x, y), b)
 
 
 # ---------------------------------------------------------------------------- icons
@@ -354,24 +367,20 @@ def draw_relic(e: dict) -> Image.Image:
     return draw_icon_box(e, "N4", stripe=RARITY_KEY.get(e["accent"] or "", None))
 
 
-def draw_consumable(e: dict, glyph_cache: dict[str, Image.Image], base_cache: dict[str, Image.Image]) -> Image.Image:
-    kind = e["id"].split("_", 1)[0]
-    if kind in ("tome", "sigil") and e["accent"]:
-        base = base_cache[f"{kind}_base"].copy()
-        glyph = glyph_cache[f"glyph8_{e['accent'].lower()}"]
-        base.alpha_composite(glyph, (4, 4))  # ART_SPEC §5.2: glyph8 at (4, 4)
-        return base
-    accent = {"ink_wild": "G1", "ink_sharp": "R1", "ink_swarm": "L2", "ink_hex": "N5",
-              "ink_gold": "G1", "spare_die": "B2"}.get(e["id"])
-    return draw_icon_box(e, "N4", stripe=accent)
+def draw_consumable(e: dict) -> Image.Image:
+    return draw_icon_box(e, e["ramp"], stripe=colour_of(e["accent"]))
 
 
-def draw_base(e: dict) -> Image.Image:
-    # Tag sits under the glyph8 area (4..11) so composed icons hide it.
-    img = draw_icon_box(e, e["ramp"], tag=False)
-    if e["id"] == "tome_base":
-        fill_rect(img, 3, 2, 3, 13, "N5")   # spine
-    text_c(img, 8, 5, fit_tag(e["tag"], 7, 5), "N7")
+def draw_legend(e: dict) -> Image.Image:
+    """32x32 legend placeholder: the 16x16 unit placeholder doubled (feet land on row 31)."""
+    small = draw_unit({**e, "flags": []})
+    return small.resize((64, 32), Image.NEAREST)
+
+
+def draw_num(e: dict) -> Image.Image:
+    img = new(7, 9)
+    fill_rect(img, 0, 0, 6, 8, "N0")
+    text_c(img, 4, 2, e["tag"], "N7")
     return img
 
 
@@ -587,16 +596,18 @@ def render(e: dict, glyphs: dict[str, Image.Image], bases: dict[str, Image.Image
         return draw_glyph(e, 8)
     if c == "pip":
         return draw_pip(e)
-    if c == "mod":
-        return draw_mod(e)
+    if c == "legend":
+        return draw_legend(e)
+    if c == "num":
+        return draw_num(e)
     if c == "dice_overlay":
         return draw_overlay(e)
     if c == "relic_icon":
         return draw_relic(e)
-    if c == "consumable_base":
-        return draw_base(e)
     if c == "consumable_icon":
-        return draw_consumable(e, glyphs, bases)
+        return draw_consumable(e)
+    if c == "coffer_icon":
+        return draw_icon_box(e, "B0")
     if c == "equipment_icon":
         return draw_icon_box(e, "N4")
     if c == "stat_icon":
@@ -642,8 +653,7 @@ def main(argv: list[str] | None = None) -> int:
         return any(fnmatch.fnmatch(e["id"], g) or fnmatch.fnmatch(e["path"], g)
                    or fnmatch.fnmatch(e["path"], f"*{g}*") for g in args.only)
 
-    # Composition sources first (glyph8 + bases), so composed consumables use what is on disk.
-    order = sorted(entries, key=lambda e: 0 if e["category"] in ("glyph8", "consumable_base") else 1)
+    order = entries
     glyphs: dict[str, Image.Image] = {}
     bases: dict[str, Image.Image] = {}
     written: dict[str, int] = {}
@@ -664,10 +674,6 @@ def main(argv: list[str] | None = None) -> int:
             written[e["category"]] = written.get(e["category"], 0) + 1
         else:
             skipped += 1
-        if e["category"] == "glyph8":
-            glyphs[e["id"]] = _load_or(path, img or render(e, glyphs, bases))
-        elif e["category"] == "consumable_base":
-            bases[e["id"]] = _load_or(path, img or render(e, glyphs, bases))
 
     total = sum(written.values())
     print(f"placeholders: wrote {total}, kept {skipped} existing (of {len(entries)})")

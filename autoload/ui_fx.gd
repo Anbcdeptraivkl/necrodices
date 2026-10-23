@@ -229,8 +229,7 @@ func _show_tip(target: Control) -> void:
 ## Greedy word wrap to `width` px at the 8 px pixel-font size.
 static func _wrap(font: Font, text: String, width: float) -> String:
 	var out: PackedStringArray = []
-	for paragraph in text.split("
-"):
+	for paragraph in text.split("\n"):
 		var line := ""
 		for word in paragraph.split(" ", false):
 			var trial := word if line == "" else line + " " + word
@@ -240,5 +239,4 @@ static func _wrap(font: Font, text: String, width: float) -> String:
 			else:
 				line = trial
 		out.append(line)
-	return "
-".join(out)
+	return "\n".join(out)

@@ -50,8 +50,9 @@ is `roguelike-scoring-pipeline`; pixel-perfect rendering rules are `godot-pixel-
   the view methods, which only add tweeners — so skipping kills one Tween per state.
 - The screen owns skipping: `queue.skip_all()` then `view.snap_final(final numbers)`; states
   need no per-state end look.
-- Per-group counts on the battlefield are each group's share of the running Count; a final
-  step rescales every group so the badges always sum to the real Count.
+- Soldiers on the field = each scored hand's own Count (hands scored one by one); the playback
+  adds the hand's column at its base Count and updates only that column per step. Sharing one
+  running Count across groups made sizes depend on resolve order and confused players.
 
 ## Procedure — adding an animation
 
@@ -74,3 +75,5 @@ is `roguelike-scoring-pipeline`; pixel-perfect rendering rules are `godot-pixel-
 | Durations summed per step at ×1 then scaled per step | Long fights exceed the cap at ×1 | Compute the whole timeline, compress, then scale |
 | Shake applied to the camera/root at a fractional offset | Blurry frame during shake | Integer offsets; restore exactly |
 | Playback reads model values live | Shows the *next* encounter's numbers after an early state change | Replay only the trace / event payloads captured at resolve time |
+| Negative `z_index` to put an aura behind its unit | The aura vanishes: z order is per canvas layer, so it sinks under the screen background too | Keep z at 0 and order by tree: add the aura pool before the unit pool, and draw badges / labels on a child added last |
+| One state class per beat kind (combo, step, strength, charge…) | Many near-identical classes, each with its own tween / skip code | One `Beat` state that takes a `Callable(tween, duration)` and a nominal duration; the view methods add tweeners to that tween |

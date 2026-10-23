@@ -1,67 +1,110 @@
 class_name Scorer
 extends RefCounted
-## The one scorer (GAME_SPEC §5.3). Previews, combat, bots and tests all call `score`.
-## Order: groups in summon order → base stats → face modifiers in tray order → GROUP relics
-## left to right; then FINAL relics left to right; damage = floor(P × C).
-## Pure: no RNG, no side effects; commit-time effects (counters, GOLD money) live in
-## EncounterState, so a preview can never change the run.
+## The one scorer (GAME_SPEC §5). Previews, the battle, bots and tests all call it.
+## Squad order: combo base → each scored die in pick order (points, rune, DIE trinkets left to
+## right) → IRON runes on held dice → SQUAD trinkets left to right → strength = floor(P × C).
+## Resolve: army = Σ strength → RESOLVE trinkets left to right → damage.
+## Pure: no RNG (luck arrives on the squad), no side effects; commit-time effects (counters,
+## money, glass breaks) live in EncounterState, so a preview can never change the run.
 
 
-static func score(db: ContentDb, army: Array[Group], relics: Array[RelicInstance], levels: Dictionary,
+static func score_squad(db: ContentDb, squad: Squad, relics: Array[RelicInstance], levels: Dictionary,
 		ctx: ScoreCtx, rules: PackedStringArray) -> ScoreResult:
+	ctx.squad = squad
 	var result := ScoreResult.new()
 	var trace := result.trace
-	for gi in army.size():
-		var g := army[gi]
-		_resolve_group(db, g, gi, relics, levels, ctx, rules, trace)
-		ctx.seen_units[g.unit_id] = true
-	for r in relics:
-		if r.disabled:
-			continue
-		var row: Dictionary = db.relics[r.id]
-		for block: Dictionary in RulesRegistry.relic_blocks(row):
-			if block["trigger"] == "FINAL" and RelicEval.cond(block["cond"], null, -1, ctx, db):
-				_apply_effects(db, block["effects"], r, -1, ctx, trace)
+	var level: int = levels.get(squad.combo, 1)
+	var base := db.combo_stats(squad.combo, level)
+	ctx.p = base.x
+	ctx.c = base.y
+	trace.append(TraceStep.make(TraceStep.Kind.COMBO, -1, squad.combo, "none", base.x, ctx.p, ctx.c,
+		db.text("lbl_combo_step") % [db.combos[squad.combo]["name"], level, RelicEval.fmt(base.x), RelicEval.fmt(base.y)]))
+	for k in squad.scored:
+		_score_die(db, squad, k, relics, ctx, rules, trace)
+	var iron: Dictionary = db.economy["runes"]["IRON"]
+	for h in squad.held.size():
+		if squad.held_faces[h].rune == "IRON":
+			var op := RelicEval.apply(iron["op"], float(iron["value"]), ctx)
+			trace.append(TraceStep.make(TraceStep.Kind.HELD, squad.held[h], "IRON", op, float(iron["value"]),
+				ctx.p, ctx.c, RelicEval.label(db, iron["op"], float(iron["value"]))))
+	_fire(db, "SQUAD", relics, ctx, -1, trace)
 	result.power = ctx.p
 	result.count = ctx.c
-	result.damage = floorf(ctx.p * ctx.c)
-	trace.append(TraceStep.make(TraceStep.Kind.TOTAL, -1, "TOTAL", "none", result.damage, ctx.p, ctx.c,
-		db.text("lbl_total") % [RelicEval.fmt(ctx.p), RelicEval.fmt(ctx.c), RelicEval.fmt(result.damage)]))
+	result.strength = floorf(ctx.p * ctx.c)
+	trace.append(TraceStep.make(TraceStep.Kind.STRENGTH, -1, "STRENGTH", "none", result.strength, ctx.p, ctx.c,
+		db.text("lbl_total") % [RelicEval.fmt(ctx.p), RelicEval.fmt(ctx.c), RelicEval.fmt(result.strength)]))
 	return result
 
 
-static func _resolve_group(db: ContentDb, g: Group, gi: int, relics: Array[RelicInstance], levels: Dictionary,
-		ctx: ScoreCtx, rules: PackedStringArray, trace: Array[TraceStep]) -> void:
-	var stats := db.unit_stats(g.unit_id, levels.get(g.unit_id, 1))
-	var bp := stats.x
-	if rules.has("EXORCIST") and g.has_element("BONE"):
-		bp = floorf(bp * 0.5)
-		trace.append(TraceStep.make(TraceStep.Kind.BOSS, gi, "EXORCIST", "none", 0.0, ctx.p, ctx.c,
-			db.text("lbl_exorcist_step")))
-	ctx.p += bp
-	ctx.c += stats.y
-	trace.append(TraceStep.make(TraceStep.Kind.GROUP_BASE, gi, g.unit_id, "none", bp, ctx.p, ctx.c,
-		db.text("lbl_group_base") % [RelicEval.fmt(bp), RelicEval.fmt(stats.y)]))
-	for f in g.faces:
-		if f.modifier == "" or f.modifier == "WILD" or f.modifier == "GOLD":
-			continue
-		var mod: Dictionary = db.economy["modifiers"][f.modifier]
-		var v := float(mod["value"])
-		var op := RelicEval.apply(mod["op"], v, ctx)
-		trace.append(TraceStep.make(TraceStep.Kind.FACE_MOD, gi, f.modifier, op, v, ctx.p, ctx.c,
-			RelicEval.label(db, mod["op"], v)))
+static func _score_die(db: ContentDb, squad: Squad, k: int, relics: Array[RelicInstance], ctx: ScoreCtx,
+		rules: PackedStringArray, trace: Array[TraceStep]) -> void:
+	var f := squad.faces[k]
+	var tray := squad.dice[k]
+	if not f.is_tomb():
+		var pts := float(f.points)
+		if rules.has("EXORCIST") and f.element == "BONE":
+			pts = 0.0
+			trace.append(TraceStep.make(TraceStep.Kind.BOSS, tray, "EXORCIST", "none", 0.0, ctx.p, ctx.c,
+				db.text("lbl_exorcist_step")))
+		ctx.p += pts
+		trace.append(TraceStep.make(TraceStep.Kind.DIE, tray, squad.elements[k], "add_p", pts, ctx.p, ctx.c,
+			db.text("op_add_power") % RelicEval.fmt(pts)))
+	if f.rune != "":
+		var row: Dictionary = db.economy["runes"][f.rune]
+		var fires: bool = row["when"] == "SCORED"
+		if f.rune == "LUCKY":
+			fires = squad.luck.get(k, {}).get("count", false)
+		if fires:
+			var v := float(row["value"])
+			var op := RelicEval.apply(row["op"], v, ctx)
+			trace.append(TraceStep.make(TraceStep.Kind.RUNE, tray, f.rune, op, v, ctx.p, ctx.c,
+				RelicEval.label(db, row["op"], v)))
+	_fire(db, "DIE", relics, ctx, k, trace)
+
+
+## Every enabled trinket block of `trigger` whose condition holds, left to right.
+static func _fire(db: ContentDb, trigger: String, relics: Array[RelicInstance], ctx: ScoreCtx, k: int,
+		trace: Array[TraceStep]) -> void:
+	var tray := ctx.squad.dice[k] if k >= 0 else -1
 	for r in relics:
 		if r.disabled:
 			continue
 		for block: Dictionary in RulesRegistry.relic_blocks(db.relics[r.id]):
-			if block["trigger"] == "GROUP" and RelicEval.cond(block["cond"], g, gi, ctx, db):
-				_apply_effects(db, block["effects"], r, gi, ctx, trace)
+			if block["trigger"] != trigger or not RelicEval.cond(block["cond"], ctx, k):
+				continue
+			for effect: Dictionary in block["effects"]:
+				var v := RelicEval.value(effect["value"], r.counter, ctx)
+				var op := RelicEval.apply(effect["op"], v, ctx)
+				trace.append(TraceStep.make(TraceStep.Kind.TRINKET, tray, r.id, op, v, ctx.p, ctx.c,
+					RelicEval.label(db, effect["op"], v)))
 
 
-static func _apply_effects(db: ContentDb, effects: Array, r: RelicInstance, gi: int, ctx: ScoreCtx,
-		trace: Array[TraceStep]) -> void:
-	for effect: Dictionary in effects:
-		var v := RelicEval.value(effect["value"], r.counter, ctx)
-		var op := RelicEval.apply(effect["op"], v, ctx)
-		trace.append(TraceStep.make(TraceStep.Kind.RELIC, gi, r.id, op, v, ctx.p, ctx.c,
-			RelicEval.label(db, effect["op"], v)))
+## Army damage (§5.2). `strengths` in summon order; ctx.squad stays null.
+static func resolve(db: ContentDb, strengths: Array[float], relics: Array[RelicInstance], ctx: ScoreCtx) -> ResolveResult:
+	ctx.squad = null
+	var out := ResolveResult.new()
+	for s in strengths:
+		out.army += s
+	var dmg := out.army
+	for r in relics:
+		if r.disabled:
+			continue
+		for block: Dictionary in RulesRegistry.relic_blocks(db.relics[r.id]):
+			if block["trigger"] != "RESOLVE" or not RelicEval.cond(block["cond"], ctx, -1, strengths.size()):
+				continue
+			for effect: Dictionary in block["effects"]:
+				var v := RelicEval.value(effect["value"], r.counter, ctx)
+				var op := "mul_d"
+				if effect["op"] == "mul_damage":
+					dmg = RelicEval.round_half_up(dmg * v)
+				else:
+					dmg += v
+					op = "add_d"
+				out.trace.append(TraceStep.make(TraceStep.Kind.RESOLVE, -1, r.id, op, v, dmg, 0.0,
+					RelicEval.label(db, effect["op"], v)))
+	out.damage = dmg
+	for s in strengths:
+		out.shares.append(s * dmg / out.army if out.army > 0.0 else 0.0)
+	out.trace.append(TraceStep.make(TraceStep.Kind.TOTAL, -1, "TOTAL", "none", dmg, dmg, 0.0,
+		db.text("lbl_army_total") % RelicEval.fmt(dmg)))
+	return out

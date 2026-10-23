@@ -25,7 +25,7 @@ func _ready() -> void:
 	for i in run.night_plan.size():
 		var card: EncounterCard = packed.instantiate()
 		_cards.add_child(card)
-		card.show_entry(db, run.night_plan[i], signi(i - run.encounter_index))
+		card.show_entry(db, run, run.night_plan[i], signi(i - run.encounter_index))
 	_fight.text = db.text("btn_fight")
 	_fight.pressed.connect(func() -> void:
 		Audio.play("click")

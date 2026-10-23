@@ -1,6 +1,7 @@
 class_name ConsumableFx
 extends RefCounted
-## Consumable rules (GAME_SPEC §4.7, §4.8). Targets are Vector2i(die index, face index).
+## Potion and gem rules (GAME_SPEC §6.6, §6.7). Targets are Vector2i(die index, face index),
+## in the order the player picked them (Mirror copies the first onto the second).
 ## `can_apply` is what buttons show; `apply` re-checks it, then mutates the run.
 
 
@@ -8,47 +9,58 @@ static func target_count(db: ContentDb, id: String) -> int:
 	return int(db.consumables[id]["max_targets"])
 
 
-## Exact target rule: Sigil 1–2 faces, Ink exactly 1, Tome / Die none.
+static func min_targets(db: ContentDb, id: String) -> int:
+	return int(db.consumables[id]["min_targets"])
+
+
 static func can_apply(db: ContentDb, run: RunState, id: String, targets: Array[Vector2i]) -> bool:
 	if not db.consumables.has(id):
 		return false
 	var row: Dictionary = db.consumables[id]
-	for t in targets:
-		if t.x < 0 or t.x >= run.dice.size() or t.y < 0 or t.y >= Die.FACE_COUNT:
-			return false
-	if _has_duplicates(targets):
+	if targets.size() < int(row["min_targets"]) or targets.size() > int(row["max_targets"]):
 		return false
-	match row["kind"]:
-		"TOME":
-			return targets.is_empty()
-		"SIGIL":
-			return targets.size() >= 1 and targets.size() <= int(row["max_targets"])
-		"INK":
-			return targets.size() == 1
-		"DIE":
-			return targets.is_empty() and run.dice.size() < int(db.economy["max_dice"])
-	return false
+	var seen := {}
+	for t in targets:
+		if t.x < 0 or t.x >= run.dice.size() or t.y < 0 or t.y >= Die.FACE_COUNT or seen.has(t):
+			return false
+		seen[t] = true
+	if row["action"] == "points":
+		for t in targets:
+			if run.dice[t.x].faces[t.y].element == "BONE":
+				return false
+	return true
 
 
 static func apply(db: ContentDb, run: RunState, id: String, targets: Array[Vector2i]) -> bool:
 	if not can_apply(db, run, id, targets):
 		return false
 	var row: Dictionary = db.consumables[id]
-	match row["kind"]:
-		"TOME":
-			for unit in db.tome_targets(row["element"]):
-				run.levels[unit] = run.level_of(unit) + 1
-		"SIGIL":
+	var e := db.economy
+	match row["action"]:
+		"element":
 			for t in targets:
-				run.dice[t.x].faces[t.y].element = row["element"]
-		"INK":
-			run.dice[targets[0].x].faces[targets[0].y].modifier = row["modifier"]
-		"DIE":
-			run.dice.append(Die.standard())
+				_face(run, t).set_element(row["element"], int(e["former_bone_points"]))
+		"points":
+			for t in targets:
+				var f := _face(run, t)
+				f.points = mini(int(e["max_points"]), f.points + int(row["delta"]))
+		"rune":
+			for t in targets:
+				_face(run, t).rune = row["rune"]
+		"mirror":
+			var src := _face(run, targets[0])
+			var dst := _face(run, targets[1])
+			dst.element = src.element
+			dst.points = src.points
+			dst.rune = src.rune
+		"money_double":
+			run.money += mini(int(row["max"]), maxi(0, run.money))
+		"level":
+			run.levels[row["combo"]] = run.level_of(row["combo"]) + 1
 	return true
 
 
-## Uses the held consumable at `index` (removing it) — shop or encounter.
+## Uses the held consumable at `index` (removing it) — market or battle.
 static func use_held(db: ContentDb, run: RunState, index: int, targets: Array[Vector2i]) -> bool:
 	if index < 0 or index >= run.consumables.size():
 		return false
@@ -58,10 +70,5 @@ static func use_held(db: ContentDb, run: RunState, index: int, targets: Array[Ve
 	return true
 
 
-static func _has_duplicates(targets: Array[Vector2i]) -> bool:
-	var seen := {}
-	for t in targets:
-		if seen.has(t):
-			return true
-		seen[t] = true
-	return false
+static func _face(run: RunState, t: Vector2i) -> Face:
+	return run.dice[t.x].faces[t.y]

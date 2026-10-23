@@ -2,8 +2,9 @@ class_name RngStreams
 extends RefCounted
 ## Named, seeded RNG streams (GAME_SPEC §10.1): one per concern so that drawing in one (a
 ## shop reroll) never shifts another (tomorrow's dice). States are saved with the run.
+## ROLL faces · LUCK lucky / glass runes · DICE new dice · SHOP market · ENEMY · BOSS.
 
-const NAMES: PackedStringArray = ["ROLL", "SHOP", "ENEMY", "BOSS"]
+const NAMES: PackedStringArray = ["ROLL", "LUCK", "DICE", "SHOP", "ENEMY", "BOSS"]
 
 var _streams := {}
 
@@ -24,6 +25,22 @@ func stream(name: String) -> RandomNumberGenerator:
 
 func roll_face(name: String = "ROLL") -> int:
 	return stream(name).randi_range(0, Die.FACE_COUNT - 1)
+
+
+## True with probability 1 / n (n ≤ 1 → always).
+func one_in(name: String, n: int) -> bool:
+	return n <= 1 or stream(name).randi_range(1, n) == 1
+
+
+## `k` distinct items from a list, in pick order (k is clamped to the list size).
+func pick_distinct(name: String, items: Array, k: int) -> Array:
+	var pool := items.duplicate()
+	var out: Array = []
+	for i in mini(k, pool.size()):
+		var j := stream(name).randi_range(0, pool.size() - 1)
+		out.append(pool[j])
+		pool.remove_at(j)
+	return out
 
 
 ## Uniform pick from a list (callers pass ids in a stable order).

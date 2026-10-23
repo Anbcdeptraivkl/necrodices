@@ -1,34 +1,26 @@
-"""Final icons (ART_SPEC §5): relics, consumable bases + consumables, equipment, stat icons.
+"""Final icons (ART_SPEC §5): trinkets (relics), gear (equipment) and stat icons.
 
-    python tools/art/icons.py                  # write every icon that changed
-    python tools/art/icons.py --only tome_*    # only matching ids
+    python tools/art/icons.py                       # create missing files only
+    python tools/art/icons.py --only blood_moon     # (re)write matching ids
     python tools/art/icons.py --preview captures/icons_preview.png
 
 16x16 icons: 1 px transparent margin (live area 14x14), N0 outline, <= 6 colours, light from
-the top-left, one idea per icon, no text. Stat icons are 8x8.
+the top-left, one idea per icon, no text. Stat icons are 8x8. Tier-2 gear is drawn as the
+upgraded twin of its tier-1 icon (same silhouette idea, bigger / darker / gold trim).
 
-TOME_<E> / SIGIL_<E> are composed, not drawn: base (tome_base / sigil_base, drawn here) +
-`assets/sprites/dice/glyph8_<e>.png` read from disk at run time, pasted at (4, 4) — on the
-cover for tomes, centred on the stone face for sigils (ART_SPEC §5.2). Re-run this module after
-the glyph8 files change. The bases use only two colours besides N0 so base + glyph8 stays
-within the 6-colour icon limit (glyph8 = N0 + up to 3 colours).
+Potions, gems and coffers live in tools/art/items.py; their ASSETS are merged here, so this
+module's commands cover every 16x16 item icon.
 """
 
 from __future__ import annotations
 
-import json
 import sys
 from pathlib import Path
 
 sys.path.insert(0, str(Path(__file__).resolve().parent))
-import pixelgrid  # noqa: E402
-from pixelgrid import MANIFEST, ROOT, canvas, grid, paste, run  # noqa: E402
+from pixelgrid import canvas, grid, paste, run  # noqa: E402
 
 from PIL import Image  # noqa: E402
-
-GLYPH8_DIR = ROOT / "assets" / "sprites" / "dice"
-ELEMENTS = ("bone", "fire", "ice", "leaf", "volt", "metal")
-
 
 # Manifest ids are unique (vfx ids carry a vfx_ prefix), so pixelgrid's lookup is used as is.
 
@@ -541,28 +533,6 @@ def crown_of_the_lich():  # spiked gold crown with a ghoul-green gem
     ], {"w": "V2"})
 
 
-@asset("full_moon")
-def full_moon():  # full moon with a sleepy, blushing face
-    return icon([
-        "................",
-        ".....######.....",
-        "...##777777##...",
-        "..#7777777776#..",
-        "..#7757777766#..",
-        ".#777557777766#.",
-        ".#777777777766#.",
-        ".#77##7777##76#.",
-        ".#7S77777777S6#.",
-        ".#7777#77#7666#.",
-        ".#77777##77566#.",
-        "..#7777777666#..",
-        "..#6777776666#..",
-        "...##666666##...",
-        ".....######.....",
-        "................",
-    ], {"S": "S1"})
-
-
 @asset("black_grimoire")
 def black_grimoire():  # black book, gold eye clasp on the cover
     return icon([
@@ -607,242 +577,139 @@ def elemental_convergence():  # ring of six element-coloured dots (metal = holed
     ])
 
 
-# ====================================================================== consumables (§5.2)
-
-@asset("tome_base")
-def tome_base():  # closed book: N3 cover, N5 spine, corner caps and page block
-    return icon([
-        "................",
-        "..###########...",
-        ".#5#33333333#...",
-        ".#5#333333355#..",
-        ".#5#333333335#..",
-        ".#5#333333333#..",
-        ".#5#333333333#..",
-        ".#5#333333333#..",
-        ".#5#333333333#..",
-        ".#5#333333333#..",
-        ".#5#333333333#..",
-        ".#5#333333335#..",
-        ".#5#333333355#..",
-        ".#5#5555555555#.",
-        "..#############.",
-        "................",
-    ], {"3": "N3"})
-
-
-@asset("sigil_base")
-def sigil_base():  # round rune stone: N4 face, N5 top-left rim, carved ticks
+@asset("trio_totem")
+def trio_totem():  # carved totem pole: winged beaked head over two more faces
     return icon([
         "................",
         ".....######.....",
-        "...##555555##...",
-        "..#5554##4444#..",
-        ".#554444444444#.",
-        ".#544444444444#.",
-        ".#544444444444#.",
-        ".#5#44444444#4#.",
-        ".#4#44444444#4#.",
-        ".#444444444444#.",
-        ".#444444444444#.",
-        ".#444444444444#.",
-        "..#4444##4444#..",
-        "...##444444##...",
-        ".....######.....",
+        ".##.#SSSSSs#.##.",
+        ".#F##S#SS#s##F#.",
+        ".#FF#SSFFSs#FF#.",
+        "..#F#SSFFSs#F#..",
+        "...##SSSSSs##...",
+        "....#bbbbbb#....",
+        "....#S#SS#s#....",
+        "....#SSSSSs#....",
+        "....#S7777s#....",
+        "....#bbbbbb#....",
+        "....#s#ss#b#....",
+        "....#ss##sb#....",
+        "....########....",
+        "................",
+    ], {"S": "S1", "s": "S0", "b": "B0", "F": "F1", "7": "N7"})
+
+
+@asset("moon_charm")
+def moon_charm():  # pale crescent moon charm hanging from a cord
+    return icon([
+        "................",
+        "...55........5..",
+        ".....555....5...",
+        "........55.5....",
+        ".........###....",
+        ".......##wwV#...",
+        ".....##7wwV#....",
+        "....#7wwwV#.....",
+        "...#7wwwV#......",
+        "...#7wwwV#......",
+        "...#7wwwV#......",
+        "....#wwwwV#.....",
+        ".....##wwwV#....",
+        ".......##wwV#...",
+        ".........###....",
+        "................",
+    ], {"w": "V2", "7": "N7"})
+
+
+@asset("loaded_bone")
+def loaded_bone():  # bone die with a heavy lead weight hooked to its corner
+    return icon([
+        "................",
+        "................",
+        "................",
+        "..#######.......",
+        ".#ccccccB#......",
+        ".#c##cccB#......",
+        ".#c##cccB#......",
+        ".#ccc##cB####...",
+        ".#ccc##cB#t#t#..",
+        ".#ccccccB#ttt#..",
+        ".#cccccc#TTTtt#.",
+        ".#BBBBBB#TTTtt#.",
+        ".#bbbbbb#TTttt#.",
+        "..######.#####..",
+        "................",
         "................",
     ])
 
 
-def _glyph8(element: str) -> Image.Image:
-    return Image.open(GLYPH8_DIR / f"glyph8_{element}.png").convert("RGBA")
-
-
-def _compose(base_fn, element: str) -> Image.Image:
-    return paste(base_fn(), _glyph8(element), 4, 4)  # §5.2: glyph8 at (4, 4)
-
-
-for _e in ELEMENTS:
-    ASSETS[f"tome_{_e}"] = (lambda e=_e: _compose(tome_base, e))
-    ASSETS[f"sigil_{_e}"] = (lambda e=_e: _compose(sigil_base, e))
-
-
-@asset("ink_wild")
-def ink_wild():  # squat ink bottle with an open eye, gold pupil
+@asset("gilded_tooth")
+def gilded_tooth():  # big gold molar with two roots and a glint
     return icon([
         "................",
-        "......####......",
-        "......#BB#......",
-        "......####......",
-        ".......#3#......",
-        "....###33###....",
-        "...#53333333#...",
-        "..#5333333333#..",
-        "..#53#77777#3#..",
-        "..#5#77#O#77#3#.",
-        "..#5#7#OOO#7#3#.",
-        "..#53#77O77#33#.",
-        "..#333#####333#.",
-        "...#333333333#..",
+        "................",
+        "...####..####...",
+        "..#wOOO##OOOo#..",
+        ".#w7OOOOOOOOOo#.",
+        ".#wOOOOOOOOOoo#.",
+        ".#wOOOOOOOOOoo#.",
+        ".#OOOOOOOOOooo#.",
+        "..#OOOOOOOOoo#..",
+        "..#OOOOOOOooo#..",
+        "..#OOOo##OOoo#..",
+        "..#OOo#..#Ooo#..",
+        "..#Oo#....#oo#..",
+        "...##......##...",
+        "................",
+        "................",
+    ], {"w": "V2", "7": "N7"})
+
+
+@asset("last_rites")
+def last_rites():  # last candle burning on a skull, wax dripping down its brow
+    return icon([
+        "................",
+        ".......##.......",
+        "......#gg#......",
+        ".....#gFFg#.....",
+        ".....#gFFg#.....",
+        "......#gg#......",
+        ".....#777B#.....",
+        ".....#777B#.....",
+        "..####777B####..",
+        "..#ccc7cc7ccB#..",
+        "..#c##cccc##B#..",
+        "..#c##cccc##B#..",
+        "..#ccccc#cccB#..",
+        "...#c#c#c#cB#...",
         "....#########...",
-        "................",
-    ], {"3": "N3"})
-
-
-@asset("ink_sharp")
-def ink_sharp():  # whetstone with a small red blade resting on it
-    return icon([
-        "................",
-        "................",
-        "................",
-        "..####.######...",
-        ".#RRRr#uuuuuu#..",
-        ".#rrrr#TTTTT#...",
-        ".##############.",
-        ".#uuuuuuuuuuuu#.",
-        ".#TTTTTTTTTTTt#.",
-        ".#TTTTTTTTTTTt#.",
-        ".#tttttttttttt#.",
-        ".##############.",
-        "................",
-        "................",
-        "................",
-        "................",
-    ])
-
-
-@asset("ink_swarm")
-def ink_swarm():  # drawstring seed pouch, seeds spilling
-    return icon([
-        "................",
-        "................",
-        "...#########.#..",
-        "...#bbbbbbb##m#.",
-        "...#ccccccB#.#..",
-        "...#cccLccB#.#..",
-        "...#ccmLmcB##m#.",
-        "...#cmmLmmB#.#..",
-        "...#cccLccB#....",
-        "...#cccLccB#.#..",
-        "...#ccbbbcB##m#.",
-        "...#ccccccB#.#..",
-        "...#BBBBBBB#....",
-        "...#########....",
-        "................",
-        "................",
-    ])
-
-
-@asset("ink_hex")
-def ink_hex():  # burlap voodoo doll with stitched eyes and a pin
-    return icon([
-        "................",
-        "....#####.......",
-        "...#BBBBB#..##..",
-        "...#B#B#B##RR#..",
-        "...#BBBBB#7#....",
-        "...#BBBB7#......",
-        "....#####.......",
-        ".###BBBBB###....",
-        ".#BBBBBBBBB#....",
-        ".###BBRBb###....",
-        "...#BBBBb#......",
-        "...#BBbBb#......",
-        "...#Bb#Bb#......",
-        "...#Bb#Bb#......",
-        "....##.##.......",
         "................",
     ], {"7": "N7"})
 
 
-@asset("ink_gold")
-def ink_gold():  # a single leaf of gold
+@asset("blood_moon")
+def blood_moon():  # full moon turned blood red, darker maria, pale rim light
     return icon([
         "................",
-        "...........###..",
-        ".........##wwO#.",
-        ".......##wwOOo#.",
-        "......#wwOOOOo#.",
-        ".....#wOOOOOo#..",
-        "....#wOOOOOOo#..",
-        "....#wOOOOoOo#..",
-        "...#wOOOOoOOo#..",
-        "...#OOOoOOOo#...",
-        "...#OOoOOOo#....",
-        "...#OoOOoo#.....",
-        "...#ooooo#......",
-        "..#o####........",
-        ".#o#............",
+        ".....######.....",
+        "...##SSRRRR##...",
+        "..#SSRRRRRRRr#..",
+        "..#SRRrRRRRrr#..",
+        ".#SRRrrRRRRRrr#.",
+        ".#SRRRRRRRrRrr#.",
+        ".#RRRRRRRrrRrr#.",
+        ".#RRRrRRRRRRrr#.",
+        ".#RRrrrRRRRrrr#.",
+        ".#RRRrRRRRrrrr#.",
+        "..#RRRRRRrrrr#..",
+        "..#rRRRRrrrrr#..",
+        "...##rrrrrr##...",
+        ".....######.....",
         "................",
-    ], {"w": "V2"})
-
-
-@asset("spare_die")
-def spare_die():  # bone die with a green plus
-    return icon([
-        "................",
-        "...........#....",
-        "..........#m#...",
-        ".........##L##..",
-        "........#LLLLL#.",
-        "..#########L##..",
-        ".#cccccccB#L#...",
-        ".#c##ccccB##....",
-        ".#c##ccccB#.....",
-        ".#cccc##cB#.....",
-        ".#cccc##cB#.....",
-        ".#ccccc##B#.....",
-        ".#ccccc##B#.....",
-        ".#bbbbbbbb#.....",
-        "..########......",
-        "................",
-    ])
+    ], {"S": "S1"})
 
 
 # ======================================================================= equipment (§5.3)
-
-@asset("bone_pouch")
-def bone_pouch():  # small drawstring pouch with a bone toggle
-    return icon([
-        "................",
-        "................",
-        "................",
-        "......#..#......",
-        ".....#c##c#.....",
-        "......####......",
-        "......#BB#......",
-        ".....#bbbb#.....",
-        "....#cBBBBb#....",
-        "...#cBBBBBBb#...",
-        "...#BBBBBBBb#...",
-        "...#BBBBBBbb#...",
-        "....#bbbbbb#....",
-        ".....######.....",
-        "................",
-        "................",
-    ])
-
-
-@asset("bone_satchel")
-def bone_satchel():  # big flap satchel with strap and bone buckle
-    return icon([
-        "................",
-        ".....######.....",
-        "....#bbbbbb#....",
-        "...#b######b#...",
-        "...#b#....#b#...",
-        ".###b######b###.",
-        ".#cBBBBBBBBBBB#.",
-        ".#BBBBBBBBBBBB#.",
-        ".##BBBBBBBBBB##.",
-        ".#b##BBBBBB##b#.",
-        ".#bbb#BccB#bbb#.",
-        ".#bbbb####bbbb#.",
-        ".#bbbbbbbbbbbb#.",
-        "..############..",
-        "................",
-        "................",
-    ])
-
 
 @asset("grave_bell")
 def grave_bell():  # bronze bell on a hook with its clapper
@@ -974,6 +841,159 @@ def haggler_lantern():  # warm lantern with a price tag on a string
         "................",
         "................",
     ])
+
+
+@asset("death_knell")
+def death_knell():  # GRAVE_BELL's big brother: a large black iron bell with a gold band
+    return icon([
+        "................",
+        "......####......",
+        ".....#o##o#.....",
+        ".....######.....",
+        "....#544443#....",
+        "...#54444443#...",
+        "...#54444443#...",
+        "...#54444433#...",
+        "..#5444444433#..",
+        "..#5444444333#..",
+        ".#OOOOOOOOOOOo#.",
+        ".#544444443333#.",
+        ".##############.",
+        "......#oo#......",
+        ".......##.......",
+        "................",
+    ], {"5": "N5", "4": "N4", "3": "N3"})
+
+
+@asset("ossuary")
+def ossuary():  # RELIQUARY's big brother: a bone shrine box with a skull front and gold bands
+    return icon([
+        "................",
+        "......####......",
+        "....##cccB##....",
+        "...#cccccccB#...",
+        "..#ccccccccBB#..",
+        ".##############.",
+        ".#OOOOOOOOOOOo#.",
+        ".#BBBccccccBBb#.",
+        ".#BBc##cc##cBb#.",
+        ".#BBc##cc##cBb#.",
+        ".#BBccc##cccBb#.",
+        ".#BBBc#cc#cBBb#.",
+        ".#OOOOOOOOOOOo#.",
+        ".##############.",
+        "................",
+        "................",
+    ])
+
+
+@asset("black_market")
+def black_market():  # HAGGLER_LANTERN's twin: hooded black lantern, ghost-green flame, a gold coin
+    return icon([
+        "................",
+        "....#####.......",
+        "...#43333#......",
+        "..#4333333#.....",
+        ".#433333333#....",
+        ".###########....",
+        "..#3LLmLL3#.#...",
+        "..#3LmmmL3#.#...",
+        "..#3LmmmL3#.#...",
+        "..#3LLmLL3####..",
+        "..#3LLLLL3#OO3#.",
+        "..#########OO3#.",
+        "..#4444443#333#.",
+        "..#############.",
+        "................",
+        "................",
+    ], {"4": "N4", "3": "N3"})
+
+
+CRATE = [  # 7x7 wooden crate: light frame top-left, dark bottom-right, one diagonal brace
+    "#######",
+    "#SSSSb#",
+    "#SssSb#",
+    "#SsSsb#",
+    "#SSssb#",
+    "#bbbbb#",
+    "#######",
+]
+
+
+@asset("overstock")
+def overstock():  # three stacked crates
+    img = canvas(16, 16)
+    crate = grid(CRATE, {"S": "S1", "s": "S0", "b": "B0"})
+    paste(img, crate, 1, 8)
+    paste(img, crate, 7, 8)
+    paste(img, crate, 4, 2)
+    return img
+
+
+@asset("overflowing_crypt")
+def overflowing_crypt():  # OVERSTOCK's twin: one big crate, coins and a potion spilling out of it
+    return icon([
+        "................",
+        "..........##....",
+        ".........#ss#...",
+        ".........#RR#...",
+        "........#SRRR#..",
+        "...###..#SRRR#..",
+        "..#OOO#.#RRRR#..",
+        ".#OO#OO##RRRR#..",
+        ".#O#OOO#OO#OOO#.",
+        ".#SSSSSSSSSSSS#.",
+        ".#sssbsssbsssb#.",
+        ".#sssbsssbsssb#.",
+        ".#sssbsssbsssb#.",
+        ".#bbbbbbbbbbbb#.",
+        ".##############.",
+        "................",
+    ], {"S": "S1", "s": "S0", "b": "B0"})
+
+
+@asset("grave_goods")
+def grave_goods():  # clay funeral urn heaped with gold coins
+    return icon([
+        "................",
+        "......#####.....",
+        ".....#OOOOo#....",
+        "....#OOoOOoo#...",
+        "...#SSSSSSSSb#..",
+        ".....#bsssb#....",
+        "....#Ssssssb#...",
+        "...#Sssssssbb#..",
+        "..#Sssssssssbb#.",
+        "..#Sssssssssbb#.",
+        "..#ssssssssbbb#.",
+        "...#sssssbbbb#..",
+        ".....#sbbbb#....",
+        "....#bbbbbbb#...",
+        "....#########...",
+        "................",
+    ], {"S": "S1", "s": "S0", "b": "B0"})
+
+
+@asset("dragon_hoard")
+def dragon_hoard():  # GRAVE_GOODS's big brother: a mound of gold coins crowned by a skull
+    return icon([
+        "................",
+        "................",
+        ".....######.....",
+        "....#cccccB#....",
+        "....#c#cc#B#....",
+        "....#cccccB#....",
+        "...##BcBcBB##...",
+        "..#OwOOOOOOOo#..",
+        ".#OOOooOOwOOoo#.",
+        ".#wOOOOOooOOOo#.",
+        ".#OooOwOOOOOoo#.",
+        ".#OOOOOOooOwoo#.",
+        ".#OwOooOOOOooo#.",
+        ".#oooooooooooo#.",
+        ".##############.",
+        "................",
+    ], {"w": "V2"})
 
 
 # ==================================================================== stat icons 8x8 (§5.4)
@@ -1116,6 +1136,12 @@ def gear():  # settings cog: eight teeth around an open hub (M ramp, top-left li
         ".T.tt.t.",
         "...tt...",
     ], None, 8)
+
+
+# Potions, gems and coffers (tools/art/items.py) are generated through this module as well.
+from items import ASSETS as ITEM_ASSETS  # noqa: E402
+
+ASSETS.update(ITEM_ASSETS)
 
 
 if __name__ == "__main__":

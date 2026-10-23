@@ -1,43 +1,45 @@
 class_name CombatView
 extends Control
-## What combat playback may do to a screen (GAME_SPEC §11.4). The encounter screen extends
-## this; CombatPlayer's states call these with a Tween to add their tweeners to, so skipping a
-## state kills one tween and `snap_*` applies the final look. Implementations never compute
-## rules: every number comes from the ScoreTrace.
+## What battle playback may do to a screen (GAME_SPEC §11). BattleStage implements it;
+## BattlePlayer's beats call these with a Tween to add their tweeners to, so skipping a beat
+## kills one tween and `snap` applies the final look. Implementations never compute rules:
+## every number comes from a trace or a resolved squad.
 
 
-## Running Power / Count labels tick to these values over `dur`.
-func tween_score(_t: Tween, _p: float, _c: float, _dur: float, _step: int) -> void:
+## Dice `indices` tumble; die indices[k] lands at lands[k] seconds into the tween.
+func roll(_t: Tween, _indices: PackedInt32Array, _lands: Array[float]) -> void:
 	pass
 
 
-## Highlight the group chip / badge being resolved (-1 = none).
-func highlight_group(_gi: int) -> void:
+## A squad starts: combo banner, base Power / Count, its column joins the field.
+func show_combo(_t: Tween, _gi: int, _squad: Squad, _step: TraceStep, _dur: float) -> void:
 	pass
 
 
-## Shake the relic icon that fired.
-func pulse_relic(_relic_id: String, _t: Tween) -> void:
+## One squad trace step (die, rune, held die, trinket, boss rule).
+func show_step(_t: Tween, _gi: int, _step: TraceStep, _dur: float, _n: int) -> void:
 	pass
 
 
-## Per-group true Counts after a step; `burst` = a × step (clone burst).
-func show_counts(_t: Tween, _counts: Array[float], _burst: bool, _dur: float) -> void:
+## The squad's strength slam; the army total ticks from `army_before` to `army_after`.
+func show_strength(_t: Tween, _gi: int, _squad: Squad, _army_before: float, _army_after: float, _dur: float) -> void:
 	pass
 
 
-func show_total(_t: Tween, _p: float, _c: float, _damage: float, _dur: float) -> void:
+## Commit effects: money earned, glass runes shattering.
+func show_commit(_t: Tween, _squad: Squad, _dur: float) -> void:
 	pass
 
 
-func charge(_t: Tween, _damage: float, _dur: float) -> void:
+## A RESOLVE trinket multiplies the army.
+func show_resolve_step(_t: Tween, _step: TraceStep, _dur: float) -> void:
+	pass
+
+
+## Squad gi charges the hunter, dealing `share`; HP drains from hp_before to hp_after.
+func charge(_t: Tween, _gi: int, _share: float, _hp_before: float, _hp_after: float, _dur: float) -> void:
 	pass
 
 
 func show_result(_t: Tween, _win: bool, _dur: float) -> void:
-	pass
-
-
-## Final look after a skip: totals, counts, HP and the outcome.
-func snap_final(_p: float, _c: float, _counts: Array[float], _damage: float, _win: bool) -> void:
 	pass

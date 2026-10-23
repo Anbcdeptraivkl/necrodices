@@ -3,26 +3,34 @@ extends Node
 ## waits for layout and animation to settle, saves the viewport as PNG, quits.
 ##   godot --path . --resolution 960x540 res://scenes/dev/capture.tscn -- --preset=encounter --out=captures/x.png
 ## Presets are rows in PRESETS; a missing situation is a new row, not a new branch.
-## Saves go to user://sav_capture.
+## Battle presets: `squads` summons played by the balance bot's pick through the screen's own
+## handlers; `pick` leaves the last pick unsummoned; `roll` presses ROLL; `wait` = seconds of
+## playback before the shot. Saves go to user://sav_capture.
 
 const PRESETS := {
 	"title": {"screen": "title"},
 	"title_hover": {"screen": "title", "hover": "NewRun"},
 	"map_tip_codex": {"screen": "night_map", "seed": "CAPTURE1", "hover": "Codex", "wait": 0.8},
-	"map_tip_card": {"screen": "night_map", "seed": "CAPTURE1", "hover": "EncounterCard", "wait": 0.8},
 	"night_map": {"screen": "night_map", "seed": "CAPTURE1"},
+	"cup": {"screen": "encounter", "seed": "CAPTURE1", "relics": ["RATTLE_DRUM", "EMBER_JAR"]},
 	"encounter": {"screen": "encounter", "seed": "CAPTURE1", "relics": ["RATTLE_DRUM", "EMBER_JAR", "CROWN_OF_THE_LICH"],
-		"consumables": ["SIGIL_FIRE", "TOME_BONE"], "army_turns": 1},
-	"boss": {"screen": "encounter", "seed": "CAPTURE2", "night": 8, "encounter": 2, "army_turns": 2,
-		"relics": ["BONE_PILE", "FULL_MOON", "TACTICIAN_SKULL", "WISP_JAR", "GRAVEDIGGER_LAMP"], "dice": 8},
-	"combat": {"screen": "encounter", "seed": "CAPTURE3", "army_turns": 2, "attack": true, "wait": 1.6,
+		"consumables": ["ELIXIR_FIRE", "AMBER"], "squads": 2, "pick": true, "wait": 6.0},
+	"rolling": {"screen": "encounter", "seed": "CAPTURE1", "roll": true, "wait": 0.45},
+	"summoning": {"screen": "encounter", "seed": "CAPTURE3", "squads": 1, "wait": 1.1,
 		"relics": ["RATTLE_DRUM", "HYBRID_VIGOR", "GRAVEDIGGER_LAMP"], "dice": 6},
-	"horde": {"screen": "encounter", "seed": "CAPTURE4", "army_turns": 3, "levels": 12, "dice": 8,
-		"relics": ["BONE_PILE", "FULL_MOON", "CROWN_OF_THE_LICH", "BLACK_GRIMOIRE", "SPIRIT_BOARD"],
-		"attack": true, "wait": 4.6},
+	"boss": {"screen": "encounter", "seed": "CAPTURE2", "night": 8, "encounter": 2, "squads": 2, "pick": true,
+		"relics": ["BONE_PILE", "BLOOD_MOON", "TACTICIAN_SKULL", "WISP_JAR", "GRAVEDIGGER_LAMP"], "dice": 8, "wait": 6.0},
+	"horde": {"screen": "encounter", "seed": "CAPTURE4", "squads": 3, "levels": 6, "dice": 8, "runes": true, "pick": true,
+		"relics": ["MOSS_CHARM", "CROWN_OF_THE_LICH", "GRAVEDIGGER_LAMP", "SPIRIT_BOARD", "TRIO_TOTEM"], "wait": 9.0},
+	"result": {"screen": "encounter", "seed": "CAPTURE5", "squads": 1, "dice": 6, "hp": 0.01, "wait": 6.0,
+		"relics": ["EMBER_JAR", "TRIO_TOTEM"]},
+	"charge": {"screen": "encounter", "seed": "CAPTURE5", "squads": 1, "dice": 6, "hp": 0.01, "wait": 2.75,
+		"relics": ["EMBER_JAR", "TRIO_TOTEM"]},
 	"shop": {"screen": "shop", "seed": "CAPTURE5", "relics": ["RATTLE_DRUM", "OVERGROWTH"], "money": 23,
-		"consumables": ["INK_HEX"]},
-	"recipes": {"screen": "night_map", "seed": "CAPTURE1", "overlay": "run_info"},
+		"consumables": ["IRON_DRAUGHT"], "dice": 7, "runes": true, "gear": ["GRAVE_BELL", "LOADED_CUP"]},
+	"shop_tip": {"screen": "shop", "seed": "CAPTURE5", "money": 23, "hover": "ShopCard", "wait": 0.8},
+	"shop_coffer": {"screen": "shop", "seed": "CAPTURE7", "money": 23, "coffer": "COFFER_POTION_JUMBO"},
+	"codex": {"screen": "night_map", "seed": "CAPTURE1", "overlay": "run_info", "levels": 2},
 	"end": {"screen": "end", "seed": "CAPTURE6"},
 }
 
@@ -52,8 +60,7 @@ func _capture() -> void:
 	game.db = db
 	game.store = SaveStore.new("user://sav_capture")
 	game.profile = game.store.load_profile()
-	game.profile["tutorial"] = {"tut_first_roll": true, "tut_first_bind": true, "tut_before_summon": true,
-		"tut_first_combat": true, "tut_first_shop": true}
+	game.profile["tutorial"] = {"tut_first_roll": true, "tut_first_summon": true, "tut_first_shop": true}
 	var preset: Dictionary = PRESETS[_args.get("preset", "title")]
 	await _build(game, db, preset)
 	if preset.has("hover"):
@@ -87,12 +94,17 @@ func _build(game: Node, db: ContentDb, p: Dictionary) -> void:
 		run.relics.append(RelicInstance.new(id))
 	for id: String in p.get("consumables", []):
 		run.consumables.append(id)
-	while run.dice.size() < int(p.get("dice", 4)):
-		run.dice.append(Die.standard())
+	while run.dice.size() < int(p.get("dice", 5)):
+		run.dice.append(ShopState.new_die(db, run))
+	if p.get("runes", false):
+		for d in run.dice.size():
+			run.dice[d].faces[1 + d % 5].rune = RulesRegistry.RUNES[d % RulesRegistry.RUNES.size()]
 	run.money = int(p.get("money", run.money))
+	for id: String in p.get("gear", []):
+		run.equipment.append(id)
 	if p.has("levels"):
-		for u in db.unit_order:
-			run.levels[u] = int(p["levels"])
+		for c in db.combo_order:
+			run.levels[c] = int(p["levels"])
 	if p.has("night"):
 		run.night = int(p["night"])
 		NightGen.generate(db, run)
@@ -110,42 +122,33 @@ func _build(game: Node, db: ContentDb, p: Dictionary) -> void:
 		"shop":
 			run.shop = ShopState.open(db, run)
 			run.phase = RunState.Phase.SHOP
+			if p.has("coffer"):
+				run.shop.coffers[0] = {"id": p["coffer"], "price": 6, "sold": false}
+				run.shop.buy_coffer(db, run, 0)
 			game.goto("shop")
 		"end":
 			run.phase = RunState.Phase.GAME_OVER
 			run.stats["best_damage"] = 1234567.0
-			run.record_summon("LICH")
+			run.record_summon("LICH", 5000.0)
 			game.goto("end")
 		"encounter":
+			var entry: Dictionary = run.night_plan[run.encounter_index]
+			entry["hp"] = float(entry["hp"]) * float(p.get("hp", 1000.0 if p.has("squads") else 1.0))
 			game.start_encounter()
 			await get_tree().process_frame
 			await get_tree().process_frame
-			var enc: EncounterState = game.encounter
-			for t in int(p.get("army_turns", 0)):
-				_bind_pairs(enc)
-				if t == int(p.get("army_turns", 0)) - 1 and p.get("attack", false):
-					enc.attack_now()
-					get_tree().current_scene.call(&"_after_commit")
-				else:
-					enc.summon()
-			if not p.get("attack", false):
-				_select_some(enc)
+			_play(game.encounter, get_tree().current_scene, SimBot.new(db), p)
 
 
-func _bind_pairs(enc: EncounterState) -> void:
-	var bot := SimBot.new(enc.db)
-	var part := bot.best_partition_projected(enc)
-	for idx: PackedInt32Array in part:
-		for i in idx:
-			enc.toggle_select(i)
-		enc.bind()
-
-
-func _select_some(enc: EncounterState) -> void:
-	_bind_pairs(enc)
-	if enc.pending.size() > 1:
-		enc.unbind(enc.pending.size() - 1)
-	for i in enc.tray_size:
-		if enc.bound[i] == -1 and i != enc.shackled:
-			enc.toggle_select(i)
-			break
+## Summons through the screen's handlers so the playback runs exactly as in play.
+func _play(enc: EncounterState, screen: Node, bot: SimBot, p: Dictionary) -> void:
+	var squads := int(p.get("squads", 0))
+	for t in squads:
+		enc.roll()
+		enc.picked = bot.best_pick(enc)
+		if t == squads - 1 and p.get("pick", false):
+			enc.changed.emit()
+			return
+		screen.call(&"_on_summon")
+	if p.get("roll", false):
+		screen.call(&"_on_main")
