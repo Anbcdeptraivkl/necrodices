@@ -26,6 +26,8 @@ const TIP_OFFSET := Vector2(8, 10)
 
 var _tip_panel: PanelContainer
 var _tip_title: Label
+var _tip_kind: Label     # what the thing is (Trinket / Rare …) in its kind colour
+var _tip_price: Label    # its cost, gold, on a line of its own
 var _tip_body: Label
 enum Tip { IDLE, WAITING, SHOWN, GRACE }
 
@@ -94,9 +96,12 @@ func _build_tooltip() -> void:
 	box.add_theme_constant_override(&"separation", 1)
 	box.mouse_filter = Control.MOUSE_FILTER_IGNORE
 	_tip_title = Label.new()
+	_tip_kind = Label.new()
+	_tip_price = Label.new()
+	_tip_price.theme_type_variation = &"GoldLabel"
 	_tip_body = Label.new()
 	_tip_body.theme_type_variation = &"BodyLabel"
-	for label: Label in [_tip_title, _tip_body]:
+	for label: Label in [_tip_title, _tip_kind, _tip_price, _tip_body]:
 		label.mouse_filter = Control.MOUSE_FILTER_IGNORE  # no autowrap: lines are wrapped by _wrap
 		box.add_child(label)
 	_tip_panel.add_child(box)
@@ -195,6 +200,9 @@ func _docked_info_visible() -> bool:
 
 func _show_tip(target: Control) -> void:
 	var title := ""
+	var kind := ""
+	var kind_colour := Color.WHITE
+	var price := ""
 	var body := ""
 	if target.has_meta(&"tip"):
 		title = str(target.get_meta(&"tip"))
@@ -204,12 +212,20 @@ func _show_tip(target: Control) -> void:
 			_tip_panel.visible = false
 			return
 		title = info.get("title", "")
+		kind = info.get("kind", "")
+		kind_colour = info.get("kind_colour", Color(0.77, 0.73, 0.85))
+		price = info.get("price", "")
 		body = info.get("body", "")
 	# Wrap by hand: autowrap Labels report a stale minimum height on their first layout
 	# (skill godot-debugging-testing engine traps), which made the panel grow far too tall.
 	var font := _tip_title.get_theme_font(&"font")
 	var inner := TIP_MAX_W - 8.0
 	_tip_title.text = _wrap(font, title, inner)
+	_tip_kind.text = kind
+	_tip_kind.visible = kind != ""
+	_tip_kind.add_theme_color_override(&"font_color", kind_colour)
+	_tip_price.text = price
+	_tip_price.visible = price != ""
 	_tip_body.text = _wrap(font, body, inner)
 	_tip_body.visible = body != ""
 	_tip_panel.reset_size()

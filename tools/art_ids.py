@@ -117,6 +117,7 @@ UI_FILES = [
     ("btn_primary_disabled", 24, 24, 6), ("btn_primary_hover", 24, 24, 6),
     ("btn_secondary_normal", 24, 24, 6), ("btn_secondary_pressed", 24, 24, 6),
     ("btn_secondary_disabled", 24, 24, 6), ("btn_secondary_hover", 24, 24, 6),
+    ("btn_danger_normal", 24, 24, 6), ("btn_danger_pressed", 24, 24, 6), ("btn_danger_hover", 24, 24, 6),
     ("panel_dark", 24, 24, 6), ("panel_card", 24, 24, 6), ("panel_tooltip", 16, 16, 4),
     ("chip", 16, 12, 4), ("slot", 20, 20, None), ("slot_selected", 20, 20, None),
     ("hp_frame", 16, 7, 3), ("hp_fill", 1, 5, None), ("hp_preview", 1, 5, None),
@@ -125,7 +126,7 @@ UI_FILES = [
     ("rarity_stripe_rare", 4, 4, None),
     ("stamp_defeated", 64, 20, None), ("divider", 8, 1, None),
 ]
-assert len(UI_FILES) == 24
+assert len(UI_FILES) == 27
 # Drawn at the largest canvas (ART_SPEC §2, 640x300) and centred; the 480x270 centre is the
 # safe area every screen size shows.
 BACKGROUNDS = [("bg_title", 640, 300), ("bg_map", 640, 300), ("bg_battle", 640, 300),

@@ -13,6 +13,11 @@ const KIND_GEAR := "GEAR"
 const KIND_COFFER := "COFFER"
 
 var slot := -1
+## Kind colour code (Art.kind_colour), drawn as the card's outer ring.
+var ring := Color(0, 0, 0, 0):
+	set(v):
+		ring = v
+		queue_redraw()
 @onready var _price: Label = %Price
 @onready var _stripe: TextureRect = %Stripe
 @onready var _icon: TextureRect = %Icon
@@ -34,6 +39,7 @@ func show_item(db: ContentDb, item: Dictionary, can_buy: bool, can_use: bool, bu
 	var id: String = item["id"]
 	var sold: bool = item.get(sold_flag, false)
 	_stripe.modulate.a = 1.0 if kind == ShopState.KIND_RELIC else 0.0
+	ring = Art.kind_colour(kind)
 	_icon.visible = kind != ShopState.KIND_DIE
 	_faces.visible = kind == ShopState.KIND_DIE
 	InfoPanel.attach(self, _show_art(db, item, kind, id))
@@ -70,6 +76,11 @@ func _show_art(db: ContentDb, item: Dictionary, kind: String, id: String) -> Cal
 			return func() -> Dictionary: return InfoText.coffer(db, id)
 	_icon.texture = Art.consumable(id)
 	return func() -> Dictionary: return InfoText.consumable(db, id)
+
+
+func _draw() -> void:
+	if ring.a > 0.0:
+		Art.draw_ring(self, Rect2(Vector2.ZERO, size), ring)
 
 
 func _show_faces(die: Die) -> void:

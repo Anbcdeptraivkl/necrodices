@@ -39,7 +39,7 @@ func test_whole_numbers_are_ints() -> void:
 	_eq(typeof(db.economy["runes"]["IRON"]["value"]), TYPE_FLOAT, "1.5 stays float")
 
 
-## Every literal key passed to db.text("...") in game code exists in strings_en.json, so no UI
+## Every literal key passed to db.text("...") in game code exists in data/text/ui, so no UI
 ## text falls back to its key.
 func test_every_text_key_exists() -> void:
 	var db := _db()

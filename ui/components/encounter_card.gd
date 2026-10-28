@@ -20,13 +20,13 @@ func show_entry(db: ContentDb, run: RunState, entry: Dictionary, state: int) -> 
 	var rules: Array = entry["rules"]
 	_name.text = db.enemies[_enemy_id]["name"]
 	if rules.has("ENRAGED"):
-		_name.text = db.text("rule_name_enraged") + " " + _name.text
+		_name.text = db.boss_rules["ENRAGED"]["name"] + " " + _name.text
 	_role.text = db.text("role_" + role.to_lower())
 	_hp.text = db.text("lbl_hp") % Settings.fmt(entry["hp"])
 	%Bounty.text = db.text("lbl_bounty") % Economy.bounty(db, run, role)
 	var names: PackedStringArray = []
 	for r: String in NightGen.active_rules(entry):
-		names.append(db.text("rule_short_" + r.to_lower()))
+		names.append(db.boss_rules[r]["short"])
 	_rule.text = "\n".join(names)
 	_rule.get_parent().visible = not names.is_empty()
 	_stamp.texture = Art.ui("stamp_defeated")

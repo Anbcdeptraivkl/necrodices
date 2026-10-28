@@ -91,11 +91,14 @@ func refresh() -> void:
 		var s := _relic_slots[i]
 		var has := i < _run.relics.size()
 		s.icon = Art.relic(_run.relics[i].id) if has else null
+		s.ring = Art.kind_colour("RELIC")
 		s.dimmed = has and _run.relics[i].disabled
 		s.selected = _pick == Pick.RELIC and _pick_index == i
 	for i in _held_slots.size():
 		var s := _held_slots[i]
 		s.icon = Art.consumable(_run.consumables[i]) if i < _run.consumables.size() else null
+		if i < _run.consumables.size():
+			s.ring = Art.kind_colour(_db.consumables[_run.consumables[i]]["kind"])
 		s.selected = _pick == Pick.CONSUMABLE and _pick_index == i
 	_money.text = "$%d" % _run.money
 

@@ -18,7 +18,8 @@ tools\run.cmd                         :: play windowed 960x540
 tools\test.cmd                        :: re-import + every suite
 tools\test.cmd --changed              :: suites covering changed files
 tools\test.cmd combos:wild           :: one suite / cases by name part
-python tools\check_data.py            :: data vs spec tables
+python tools\check_data.py            :: data vs spec tables, and data/text covers every id
+python tools\art\compile_sheets.py    :: docs/art_sheets: units / hunters / items / dice review sheets + README table
 python tools\build_manifest.py        :: assets/manifest.json from ART_SPEC §11
 python tools\gen_placeholders.py      :: create MISSING placeholder PNGs (--only <glob> / --force to overwrite)
 python tools\validate_art.py          :: ART_SPEC §9.3 checks
@@ -44,7 +45,7 @@ core/       pure rules (RefCounted), headless-tested
 scenes/     boot, title, night_map, encounter, shop, end, overlays, dev
 ui/         components + theme
 fx/         presentation queue, battle player (roll / summon / resolve beats), horde renderer, shaders
-data/       content JSON (GAME_SPEC §9)
+data/       content JSON (GAME_SPEC §9); data/text = every player-facing word (designer-edited)
 assets/     art per ART_SPEC §11 (manifest.json is generated)
 tools/      python + cmd tooling, balance_sim.gd
 tests/      _run.gd, _suite.gd, test_*.gd (headless core), ui/ui_runner.tscn (in-game UI flows)

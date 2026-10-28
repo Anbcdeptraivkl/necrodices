@@ -64,6 +64,7 @@ func test_spoils_lines() -> void:
 	Fixtures.set_tray(enc, ["FIRE1", "FIRE1", "FIRE1", "ICE2+GILDED"])
 	Fixtures.pick(enc, [0, 1, 2])
 	enc.summon()
+	enc.attack()
 	enc.run.money = 12
 	var by_key := {}
 	for l in Economy.spoils_lines(db, enc.run, enc):
@@ -87,6 +88,7 @@ func test_final_boss_bounty() -> void:
 	enc.roll()
 	Fixtures.pick(enc, [0, 1, 2])
 	enc.summon()
+	enc.attack()
 	_eq(Economy.spoils_lines(db, run, enc)[0]["amount"], int(db.economy["reward_final"]), "final bounty")
 	RunFlow.finish_encounter(db, run, enc)
 	_eq(run.phase, RunState.Phase.VICTORY, "victory")
@@ -241,6 +243,9 @@ func _scripted_run(seed: String) -> String:
 		var enc := RunFlow.start_encounter(db, run)
 		enc.begin()
 		while enc.phase != EncounterState.Phase.DONE:
+			if enc.squads.size() > 0 and (enc.army_resolution().damage >= enc.hp or enc.summons_left == 0):
+				enc.attack()
+				break
 			enc.roll()
 			if enc.rerolls_left > 0:
 				Fixtures.pick_free(enc, 1)

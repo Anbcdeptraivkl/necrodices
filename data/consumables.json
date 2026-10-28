@@ -3,277 +3,227 @@
   "consumables": [
     {
       "id": "ELIXIR_BONE",
-      "name": "Elixir of Bone",
       "kind": "POTION",
       "price": 3,
       "action": "element",
       "element": "BONE",
       "min_targets": 1,
-      "max_targets": 2,
-      "text": "Up to 2 faces become BONE (6 points)"
+      "max_targets": 2
     },
     {
       "id": "ELIXIR_FIRE",
-      "name": "Elixir of Fire",
       "kind": "POTION",
       "price": 3,
       "action": "element",
       "element": "FIRE",
       "min_targets": 1,
-      "max_targets": 2,
-      "text": "Up to 2 faces become FIRE"
+      "max_targets": 2
     },
     {
       "id": "ELIXIR_ICE",
-      "name": "Elixir of Ice",
       "kind": "POTION",
       "price": 3,
       "action": "element",
       "element": "ICE",
       "min_targets": 1,
-      "max_targets": 2,
-      "text": "Up to 2 faces become ICE"
+      "max_targets": 2
     },
     {
       "id": "ELIXIR_LEAF",
-      "name": "Elixir of Leaf",
       "kind": "POTION",
       "price": 3,
       "action": "element",
       "element": "LEAF",
       "min_targets": 1,
-      "max_targets": 2,
-      "text": "Up to 2 faces become LEAF"
+      "max_targets": 2
     },
     {
       "id": "ELIXIR_VOLT",
-      "name": "Elixir of Volt",
       "kind": "POTION",
       "price": 3,
       "action": "element",
       "element": "VOLT",
       "min_targets": 1,
-      "max_targets": 2,
-      "text": "Up to 2 faces become VOLT"
+      "max_targets": 2
     },
     {
       "id": "ELIXIR_METAL",
-      "name": "Elixir of Metal",
       "kind": "POTION",
       "price": 3,
       "action": "element",
       "element": "METAL",
       "min_targets": 1,
-      "max_targets": 2,
-      "text": "Up to 2 faces become METAL"
+      "max_targets": 2
     },
     {
       "id": "STRENGTH_TONIC",
-      "name": "Strength Tonic",
       "kind": "POTION",
       "price": 3,
       "action": "points",
       "delta": 2,
       "min_targets": 1,
-      "max_targets": 2,
-      "text": "Up to 2 non-BONE faces: +2 points (max 9)"
+      "max_targets": 2
     },
     {
       "id": "WHETSTONE_OIL",
-      "name": "Whetstone Oil",
       "kind": "POTION",
       "price": 3,
       "action": "rune",
       "rune": "SHARP",
       "min_targets": 1,
-      "max_targets": 2,
-      "text": "SHARP rune on up to 2 faces"
+      "max_targets": 2
     },
     {
       "id": "SWARM_BREW",
-      "name": "Swarm Brew",
       "kind": "POTION",
       "price": 3,
       "action": "rune",
       "rune": "SWARM",
       "min_targets": 1,
-      "max_targets": 2,
-      "text": "SWARM rune on up to 2 faces"
+      "max_targets": 2
     },
     {
       "id": "WILD_SPIRITS",
-      "name": "Wild Spirits",
       "kind": "POTION",
       "price": 3,
       "action": "rune",
       "rune": "WILD",
       "min_targets": 1,
-      "max_targets": 1,
-      "text": "WILD rune on 1 face"
+      "max_targets": 1
     },
     {
       "id": "GLASS_DRAUGHT",
-      "name": "Glass Draught",
       "kind": "POTION",
       "price": 3,
       "action": "rune",
       "rune": "GLASS",
       "min_targets": 1,
-      "max_targets": 1,
-      "text": "GLASS rune on 1 face"
+      "max_targets": 1
     },
     {
       "id": "IRON_DRAUGHT",
-      "name": "Iron Draught",
       "kind": "POTION",
       "price": 3,
       "action": "rune",
       "rune": "IRON",
       "min_targets": 1,
-      "max_targets": 1,
-      "text": "IRON rune on 1 face"
+      "max_targets": 1
     },
     {
       "id": "GRAVE_DUST",
-      "name": "Grave Dust",
       "kind": "POTION",
       "price": 3,
       "action": "rune",
       "rune": "TOMB",
       "min_targets": 1,
-      "max_targets": 1,
-      "text": "TOMB rune on 1 face"
+      "max_targets": 1
     },
     {
       "id": "LIQUID_GOLD",
-      "name": "Liquid Gold",
       "kind": "POTION",
       "price": 3,
       "action": "rune",
       "rune": "GILDED",
       "min_targets": 1,
-      "max_targets": 1,
-      "text": "GILDED rune on 1 face"
+      "max_targets": 1
     },
     {
       "id": "LUCKY_CLOVER",
-      "name": "Lucky Clover",
       "kind": "POTION",
       "price": 3,
       "action": "rune",
       "rune": "LUCKY",
       "min_targets": 1,
-      "max_targets": 2,
-      "text": "LUCKY rune on up to 2 faces"
+      "max_targets": 2
     },
     {
       "id": "MIRROR_DRAUGHT",
-      "name": "Mirror Draught",
       "kind": "POTION",
       "price": 3,
       "action": "mirror",
       "min_targets": 2,
-      "max_targets": 2,
-      "text": "Pick 2 faces: the second becomes a copy of the first"
+      "max_targets": 2
     },
     {
       "id": "HERMIT_BREW",
-      "name": "Hermit's Brew",
       "kind": "POTION",
       "price": 3,
       "action": "money_double",
       "max": 20,
       "min_targets": 0,
-      "max_targets": 0,
-      "text": "Double your money (max +$20)"
+      "max_targets": 0
     },
     {
       "id": "OPAL",
-      "name": "Opal",
       "kind": "GEM",
       "price": 3,
       "action": "level",
       "combo": "RABBLE",
       "min_targets": 0,
-      "max_targets": 0,
-      "text": "+1 level to Rabble"
+      "max_targets": 0
     },
     {
       "id": "GARNET",
-      "name": "Garnet",
       "kind": "GEM",
       "price": 3,
       "action": "level",
       "combo": "DUO_PACT",
       "min_targets": 0,
-      "max_targets": 0,
-      "text": "+1 level to Duo Pact"
+      "max_targets": 0
     },
     {
       "id": "AMBER",
-      "name": "Amber",
       "kind": "GEM",
       "price": 3,
       "action": "level",
       "combo": "TRIO",
       "min_targets": 0,
-      "max_targets": 0,
-      "text": "+1 level to Trio"
+      "max_targets": 0
     },
     {
       "id": "PRISM",
-      "name": "Prism",
       "kind": "GEM",
       "price": 3,
       "action": "level",
       "combo": "RAINBOW",
       "min_targets": 0,
-      "max_targets": 0,
-      "text": "+1 level to Rainbow"
+      "max_targets": 0
     },
     {
       "id": "MOONSTONE",
-      "name": "Moonstone",
       "kind": "GEM",
       "price": 3,
       "action": "level",
       "combo": "FULL_MOON",
       "min_targets": 0,
-      "max_targets": 0,
-      "text": "+1 level to Full Moon"
+      "max_targets": 0
     },
     {
       "id": "OBSIDIAN",
-      "name": "Obsidian",
       "kind": "GEM",
       "price": 3,
       "action": "level",
       "combo": "RITUAL",
       "min_targets": 0,
-      "max_targets": 0,
-      "text": "+1 level to Ritual"
+      "max_targets": 0
     },
     {
       "id": "EMERALD",
-      "name": "Emerald",
       "kind": "GEM",
       "price": 3,
       "action": "level",
       "combo": "QUARTET",
       "min_targets": 0,
-      "max_targets": 0,
-      "text": "+1 level to Quartet"
+      "max_targets": 0
     },
     {
       "id": "BLOODSTONE",
-      "name": "Bloodstone",
       "kind": "GEM",
       "price": 3,
       "action": "level",
       "combo": "QUINTET",
       "min_targets": 0,
-      "max_targets": 0,
-      "text": "+1 level to Quintet"
+      "max_targets": 0
     }
   ]
 }

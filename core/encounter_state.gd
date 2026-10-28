@@ -10,7 +10,7 @@ signal changed
 signal rolled(indices: PackedInt32Array)
 
 enum Phase { AWAIT_ROLL, PICK, DONE }
-enum Verb { ROLL, SELECT, REROLL, SUMMON, USE_CONSUMABLE }
+enum Verb { ROLL, SELECT, REROLL, SUMMON, ATTACK, USE_CONSUMABLE }
 
 var db: ContentDb
 var run: RunState
@@ -66,7 +66,9 @@ func can(verb: Verb, arg: int = -1) -> bool:
 		return false
 	match verb:
 		Verb.ROLL:
-			return phase == Phase.AWAIT_ROLL
+			return phase == Phase.AWAIT_ROLL and summons_left > 0
+		Verb.ATTACK:
+			return phase == Phase.AWAIT_ROLL and not squads.is_empty()
 		Verb.SELECT:
 			return phase == Phase.PICK and arg >= 0 and arg < tray_size and arg != shackled \
 				and (picked.has(arg) or picked.size() < int(db.economy["pick_max"]))
@@ -131,8 +133,8 @@ func reroll() -> bool:
 	return true
 
 
-## SUMMON (§4.5): luck → counters → score → commit → join the army → resolve when won or out
-## of summons.
+## SUMMON (§4.5): luck → counters → score → commit → join the army → back to the cup. The
+## battle resolves only on ATTACK.
 func summon() -> bool:
 	if not can(Verb.SUMMON):
 		return false
@@ -150,11 +152,17 @@ func summon() -> bool:
 		_battle_elements[e] = true
 	picked.clear()
 	shackled = -1
-	var res := army_resolution()
-	if res.damage >= hp or summons_left <= 0:
-		_finish(res, squad)
-	else:
-		phase = Phase.AWAIT_ROLL
+	phase = Phase.AWAIT_ROLL
+	changed.emit()
+	return true
+
+
+## ATTACK (§4.5): the army charges now; every summon left unused pays at the spoils. Legal
+## between summons once a squad exists (and the only move left when the summons run out).
+func attack() -> bool:
+	if not can(Verb.ATTACK):
+		return false
+	_finish(army_resolution(), squads[-1])
 	changed.emit()
 	return true
 

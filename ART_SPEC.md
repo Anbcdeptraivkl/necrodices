@@ -345,9 +345,10 @@ y 270 └──────────────┴────────�
 | Battlefield | centre, between HP text and tray | Squads in columns, centred when they do not fill it; horde squads = soldiers, single / legend = one body + aura |
 | Dice tray | bottom of the centre column, dice 20×23, gap 6 | All dice (5–8). Picked dice raised with the `G1` ring; shackled dice dimmed |
 | Counters | 356, 28 | SUMMON n / REROLL n chips |
-| Pick tray | 356, ~52, 120 | Combo + level (or "PICK 3-5 DICE"), the picked dice in pick order, preview `P × C = S` (`G1`) |
-| Squads | below, flexible | One chip per summoned squad: unit icon, combo, strength (no hint text) |
-| Actions | bottom right, 2 × 58×24 | REROLL (secondary) · ROLL / SUMMON (primary, same button by phase) |
+| Pick tray | 356, ~52, 120 | Header "CURRENT DICE" (muted, left, like "SQUADS"), the picked dice in pick order, combo + level and the preview `P × C = S` (`G1`) once a combo forms; no hint text |
+| Squads | below, flexible | A grid of 22×22 unit icons, one per summoned squad; combo, P × C and strength in the tooltip |
+| Pick actions | bottom right, stacked | REROLL (secondary, 120×26) over SUMMON (`BigButton`: primary, 12 px text, 120×36) |
+| Big actions | centre of the stage, between summons | ROLL (`BigButton` with a tumbling die icon) and ATTACK! (`DangerButton`: the blood-red button, sword-slash icon) at 96×36; ATTACK! breathes gold once the army beats the HP; only ATTACK! when the summons are spent |
 
 ### 6.3 Shop screen (Balatro layout, D-R16)
 The screen is dark (`N0`); only the right column is decorated (D-R12). The shop itself is **one
@@ -404,10 +405,10 @@ explains itself in its tooltip.
 ### 6.6 Overlays (centred on the canvas)
 | Overlay | Panel size | Content |
 |---|---|---|
-| Tooltip (floating) | max w 140, padding 4 | Only over overlays, where the info panel is covered. Header (icon ×2 + name), kind line, body `N6` |
+| Tooltip (floating) | max w 140, padding 4 | Only over overlays, where the info panel is covered. Header (icon ×2 + name), kind line in its colour, price (`G1`), body `N6` — one idea per line, never joined with "·" |
 | Dice Inspector | 300 × 232 | One row per die: index + 6 face tiles 16×16 (rune material, glyph8, points); pick up to N faces in order (`G1` ring + order number); Confirm / Cancel |
 | Spoils | 200 × 160 | Lines (label left, `$` right `G1`), total, CONTINUE |
-| Codex | 456 × 246 | Left: combos best first (name, pattern, level, P × C at that level, gold when levelled); right: the 4 rituals (unit + glyphs, core twice) and the 8 runes |
+| Codex | 464 × 252 | Tabs: COMBOS (illustrated combos with level and P × C, the 4 rituals) · MONSTERS · HUNTERS · RUNES · TRINKETS · POTIONS · GEMS · GEAR — a grid of 34×34 cells (art at integer scale, kind-coloured ring) and a detail pane: art, name, kind line in its colour, price, effect, a short description (one idea per line) |
 | Coffer | 300 × 170 | The opened coffer's choices as market cards with TAKE, "Choose n", SKIP |
 | Game Over / Victory | full canvas | Title text large, stats list, buttons |
 | Settings | 220 × 200 | Toggles / sliders built from button 9-slices |

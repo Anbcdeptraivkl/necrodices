@@ -1,0 +1,67 @@
+{
+  "hunters": {
+    "MOB_TORCH_VILLAGER": {
+      "name": "Torch Villager",
+      "lore": "Brought a torch to a necromancer fight. Bold."
+    },
+    "MOB_PITCHFORK_FARMER": {
+      "name": "Pitchfork Farmer",
+      "lore": "Farms by day, forks by night."
+    },
+    "MOB_LANTERN_WATCHMAN": {
+      "name": "Lantern Watchman",
+      "lore": "Counts the hours and the skeletons. Loses count of both."
+    },
+    "CHAMP_GUARD_CAPTAIN": {
+      "name": "Guard Captain",
+      "lore": "Polished helmet, red plume, no sense of humour."
+    },
+    "CHAMP_MONSTER_HUNTER": {
+      "name": "Monster Hunter",
+      "lore": "Twelve stakes on the belt, three of them sharp."
+    },
+    "BOSS_EXORCIST": {
+      "name": "The Exorcist",
+      "lore": "Splashes holy water on anything that rattles, including the plumbing."
+    },
+    "BOSS_WITCH_HUNTER": {
+      "name": "The Witch Hunter",
+      "lore": "Confiscates your favourite trinket 'for evidence'."
+    },
+    "BOSS_BELL_RINGER": {
+      "name": "The Bell Ringer",
+      "lore": "Rings the great bell until something gets stuck. Usually a die."
+    },
+    "BOSS_INQUISITOR": {
+      "name": "The Inquisitor",
+      "lore": "Asks many questions. Accepts one fewer summon as an answer."
+    }
+  },
+  "rules": {
+    "EXORCIST": {
+      "name": "Holy Water",
+      "short": "Holy Water: BONE dice score 0",
+      "effect": "Holy Water: BONE dice score 0 points."
+    },
+    "WITCH_HUNTER": {
+      "name": "Confiscation",
+      "short": "Confiscation: leftmost trinket off",
+      "effect": "Confiscation: your leftmost trinket is disabled."
+    },
+    "BELL_RINGER": {
+      "name": "Toll",
+      "short": "Toll: 1 die chained per roll",
+      "effect": "Toll: after every roll and reroll, 1 random die is shackled."
+    },
+    "INQUISITOR": {
+      "name": "Interrogation",
+      "short": "Interrogation: -1 Summon",
+      "effect": "Interrogation: −1 Summon this battle."
+    },
+    "ENRAGED": {
+      "name": "Enraged",
+      "short": "Enraged: two rules at once",
+      "effect": "Enraged: two rules at once."
+    }
+  }
+}

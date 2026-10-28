@@ -51,26 +51,27 @@ func test_summon_cycle_and_loss() -> void:
 		Fixtures.pick(enc, [0, 1, 2])
 		_check(enc.summon(), "summon %d" % n)
 	_eq(enc.squads.size(), 3, "three squads")
-	_eq(enc.phase, EncounterState.Phase.DONE, "out of summons resolves")
+	_check(not enc.can(EncounterState.Verb.ROLL), "no roll without summons")
+	_check(enc.attack(), "attack is the only move left")
+	_eq(enc.phase, EncounterState.Phase.DONE, "attack resolves")
 	_check(not enc.win, "a huge HP is not beaten")
 	_eq(enc.resolution.army, enc.squads[0].strength() + enc.squads[1].strength() + enc.squads[2].strength(),
 		"army = sum of squads")
 
 
-func test_auto_resolve_when_hp_reached() -> void:
+func test_attack_early() -> void:
 	var enc := Fixtures.battle([], 1.0)
+	_check(not enc.can(EncounterState.Verb.ATTACK), "no attack without an army")
 	enc.roll()
 	Fixtures.pick(enc, [0, 1, 2])
+	_check(not enc.can(EncounterState.Verb.ATTACK), "no attack while picking")
 	enc.summon()
-	_eq(enc.phase, EncounterState.Phase.DONE, "resolved after the first squad")
+	_eq(enc.phase, EncounterState.Phase.AWAIT_ROLL, "the battle waits for ATTACK even past the HP")
+	_check(not enc.can(EncounterState.Verb.SELECT, 0), "no pick before the next roll")
+	_check(enc.attack(), "attack early")
+	_eq(enc.phase, EncounterState.Phase.DONE, "resolved")
 	_check(enc.win, "won")
-	_eq(enc.summons_left, 2, "two summons left unused")
-	var enc2 := Fixtures.battle([], 1.0e9)
-	enc2.roll()
-	Fixtures.pick(enc2, [0, 1, 2])
-	enc2.summon()
-	_eq(enc2.phase, EncounterState.Phase.AWAIT_ROLL, "back to the cup")
-	_check(not enc2.can(EncounterState.Verb.SELECT, 0), "no pick before the next roll")
+	_eq(enc.summons_left, 2, "two summons left unused (they pay in the spoils)")
 
 
 func test_preview_equals_summon() -> void:
@@ -144,6 +145,7 @@ func test_loaded_bone_and_gilded() -> void:
 	Fixtures.set_tray(enc, ["FIRE1", "FIRE1", "FIRE1", "ICE2+GILDED", "LEAF3+GILDED"])
 	Fixtures.pick(enc, [0, 1, 2])
 	enc.summon()
+	enc.attack()
 	_eq(enc.gilded, 2, "two gilded faces held at the end")
 
 

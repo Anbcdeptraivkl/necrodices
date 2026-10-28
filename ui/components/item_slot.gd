@@ -24,6 +24,11 @@ var icon: Texture2D:
 	set(v):
 		icon = v
 		queue_redraw()
+## Kind colour code of the item in the slot (transparent = empty / none).
+var ring := Color(0, 0, 0, 0):
+	set(v):
+		ring = v
+		queue_redraw()
 var hovered := false:
 	set(v):
 		hovered = v
@@ -42,6 +47,8 @@ func _ready() -> void:
 
 func _draw() -> void:
 	draw_texture(Art.ui("slot_selected" if selected else "slot"), Vector2.ZERO)
+	if ring.a > 0.0 and icon != null:
+		Art.draw_ring(self, Rect2(Vector2.ZERO, size), ring)
 	if hovered and not selected:
 		Art.draw_ring(self, Rect2(Vector2(1, 1), size - Vector2(2, 2)), Art.colour("N5"))
 	if icon != null:

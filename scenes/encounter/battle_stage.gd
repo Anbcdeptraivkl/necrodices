@@ -60,7 +60,7 @@ func setup(p_db: ContentDb, entry: Dictionary, hp: float) -> void:
 	_hp = hp
 	var rules: Array = entry["rules"]
 	var enraged := rules.has("ENRAGED")
-	_name.text = db.text("rule_name_enraged") + " " + db.enemies[_enemy_id]["name"] if enraged \
+	_name.text = db.boss_rules["ENRAGED"]["name"] + " " + db.enemies[_enemy_id]["name"] if enraged \
 		else db.enemies[_enemy_id]["name"]
 	_mat.set_shader_parameter(&"enraged", 1.0 if enraged else 0.0)
 	_mat.set_shader_parameter(&"dissolve", 0.0)

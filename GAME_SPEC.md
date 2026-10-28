@@ -33,7 +33,7 @@
 | D-07 | Per battle | **3 Summons**, **2 Rerolls** (shared). A summon = roll → pick → confirm one squad |
 | D-08 | Squad | Pick **3–5** dice in order; they form one **combo** (§4.3). Score = `floor(Power × Count)` |
 | D-09 | Order | Squad: combo base → scored dice left→right (points, rune) → held-dice runes → trinkets left→right |
-| D-10 | Battle end | When the army's damage (Σ squads, then RESOLVE trinkets) ≥ hunter HP the battle resolves at once (win); after the last summon it resolves anyway (win or lose) |
+| D-10 | Battle end | The player presses **ATTACK!** between summons (or when the summons run out): the army's damage (Σ squads, then RESOLVE trinkets) hits the hunter; ≥ HP wins. Every summon left unused pays $1 (D-G14) |
 | D-11 | Run | 8 Nights × (Mob, Champion, Boss) = 24 battles |
 | D-12 | Determinism | Seeded run; all randomness from named RNG streams (§10.1). The scorer has no RNG: luck is rolled before scoring |
 
@@ -79,9 +79,9 @@ for files and classes (DECISIONS D-G12). Players never see those words.
 NIGHT MAP → BATTLE ─win→ SPOILS → CRYPT MARKET → NIGHT MAP → … (Night 8 boss → VICTORY)
                    └lose→ GAME OVER
 
-BATTLE:  [ROLL] → PICK ⇄ REROLL → [SUMMON] → squad scores (playback)
-            ▲                                   │ army damage ≥ HP → RESOLVE (win)
-            └──────── summons left ─────────────┤ no summons left → RESOLVE (win / lose)
+BATTLE:  [ROLL] → PICK ⇄ REROLL → [SUMMON] → squad scores (playback) → between summons:
+            ▲                                                              │ [ATTACK!] → RESOLVE
+            └──────────────── [ROLL] while summons are left ───────────────┘ (win / lose; unused summons pay)
 ```
 
 ---
@@ -147,7 +147,7 @@ with Count (ART_SPEC §10).
 
 | Phase | Legal verbs | Notes |
 |---|---|---|
-| `AWAIT_ROLL` | ROLL, USE_CONSUMABLE | dice are in the cup |
+| `AWAIT_ROLL` | ROLL (summons left), ATTACK (≥ 1 squad), USE_CONSUMABLE | between summons: the two big actions |
 | `PICK` | SELECT, REROLL, SUMMON, USE_CONSUMABLE | |
 | `DONE` | — | resolved; `win` set |
 
@@ -158,8 +158,9 @@ with Count (ART_SPEC §10).
   shackles again.
 - **SUMMON**: `pick_min ≤ picked ≤ pick_max`. Luck is rolled (LUCK stream, §4.6), the squad
   is scored (§5), commit effects apply (SUMMON trinkets, counters, lucky money, glass
-  breaks), the squad joins the army, `summons_left − 1`. Then: army damage ≥ HP or no
-  summons left → **RESOLVE** → `DONE`; else → `AWAIT_ROLL`.
+  breaks), the squad joins the army, `summons_left − 1` → `AWAIT_ROLL`.
+- **ATTACK**: ≥ 1 squad, between summons. **RESOLVE** → `DONE`. Attacking with the army short
+  of the HP while summons are left asks for confirmation (it ends the run).
 - **USE_CONSUMABLE**: potions / gems mid-battle; faces showing update at once and the pick is
   re-read.
 - Projected numbers: the pick panel shows the squad preview (§5.4); the hunter panel shows the
@@ -407,7 +408,7 @@ Coffer, Spoils, Confirm, How to Play.
 | `equipment.json` | gear §6.8 |
 | `enemies.json` | §6.10–§6.11 |
 | `curve.json`, `economy.json` | §6.12, §6.13, rune values, market weights |
-| `strings_en.json` | every UI string |
+| `text/ui/*.json`, `text/content/*.json` | every word the player reads: UI strings per screen; names, effects and lore per id (designer-edited, `data/text/README.md`) |
 
 ### 9.1 Trinket DSL
 ```json

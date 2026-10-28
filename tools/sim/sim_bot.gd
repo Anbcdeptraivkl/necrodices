@@ -4,7 +4,8 @@ extends RefCounted
 ## commands the UI uses, so a bot result is evidence about the real rules (balance evidence
 ## only — never fun evidence).
 ## Battle: roll; while the best squad is weaker than a Trio and rerolls are left, keep the dice
-## of the most common element and reroll up to five others; summon the strongest preview.
+## of the most common element and reroll up to five others; summon the strongest preview;
+## attack as soon as the army beats the HP (or the summons run out).
 ## Market: best trinket, a die when affordable, gems for its most-used combo, coffers it can
 ## use at once, gear — keeping $5 from Night 2 for interest.
 
@@ -87,6 +88,11 @@ func play_encounter(enc: EncounterState) -> void:
 	var trio_rank := int(db.combos["TRIO"]["rank"])
 	while enc.phase != EncounterState.Phase.DONE:
 		if enc.phase == EncounterState.Phase.AWAIT_ROLL:
+			# Attack as soon as the army is enough (unused summons pay), or when out of summons.
+			if enc.can(EncounterState.Verb.ATTACK) and (enc.army_resolution().damage >= enc.hp
+					or not enc.can(EncounterState.Verb.ROLL)):
+				enc.attack()
+				return
 			enc.roll()
 		var best := best_pick(enc)
 		if enc.rerolls_left > 0 and _combo_rank(enc, best) < trio_rank:

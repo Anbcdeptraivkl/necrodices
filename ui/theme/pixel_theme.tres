@@ -1,4 +1,4 @@
-[gd_resource type="Theme" load_steps=38 format=3]
+[gd_resource type="Theme" load_steps=44 format=3]
 
 [ext_resource type="FontFile" path="res://assets/fonts/fusion_pixel/fusion_pixel_8px.otf" id="f8"]
 [ext_resource type="FontFile" path="res://assets/fonts/fusion_pixel/fusion_pixel_12px.otf" id="f12"]
@@ -10,6 +10,9 @@
 [ext_resource type="Texture2D" path="res://assets/ui/btn_secondary_disabled.png" id="sd"]
 [ext_resource type="Texture2D" path="res://assets/ui/btn_primary_hover.png" id="ph"]
 [ext_resource type="Texture2D" path="res://assets/ui/btn_secondary_hover.png" id="sh"]
+[ext_resource type="Texture2D" path="res://assets/ui/btn_danger_normal.png" id="dn"]
+[ext_resource type="Texture2D" path="res://assets/ui/btn_danger_pressed.png" id="dp"]
+[ext_resource type="Texture2D" path="res://assets/ui/btn_danger_hover.png" id="dh"]
 [ext_resource type="Texture2D" path="res://assets/ui/panel_dark.png" id="panel_dark"]
 [ext_resource type="Texture2D" path="res://assets/ui/panel_card.png" id="panel_card"]
 [ext_resource type="Texture2D" path="res://assets/ui/panel_tooltip.png" id="panel_tooltip"]
@@ -198,6 +201,39 @@ border_width_right = 1
 border_width_bottom = 1
 border_color = Color(0.156863, 0.113725, 0.231373, 1)
 
+[sub_resource type="StyleBoxTexture" id="d_normal"]
+texture = ExtResource("dn")
+texture_margin_left = 6.0
+texture_margin_top = 6.0
+texture_margin_right = 6.0
+texture_margin_bottom = 6.0
+content_margin_left = 3.0
+content_margin_top = 2.0
+content_margin_right = 3.0
+content_margin_bottom = 3.0
+
+[sub_resource type="StyleBoxTexture" id="d_pressed"]
+texture = ExtResource("dp")
+texture_margin_left = 6.0
+texture_margin_top = 6.0
+texture_margin_right = 6.0
+texture_margin_bottom = 6.0
+content_margin_left = 3.0
+content_margin_top = 3.0
+content_margin_right = 3.0
+content_margin_bottom = 2.0
+
+[sub_resource type="StyleBoxTexture" id="d_hover"]
+texture = ExtResource("dh")
+texture_margin_left = 6.0
+texture_margin_top = 6.0
+texture_margin_right = 6.0
+texture_margin_bottom = 6.0
+content_margin_left = 3.0
+content_margin_top = 1.0
+content_margin_right = 3.0
+content_margin_bottom = 4.0
+
 [resource]
 default_font = ExtResource("f8")
 default_font_size = 8
@@ -268,5 +304,23 @@ DimPanel/base_type = &"Panel"
 DimPanel/styles/panel = SubResource("dim")
 CurrentBorder/base_type = &"Panel"
 CurrentBorder/styles/panel = SubResource("current_border")
+DangerButton/base_type = &"Button"
+DangerButton/colors/font_color = Color(0.956863, 0.937255, 0.894118, 1)
+DangerButton/colors/font_hover_color = Color(0.956863, 0.937255, 0.894118, 1)
+DangerButton/colors/font_pressed_color = Color(0.956863, 0.937255, 0.894118, 1)
+DangerButton/colors/font_focus_color = Color(0.956863, 0.937255, 0.894118, 1)
+DangerButton/colors/font_hover_pressed_color = Color(0.956863, 0.937255, 0.894118, 1)
+DangerButton/colors/font_disabled_color = Color(0.341176, 0.270588, 0.466667, 1)
+DangerButton/fonts/font = ExtResource("f12")
+DangerButton/font_sizes/font_size = 12
+DangerButton/styles/normal = SubResource("d_normal")
+DangerButton/styles/hover = SubResource("d_hover")
+DangerButton/styles/pressed = SubResource("d_pressed")
+DangerButton/styles/hover_pressed = SubResource("d_pressed")
+DangerButton/styles/disabled = SubResource("p_disabled")
+DangerButton/styles/focus = SubResource("empty")
+BigButton/base_type = &"Button"
+BigButton/fonts/font = ExtResource("f12")
+BigButton/font_sizes/font_size = 12
 TrayPanel/base_type = &"PanelContainer"
 TrayPanel/styles/panel = SubResource("tray_box")

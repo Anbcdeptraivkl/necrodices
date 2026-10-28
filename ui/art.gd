@@ -37,6 +37,16 @@ static func colour(key: String) -> Color:
 	return PALETTE[key]
 
 
+## Colour code per item kind (D-R17): trinkets gold, potions purple, gems green, gear steel,
+## dice bone, coffers wood, runes lavender. Borders, tooltip kind lines and Codex use it.
+const KIND_COLOURS := {"RELIC": "G1", "POTION": "N6", "GEM": "L1", "GEAR": "M2", "DIE": "B2", "COFFER": "S1",
+	"RUNE": "I2"}
+
+
+static func kind_colour(kind: String) -> Color:
+	return PALETTE[KIND_COLOURS.get(kind, "N7")]
+
+
 static func element_colour(element: String, step: int = 1) -> Color:
 	return PALETTE["%s%d" % [ELEMENT_RAMP[element], step]]
 

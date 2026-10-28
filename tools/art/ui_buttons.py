@@ -1,5 +1,5 @@
-"""Button hover states (ART_SPEC §7): derived from the normal 9-slices on disk, so a
-hand-edited normal button carries its edits into hover.
+"""Derived button states (ART_SPEC §7): hover states and the danger (ATTACK!) button are recoloured
+from the normal 9-slices on disk, so a hand-edited normal button carries its edits into them.
 
     python tools/art/ui_buttons.py --only "btn_*_hover"   # rebuild after editing a normal button
 
@@ -22,6 +22,10 @@ UI = ROOT / "assets" / "ui"
 HOVER = {
     "btn_primary_hover": ("btn_primary_normal", {"F1": "F2", "F2": "V2"}),
     "btn_secondary_hover": ("btn_secondary_normal", {"N4": "N5", "N5": "N6"}),
+    # Danger (ATTACK!): the primary button in the blood ramp; hover lifts the highlight.
+    "btn_danger_normal": ("btn_primary_normal", {"F1": "R1", "F0": "R0", "F2": "S1"}),
+    "btn_danger_pressed": ("btn_primary_pressed", {"F1": "R1", "F0": "R0", "F2": "S1"}),
+    "btn_danger_hover": ("btn_primary_normal", {"F1": "R1", "F0": "R0", "F2": "N7"}),
 }
 
 

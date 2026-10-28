@@ -1,0 +1,12 @@
+{
+  "end_best": "Best damage: %s",
+  "end_encounter": "Fell to the %s",
+  "end_most": "Favourite: %s",
+  "end_night": "Night reached: %d / %d",
+  "end_seed": "Seed: %s",
+  "msg_defeat": "The village hunters win this night.",
+  "msg_victory": "The village falls silent.",
+  "title_defeated": "DEFEATED",
+  "title_game_over": "GAME OVER",
+  "title_victory": "VICTORY"
+}

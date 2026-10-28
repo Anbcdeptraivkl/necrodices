@@ -3,133 +3,107 @@
   "equipment": [
     {
       "id": "GRAVE_BELL",
-      "name": "Grave Bell",
       "price": 10,
       "requires": null,
       "effect": {
         "summons": 1
-      },
-      "text": "+1 Summon every battle"
+      }
     },
     {
       "id": "DEATH_KNELL",
-      "name": "Death Knell",
       "price": 10,
       "requires": "GRAVE_BELL",
       "effect": {
         "summons": 1
-      },
-      "text": "+1 Summon every battle"
+      }
     },
     {
       "id": "LOADED_CUP",
-      "name": "Loaded Cup",
       "price": 10,
       "requires": null,
       "effect": {
         "rerolls": 1
-      },
-      "text": "+1 Reroll every battle"
+      }
     },
     {
       "id": "SECOND_CUP",
-      "name": "Second Cup",
       "price": 10,
       "requires": "LOADED_CUP",
       "effect": {
         "rerolls": 1
-      },
-      "text": "+1 Reroll every battle"
+      }
     },
     {
       "id": "RELIQUARY",
-      "name": "Reliquary",
       "price": 10,
       "requires": null,
       "effect": {
         "relic_slots": 1
-      },
-      "text": "+1 Trinket slot"
+      }
     },
     {
       "id": "OSSUARY",
-      "name": "Ossuary",
       "price": 10,
       "requires": "RELIQUARY",
       "effect": {
         "relic_slots": 1
-      },
-      "text": "+1 Trinket slot"
+      }
     },
     {
       "id": "HAGGLER_LANTERN",
-      "name": "Haggler's Lantern",
       "price": 10,
       "requires": null,
       "effect": {
         "shop_reroll_discount": 2
-      },
-      "text": "Market rerolls cost $2 less"
+      }
     },
     {
       "id": "BLACK_MARKET",
-      "name": "Black Market",
       "price": 10,
       "requires": "HAGGLER_LANTERN",
       "effect": {
         "shop_reroll_discount": 2
-      },
-      "text": "Market rerolls cost $2 less"
+      }
     },
     {
       "id": "OVERSTOCK",
-      "name": "Overstock",
       "price": 10,
       "requires": null,
       "effect": {
         "shop_card_slots": 1
-      },
-      "text": "+1 card in the Market"
+      }
     },
     {
       "id": "OVERFLOWING_CRYPT",
-      "name": "Overflowing Crypt",
       "price": 10,
       "requires": "OVERSTOCK",
       "effect": {
         "shop_card_slots": 1
-      },
-      "text": "+1 card in the Market"
+      }
     },
     {
       "id": "GRAVE_GOODS",
-      "name": "Grave Goods",
       "price": 10,
       "requires": null,
       "effect": {
         "interest_cap": 5
-      },
-      "text": "Interest cap +$5"
+      }
     },
     {
       "id": "DRAGON_HOARD",
-      "name": "Dragon's Hoard",
       "price": 10,
       "requires": "GRAVE_GOODS",
       "effect": {
         "interest_cap": 5
-      },
-      "text": "Interest cap +$5"
+      }
     },
     {
       "id": "POCKET_CRYPT",
-      "name": "Pocket Crypt",
       "price": 10,
       "requires": null,
       "effect": {
         "consumable_slots": 1
-      },
-      "text": "+1 Potion / Gem slot"
+      }
     }
   ]
 }

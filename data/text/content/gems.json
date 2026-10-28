@@ -1,0 +1,42 @@
+{
+  "OPAL": {
+    "name": "Opal",
+    "effect": "+1 level to Rabble",
+    "lore": "Milky, humble, makes a Rabble feel important."
+  },
+  "GARNET": {
+    "name": "Garnet",
+    "effect": "+1 level to Duo Pact",
+    "lore": "Two pairs of red facets. Couples love it."
+  },
+  "AMBER": {
+    "name": "Amber",
+    "effect": "+1 level to Trio",
+    "lore": "Holds a tiny skeleton inside. Very old. Very motivated."
+  },
+  "PRISM": {
+    "name": "Prism",
+    "effect": "+1 level to Rainbow",
+    "lore": "Splits light into every element at once."
+  },
+  "MOONSTONE": {
+    "name": "Moonstone",
+    "effect": "+1 level to Full Moon",
+    "lore": "Glows brighter under a full moon, naturally."
+  },
+  "OBSIDIAN": {
+    "name": "Obsidian",
+    "effect": "+1 level to Ritual",
+    "lore": "Black glass from a ritual fire."
+  },
+  "EMERALD": {
+    "name": "Emerald",
+    "effect": "+1 level to Quartet",
+    "lore": "Four perfect facets for four perfect dice."
+  },
+  "BLOODSTONE": {
+    "name": "Bloodstone",
+    "effect": "+1 level to Quintet",
+    "lore": "Pulses like a heartbeat. Not yours."
+  }
+}

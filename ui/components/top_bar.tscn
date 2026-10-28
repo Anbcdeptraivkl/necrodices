@@ -19,11 +19,13 @@ layout_mode = 1
 anchors_preset = 4
 anchor_top = 0.5
 anchor_bottom = 0.5
-offset_top = -5.0
+offset_top = -10.0
 offset_right = 110.0
-offset_bottom = 4.0
+offset_bottom = 10.0
 grow_vertical = 2
-text = "NIGHT 1"
+text = "NIGHT 1
+MOB"
+vertical_alignment = 1
 clip_text = true
 
 [node name="Items" type="HBoxContainer" parent="Row"]

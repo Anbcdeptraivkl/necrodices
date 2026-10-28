@@ -108,7 +108,7 @@ func _new_run(seed: String, hp_mult: float) -> void:
 ## Presses ROLL, skips the roll playback, picks the first `n` free dice through the die views.
 func _roll_and_pick(screen: Node, n: int) -> void:
 	var enc: EncounterState = _game.encounter
-	(screen.get_node("%Main") as Button).pressed.emit()
+	(screen.get_node("%Roll") as Button).pressed.emit()
 	await _frames(1)
 	(screen.get_node("%Queue") as PresentationQueue).skip_all()
 	await _frames(2)
@@ -134,9 +134,15 @@ func _win_loop() -> void:
 	_check(enc.phase == EncounterState.Phase.PICK, "rolled through the ROLL button")
 	_check(enc.picked.size() == 3, "three dice picked through the die views")
 	_check((screen.get_node("%PickSlots") as Node).get_child(2).modulate.a == 1.0, "pick tray shows the third die")
-	(screen.get_node("%Main") as Button).pressed.emit()
+	(screen.get_node("%Summon") as Button).pressed.emit()
+	await _frames(1)
+	(screen.get_node("%Queue") as PresentationQueue).skip_all()
 	await _frames(2)
-	_check(enc.phase == EncounterState.Phase.DONE and enc.win, "battle won by the first squad")
+	_check(enc.phase == EncounterState.Phase.AWAIT_ROLL, "the squad joins; the battle waits")
+	_check((screen.get_node("%Attack") as Button).is_visible_in_tree(), "ATTACK! shown between summons")
+	(screen.get_node("%Attack") as Button).pressed.emit()
+	await _frames(2)
+	_check(enc.phase == EncounterState.Phase.DONE and enc.win, "battle won by attacking early")
 	_check(_game.run.phase == RunState.Phase.SHOP, "run moved to SHOP at once")
 	(screen.get_node("%Queue") as PresentationQueue).skip_all()
 	await _frames(3)
@@ -173,6 +179,7 @@ func _continue_restores_shop() -> void:
 		if enc.picked.size() < 3 and i != enc.shackled:
 			enc.toggle_select(i)
 	enc.summon()
+	enc.attack()
 	_game.finish_encounter()
 	var saved := JSON.stringify(JsonUtil.narrow(_game.run.to_dict()), "", true)
 	_game.run = null
@@ -189,10 +196,15 @@ func _loss() -> void:
 	var screen := _scene()
 	for t in 3:
 		await _roll_and_pick(screen, 3)
-		(screen.get_node("%Main") as Button).pressed.emit()
+		(screen.get_node("%Summon") as Button).pressed.emit()
 		await _frames(1)
 		(screen.get_node("%Queue") as PresentationQueue).skip_all()
 		await _frames(2)
+	_check(not (screen.get_node("%Roll") as Button).visible, "no ROLL without summons")
+	(screen.get_node("%Attack") as Button).pressed.emit()
+	await _frames(1)
+	(screen.get_node("%Queue") as PresentationQueue).skip_all()
+	await _frames(2)
 	_check(_game.encounter.phase == EncounterState.Phase.DONE and not _game.encounter.win, "lost the battle")
 	_check(_game.run.phase == RunState.Phase.GAME_OVER, "run over")
 	_check(not _game.store.has_run(), "run save deleted")

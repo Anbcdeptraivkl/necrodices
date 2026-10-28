@@ -1,0 +1,50 @@
+{
+  "COFFER_POTION": {
+    "name": "Potion Coffer",
+    "lore": "Rattles with glass."
+  },
+  "COFFER_POTION_JUMBO": {
+    "name": "Jumbo Potion Coffer",
+    "lore": "Rattles with glass."
+  },
+  "COFFER_POTION_MEGA": {
+    "name": "Mega Potion Coffer",
+    "lore": "Rattles with glass."
+  },
+  "COFFER_GEM": {
+    "name": "Gem Coffer",
+    "lore": "Something glitters inside."
+  },
+  "COFFER_GEM_JUMBO": {
+    "name": "Jumbo Gem Coffer",
+    "lore": "Something glitters inside."
+  },
+  "COFFER_GEM_MEGA": {
+    "name": "Mega Gem Coffer",
+    "lore": "Something glitters inside."
+  },
+  "COFFER_TRINKET": {
+    "name": "Trinket Coffer",
+    "lore": "Heavy with curios."
+  },
+  "COFFER_TRINKET_JUMBO": {
+    "name": "Jumbo Trinket Coffer",
+    "lore": "Heavy with curios."
+  },
+  "COFFER_TRINKET_MEGA": {
+    "name": "Mega Trinket Coffer",
+    "lore": "Heavy with curios."
+  },
+  "COFFER_BONE": {
+    "name": "Bone Coffer",
+    "lore": "Full of dice and something that rolls on its own."
+  },
+  "COFFER_BONE_JUMBO": {
+    "name": "Jumbo Bone Coffer",
+    "lore": "Full of dice and something that rolls on its own."
+  },
+  "COFFER_BONE_MEGA": {
+    "name": "Mega Bone Coffer",
+    "lore": "Full of dice and something that rolls on its own."
+  }
+}

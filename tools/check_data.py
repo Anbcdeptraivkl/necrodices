@@ -57,7 +57,12 @@ ECONOMY_INTS = ["start_money", "start_dice", "max_dice", "pick_min", "pick_max",
                 "shop_coffer_slots", "shop_reroll_base", "shop_reroll_step", "sell_relic_divisor", "sell_consumable",
                 "die_price", "die_rune_price", "former_bone_points", "max_points"]
 FILES = ["elements", "combos", "units", "relics", "consumables", "coffers", "equipment", "enemies", "curve",
-         "economy", "strings_en"]
+         "economy"]
+UI_TEXT = ["common", "battle", "market", "spoils", "tooltips", "codex", "tutorial", "settings", "end_screen"]
+# content text file -> (data table, fields every entry needs)
+CONTENT_TEXT = {"units": ("units", {"name", "lore"}), "combos": ("combos", {"name", "pattern", "lore"}),
+                "trinkets": ("relics", {"name", "effect", "lore"}), "gear": ("equipment", {"name", "effect", "lore"}),
+                "coffers": ("coffers", {"name", "lore"})}
 
 problems: list[str] = []
 
@@ -174,8 +179,6 @@ def check_relics(d) -> None:
                 if e.get("op") == "ensure_face" and e.get("element") not in ELEMENTS:
                     err(f"{where}: ensure_face element")
                 check_value(where, e.get("value"))
-        if not r.get("text"):
-            err(f"{where}: text")
 
 
 def check_consumables(d) -> None:
@@ -270,6 +273,53 @@ def check_economy(d) -> None:
         err("economy: die_rune_weights")
 
 
+def check_text(data) -> None:
+    """data/text: flat UI string files (no key twice) and content text covering every id."""
+    text = os.path.join(DATA, "text")
+    seen: set[str] = set()
+    for name in UI_TEXT:
+        path = os.path.join(text, "ui", f"{name}.json")
+        try:
+            d = json.load(open(path, encoding="utf-8"))
+        except (OSError, json.JSONDecodeError) as e:
+            err(f"text/ui/{name}.json: {e}")
+            continue
+        for k, v in d.items():
+            if not isinstance(v, str):
+                err(f"text/ui/{name}.json: {k} is not a string")
+            if k in seen:
+                err(f"text/ui: key {k} in two files")
+            seen.add(k)
+
+    def content(name):
+        try:
+            return json.load(open(os.path.join(text, "content", f"{name}.json"), encoding="utf-8"))
+        except (OSError, json.JSONDecodeError) as e:
+            err(f"text/content/{name}.json: {e}")
+            return {}
+
+    def cover(what, entries, ids, fields):
+        for i in ids:
+            if i not in entries:
+                err(f"text/content/{what}: no entry for {i}")
+            elif fields - set(entries[i]):
+                err(f"text/content/{what}: {i} misses {sorted(fields - set(entries[i]))}")
+        for i in entries:
+            if i not in ids:
+                err(f"text/content/{what}: unknown id {i}")
+
+    for name, (table, fields) in CONTENT_TEXT.items():
+        rows = data[table][table if table != "relics" else "relics"]
+        cover(name, content(name), [r["id"] for r in rows], fields)
+    cons = data["consumables"]["consumables"]
+    for name, kind in (("potions", "POTION"), ("gems", "GEM")):
+        cover(name, content(name), [c["id"] for c in cons if c["kind"] == kind], {"name", "effect", "lore"})
+    h = content("hunters")
+    cover("hunters", h.get("hunters", {}), [e["id"] for e in data["enemies"]["enemies"]], {"name", "lore"})
+    cover("hunters (rules)", h.get("rules", {}), [r["id"] for r in data["enemies"]["boss_rules"]], {"name", "short", "effect"})
+    cover("runes", content("runes"), sorted(RUNES), {"name", "effect", "lore"})
+
+
 def main() -> int:
     data = {n: load(n) for n in FILES}
     if any(v is None for v in data.values()):
@@ -277,7 +327,7 @@ def main() -> int:
             print("PROBLEM:", p)
         return 1
     for n, d in data.items():
-        if n != "strings_en" and d.get("version") != 2:
+        if d.get("version") != 2:
             err(f"{n}.json: version must be 2")
     unit_ids = check_units(data["units"])
     check_combos(data["combos"], unit_ids)
@@ -288,8 +338,7 @@ def main() -> int:
     check_enemies(data["enemies"])
     check_curve(data["curve"])
     check_economy(data["economy"])
-    if not all(isinstance(v, str) for v in data["strings_en"].values()):
-        err("strings_en: must be a flat key -> string map")
+    check_text(data)
     if problems:
         for p in problems:
             print("PROBLEM:", p)

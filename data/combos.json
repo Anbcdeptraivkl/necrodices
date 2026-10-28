@@ -3,83 +3,67 @@
   "combos": [
     {
       "id": "RABBLE",
-      "name": "Rabble",
       "rank": 1,
       "base_p": 10,
       "base_c": 1,
       "lvl_p": 10,
-      "lvl_c": 1,
-      "text": "3+ dice, no pattern: only the highest die scores"
+      "lvl_c": 1
     },
     {
       "id": "DUO_PACT",
-      "name": "Duo Pact",
       "rank": 2,
       "base_p": 20,
       "base_c": 2,
       "lvl_p": 20,
-      "lvl_c": 1,
-      "text": "2 of one element + 2 of another"
+      "lvl_c": 1
     },
     {
       "id": "TRIO",
-      "name": "Trio",
       "rank": 3,
       "base_p": 30,
       "base_c": 3,
       "lvl_p": 20,
-      "lvl_c": 2,
-      "text": "3 of one element"
+      "lvl_c": 2
     },
     {
       "id": "RAINBOW",
-      "name": "Rainbow",
       "rank": 4,
       "base_p": 35,
       "base_c": 4,
       "lvl_p": 30,
-      "lvl_c": 3,
-      "text": "5 different elements"
+      "lvl_c": 3
     },
     {
       "id": "FULL_MOON",
-      "name": "Full Moon",
       "rank": 5,
       "base_p": 40,
       "base_c": 4,
       "lvl_p": 25,
-      "lvl_c": 2,
-      "text": "3 of one element + 2 of another"
+      "lvl_c": 2
     },
     {
       "id": "RITUAL",
-      "name": "Ritual",
       "rank": 6,
       "base_p": 50,
       "base_c": 5,
       "lvl_p": 30,
-      "lvl_c": 3,
-      "text": "a ritual's 3 elements with its core twice"
+      "lvl_c": 3
     },
     {
       "id": "QUARTET",
-      "name": "Quartet",
       "rank": 7,
       "base_p": 60,
       "base_c": 7,
       "lvl_p": 30,
-      "lvl_c": 3,
-      "text": "4 of one element"
+      "lvl_c": 3
     },
     {
       "id": "QUINTET",
-      "name": "Quintet",
       "rank": 8,
       "base_p": 120,
       "base_c": 12,
       "lvl_p": 35,
-      "lvl_c": 3,
-      "text": "5 of one element"
+      "lvl_c": 3
     }
   ],
   "rituals": [

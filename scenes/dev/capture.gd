@@ -22,15 +22,18 @@ const PRESETS := {
 		"relics": ["BONE_PILE", "BLOOD_MOON", "TACTICIAN_SKULL", "WISP_JAR", "GRAVEDIGGER_LAMP"], "dice": 8, "wait": 6.0},
 	"horde": {"screen": "encounter", "seed": "CAPTURE4", "squads": 3, "levels": 6, "dice": 8, "runes": true, "pick": true,
 		"relics": ["MOSS_CHARM", "CROWN_OF_THE_LICH", "GRAVEDIGGER_LAMP", "SPIRIT_BOARD", "TRIO_TOTEM"], "wait": 9.0},
-	"result": {"screen": "encounter", "seed": "CAPTURE5", "squads": 1, "dice": 6, "hp": 0.01, "wait": 6.0,
+	"result": {"screen": "encounter", "seed": "CAPTURE5", "squads": 1, "dice": 6, "hp": 0.01, "wait": 6.0, "attack": true,
 		"relics": ["EMBER_JAR", "TRIO_TOTEM"]},
-	"charge": {"screen": "encounter", "seed": "CAPTURE5", "squads": 1, "dice": 6, "hp": 0.01, "wait": 2.75,
+	"charge": {"screen": "encounter", "seed": "CAPTURE5", "squads": 1, "dice": 6, "hp": 0.01, "wait": 2.75, "attack": true,
 		"relics": ["EMBER_JAR", "TRIO_TOTEM"]},
 	"shop": {"screen": "shop", "seed": "CAPTURE5", "relics": ["RATTLE_DRUM", "OVERGROWTH"], "money": 23,
 		"consumables": ["IRON_DRAUGHT"], "dice": 7, "runes": true, "gear": ["GRAVE_BELL", "LOADED_CUP"]},
-	"shop_tip": {"screen": "shop", "seed": "CAPTURE5", "money": 23, "hover": "ShopCard", "wait": 0.8},
+	"shop_tip": {"screen": "shop", "seed": "CAPTURE5", "money": 23, "hover": "Gear", "wait": 0.8},
 	"shop_coffer": {"screen": "shop", "seed": "CAPTURE7", "money": 23, "coffer": "COFFER_POTION_JUMBO"},
 	"codex": {"screen": "night_map", "seed": "CAPTURE1", "overlay": "run_info", "levels": 2},
+	"codex_units": {"screen": "night_map", "seed": "CAPTURE1", "overlay": "run_info", "page": "units"},
+	"codex_trinkets": {"screen": "night_map", "seed": "CAPTURE1", "overlay": "run_info", "page": "trinkets"},
+	"codex_runes": {"screen": "night_map", "seed": "CAPTURE1", "overlay": "run_info", "page": "runes"},
 	"end": {"screen": "end", "seed": "CAPTURE6"},
 }
 
@@ -119,6 +122,8 @@ func _build(game: Node, db: ContentDb, p: Dictionary) -> void:
 				var o: Control = (load("res://scenes/overlays/%s.tscn" % p["overlay"]) as PackedScene).instantiate()
 				host.push(o)
 				o.call(&"setup", db, run)
+				if p.has("page"):
+					o.call(&"show_page", p["page"])
 		"shop":
 			run.shop = ShopState.open(db, run)
 			run.phase = RunState.Phase.SHOP
@@ -151,4 +156,6 @@ func _play(enc: EncounterState, screen: Node, bot: SimBot, p: Dictionary) -> voi
 			return
 		screen.call(&"_on_summon")
 	if p.get("roll", false):
-		screen.call(&"_on_main")
+		screen.call(&"_on_roll")
+	if p.get("attack", false):
+		screen.call(&"_do_attack")

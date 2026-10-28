@@ -1,6 +1,8 @@
 extends Control
 ## Battle screen (GAME_SPEC §4.5, ART_SPEC §6.2): wires the player's input to EncounterState
 ## commands and shows its state. Buttons only reflect `can()`; the commands re-check.
+## Between summons ROLL and ATTACK! sit big in the middle of the stage; while picking, REROLL
+## and SUMMON are the large buttons in the right column.
 ## Every command resolves the model at once; the BattleStage then plays it back (roll → each
 ## summon's trace → the resolve) through the presentation queue. Tapping skips; while the queue
 ## plays, input other than skip is off.
@@ -12,6 +14,7 @@ const SPOILS_SCENE := "res://scenes/overlays/spoils.tscn"
 const INSPECTOR_SCENE := "res://scenes/overlays/dice_inspector.tscn"
 const RUN_INFO_SCENE := "res://scenes/overlays/run_info.tscn"
 const SETTINGS_SCENE := "res://scenes/overlays/settings.tscn"
+const CONFIRM_SCENE := "res://scenes/overlays/confirm.tscn"
 
 var db: ContentDb
 var run: RunState
@@ -22,11 +25,12 @@ var _pips: Array[Control] = []
 var _spoils: Array[Dictionary] = []
 var _refresh_queued := false
 var _shown_squads := 0     # squads whose playback has finished (chips shown)
+var _attack_ready := false  # the army beats the HP: ATTACK! breathes
 @onready var _top: TopBar = %TopBar
 @onready var _stage: BattleStage = %Stage
 @onready var _score: ScorePanel = %ScorePanel
 @onready var _tray: HBoxContainer = %Tray
-@onready var _chips: VBoxContainer = %Chips
+@onready var _chips: GridContainer = %Chips
 @onready var _overlays: OverlayHost = %Overlays
 @onready var _queue: PresentationQueue = %Queue
 @onready var _skip: Control = %SkipCatcher
@@ -63,7 +67,7 @@ func _build_static() -> void:
 	%RuleTitle.text = db.text("role_" + role.to_lower())
 	var names: PackedStringArray = []
 	for r: String in NightGen.active_rules(enc.entry):
-		names.append(db.text("rule_short_" + r.to_lower()))
+		names.append(db.boss_rules[r]["short"])
 	%RuleText.text = "\n".join(names) if not names.is_empty() else db.text("rule_none")
 	%RuleText.theme_type_variation = &"RuleLabel" if not names.is_empty() else &"MutedLabel"
 	%Bounty.text = db.text("lbl_bounty") % Economy.bounty(db, run, role)
@@ -94,19 +98,29 @@ func _build_static() -> void:
 	%GearTitle.text = db.text("lbl_equipment_short")
 	%DiceTitle.text = db.text("lbl_dice")
 	Loadout.fill_gear(%Gear, db, run)
-	%Dice.set_meta(&"tip", db.text("tip_dice_row"))
+	%Dice.set_meta(&"tip", db.text("tip_dice"))
 	%Dice.gui_input.connect(func(e: InputEvent) -> void:
 		if e is InputEventMouseButton and e.pressed and not _queue.is_busy():
 			_open(INSPECTOR_SCENE).call(&"setup", db, run, ""))
 	%Reroll.text = db.text("btn_reroll")
+	%Summon.text = db.text("btn_summon")
+	%Roll.text = db.text("btn_roll")
+	%Attack.text = db.text("btn_attack")
+	%Roll.icon = Art.frame("res://assets/sprites/dice/die_roll.png", 20, 1)
+	%Attack.icon = Art.vfx("slash", 16, 1)
 	%Header.text = db.text("lbl_squads")
+	%PickHeader.text = db.text("lbl_pick_header")
 	%ArmyCaption.text = db.text("lbl_army")
 	%Reroll.set_meta(&"tip", db.text("tip_reroll"))
+	%Roll.set_meta(&"tip", db.text("tip_roll"))
+	%Attack.set_meta(&"tip", db.text("tip_attack"))
 
 
 func _connect_input() -> void:
 	%Reroll.pressed.connect(_on_reroll)
-	%Main.pressed.connect(_on_main)
+	%Summon.pressed.connect(_on_summon_pressed)
+	%Roll.pressed.connect(_on_roll)
+	%Attack.pressed.connect(_on_attack)
 	_top.codex_pressed.connect(func() -> void: _open(RUN_INFO_SCENE).call(&"setup", db, run))
 	_top.settings_pressed.connect(func() -> void: _open(SETTINGS_SCENE))
 	_top.dice_pressed.connect(func() -> void:
@@ -145,9 +159,12 @@ func _refresh() -> void:
 	(%Summons.get_node("Label") as Label).text = db.text("lbl_summons") % enc.summons_left
 	(%Rerolls.get_node("Label") as Label).text = db.text("lbl_rerolls") % enc.rerolls_left
 	%Reroll.disabled = busy or not enc.can(EncounterState.Verb.REROLL)
-	var rolling := enc.phase == EncounterState.Phase.AWAIT_ROLL
-	%Main.text = db.text("btn_roll") if rolling else db.text("btn_summon")
-	%Main.disabled = busy or not (enc.can(EncounterState.Verb.ROLL) or enc.can(EncounterState.Verb.SUMMON))
+	%Summon.disabled = busy or not enc.can(EncounterState.Verb.SUMMON)
+	# Between summons the two big actions sit in the middle of the stage: ROLL and ATTACK!.
+	%CenterActions.visible = not busy and enc.phase == EncounterState.Phase.AWAIT_ROLL
+	%Roll.visible = enc.can(EncounterState.Verb.ROLL)
+	%Attack.visible = enc.can(EncounterState.Verb.ATTACK)
+	_attack_ready = %Attack.visible and enc.army_resolution().damage >= enc.hp
 	if not busy:
 		_stage.show_army(enc.squads)
 		var army := enc.army_resolution().damage if not enc.squads.is_empty() else 0.0
@@ -178,7 +195,7 @@ func _refresh_pick(busy: bool) -> void:
 		%PickPreview.text = "%s × %s = %s" % [Settings.fmt(r.power), Settings.fmt(r.count), Settings.fmt(r.strength)]
 		_score.show_squad(r.power, r.count)
 	else:
-		%PickTitle.text = db.text("lbl_pick_hint") % [int(db.economy["pick_min"]), int(db.economy["pick_max"])]
+		%PickTitle.text = ""
 		%PickPreview.text = ""
 		_score.show_squad(0.0, 0.0)
 
@@ -216,14 +233,49 @@ func _refresh_pips() -> void:
 
 # --- input ------------------------------------------------------------------------------
 
-func _on_main() -> void:
-	if _queue.is_busy():
+func _on_roll() -> void:
+	if _queue.is_busy() or not enc.roll():
+		Audio.play("error")
+
+
+func _on_summon_pressed() -> void:
+	if not _queue.is_busy():
+		_on_summon()
+
+
+## ATTACK!: with the army short of the HP and summons left, ask first (it ends the run).
+func _on_attack() -> void:
+	if _queue.is_busy() or not enc.can(EncounterState.Verb.ATTACK):
 		return
-	if enc.phase == EncounterState.Phase.AWAIT_ROLL:
-		if not enc.roll():
-			Audio.play("error")
+	var army := enc.army_resolution().damage
+	if army >= enc.hp or enc.summons_left == 0:
+		_do_attack()
 		return
-	_on_summon()
+	var c := _open(CONFIRM_SCENE)
+	c.call(&"setup", db.text("msg_confirm_attack") % [Settings.fmt(army), Settings.fmt(enc.hp)],
+		db.text("btn_attack"), db.text("btn_cancel"))
+	c.connect(&"closed", func(result: Variant) -> void:
+		if result == true:
+			_do_attack())
+
+
+func _do_attack() -> void:
+	if not enc.attack():
+		return
+	Audio.play("slam")
+	_spoils = Game.finish_encounter()
+	for s in BattlePlayer.resolve(_stage, enc.resolution, enc.hp, enc.win, Settings.speed()):
+		_queue.push(s)
+	_queue_refresh()
+
+
+## The ATTACK! button breathes once the army beats the HP (pixel-safe: modulate only).
+func _process(_delta: float) -> void:
+	if _attack_ready and %Attack.visible:
+		var t := Time.get_ticks_msec() / 1000.0
+		%Attack.modulate = Color.WHITE.lerp(Art.colour("G1"), 0.35 + 0.35 * sin(t * 6.0))
+	elif %Attack.modulate != Color.WHITE:
+		%Attack.modulate = Color.WHITE
 
 
 func _on_die_pressed(i: int) -> void:
@@ -259,10 +311,6 @@ func _on_summon() -> void:
 	var speed := Settings.speed()
 	for s in BattlePlayer.summon(_stage, gi, enc.squads[gi], army_before, speed):
 		_queue.push(s)
-	if enc.phase == EncounterState.Phase.DONE:
-		_spoils = Game.finish_encounter()
-		for s in BattlePlayer.resolve(_stage, enc.resolution, enc.hp, enc.win, speed):
-			_queue.push(s)
 	_queue_refresh()
 
 

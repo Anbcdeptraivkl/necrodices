@@ -1,7 +1,7 @@
 class_name FaceTile
 extends Control
 ## One die face in the Dice Inspector / dice strips (ART_SPEC §4.6, 16×16): the face tile in
-## its rune's material, glyph8 at (2, 2), points digit bottom-right, G1 ring when selected
+## its rune's material, glyph8 centred, points digit bottom-right, G1 ring when selected
 ## (with the pick order for ordered potions). Custom-drawn, no theme.
 
 signal pressed(die: int, face: int)
@@ -44,9 +44,10 @@ func _draw() -> void:
 	draw_texture(Art.face_tile(face), Vector2.ZERO)
 	if face == null:
 		return
+	# glyph8 centred on the 16×16 tile; nudged up-left by 1 px when the points digit shares it.
 	var g := Art.face_glyph(face, true)
 	if g != null:
-		draw_texture(g, Vector2(2, 2))
+		draw_texture(g, Vector2(3, 3) if show_points and not face.is_tomb() else Vector2(4, 4))
 	if show_points and not face.is_tomb() and _font != null:
 		draw_string_outline(_font, Vector2(10, 15), str(face.points), HORIZONTAL_ALIGNMENT_LEFT, -1, 8, 2,
 			Art.colour("N0"))

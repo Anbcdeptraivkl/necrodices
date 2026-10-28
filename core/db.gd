@@ -4,9 +4,24 @@ extends RefCounted
 ## dictionaries keyed by id, plus the lookup tables the rules need (units by kind and element,
 ## combos in rank order, rituals). Unknown or inconsistent data is reported in `errors` and
 ## fails the boot — never skipped silently.
+## Player-facing text lives apart from the rules, in res://data/text (designer-edited):
+## `ui/*.json` = flat key -> string per screen, merged into `strings`; `content/*.json` = names,
+## effects and lore per id, merged into the rows (`name`, `text`, `lore`, `short`).
 
 const FILES := ["elements", "combos", "units", "relics", "consumables", "coffers", "equipment",
-	"enemies", "curve", "economy", "strings_en"]
+	"enemies", "curve", "economy"]
+const UI_TEXT := ["common", "battle", "market", "spoils", "tooltips", "codex", "tutorial", "settings",
+	"end_screen"]
+## content text file -> [db table, {text field -> row field}]
+const CONTENT_TEXT := {
+	"units": ["units", {"name": "name", "lore": "lore"}],
+	"combos": ["combos", {"name": "name", "pattern": "text", "lore": "lore"}],
+	"trinkets": ["relics", {"name": "name", "effect": "text", "lore": "lore"}],
+	"potions": ["consumables", {"name": "name", "effect": "text", "lore": "lore"}],
+	"gems": ["consumables", {"name": "name", "effect": "text", "lore": "lore"}],
+	"gear": ["equipment", {"name": "name", "effect": "text", "lore": "lore"}],
+	"coffers": ["coffers", {"name": "name", "lore": "lore"}],
+}
 const ELEMENTS: PackedStringArray = ["BONE", "FIRE", "ICE", "LEAF", "VOLT", "METAL"]
 
 var raw := {}          # file name -> parsed JSON
@@ -27,6 +42,8 @@ var boss_rules := {}
 var economy := {}
 var curve := {}
 var strings := {}
+## Rune id -> {name, effect, lore} (runes are rules in economy.json; their words live here).
+var runes := {}
 var errors: PackedStringArray = []
 
 
@@ -53,7 +70,7 @@ func load_all(dir: String = "res://data") -> bool:
 	boss_rules = _index(raw["enemies"]["boss_rules"], "boss_rules")
 	economy = raw["economy"]
 	curve = raw["curve"]
-	strings = raw["strings_en"]
+	_load_text(dir.path_join("text"))
 	errors.append_array(RulesRegistry.validate(self))
 	return errors.is_empty()
 
@@ -95,6 +112,46 @@ func text(key: String) -> String:
 		push_error("missing string key %s" % key)
 		return key
 	return strings[key]
+
+
+func _load_text(dir: String) -> void:
+	strings = {}
+	for name: String in UI_TEXT:
+		var d: Variant = JsonUtil.load_file(dir.path_join("ui/%s.json" % name), errors)
+		if d is Dictionary:
+			for key: String in d:
+				if strings.has(key):
+					errors.append("text: key %s in two ui files" % key)
+				strings[key] = d[key]
+	for name: String in CONTENT_TEXT:
+		var spec: Array = CONTENT_TEXT[name]
+		_merge_text(dir.path_join("content/%s.json" % name), get(spec[0]), spec[1])
+	var h: Variant = JsonUtil.load_file(dir.path_join("content/hunters.json"), errors)
+	if h is Dictionary:
+		_merge(h["hunters"], enemies, {"name": "name", "lore": "lore"}, "hunters")
+		_merge(h["rules"], boss_rules, {"name": "name", "short": "short", "effect": "text"}, "rules")
+	var r: Variant = JsonUtil.load_file(dir.path_join("content/runes.json"), errors)
+	runes = r if r is Dictionary else {}
+	for table: String in ["units", "combos", "relics", "consumables", "equipment", "coffers", "enemies"]:
+		for id: String in get(table):
+			if not (get(table)[id] as Dictionary).has("name"):
+				errors.append("text: %s %s has no name" % [table, id])
+
+
+func _merge_text(path: String, table: Dictionary, fields: Dictionary) -> void:
+	var d: Variant = JsonUtil.load_file(path, errors)
+	if d is Dictionary:
+		_merge(d, table, fields, path.get_file())
+
+
+func _merge(entries: Dictionary, table: Dictionary, fields: Dictionary, what: String) -> void:
+	for id: String in entries:
+		if not table.has(id):
+			errors.append("text %s: unknown id %s" % [what, id])
+			continue
+		for f: String in fields:
+			if entries[id].has(f):
+				table[id][fields[f]] = entries[id][f]
 
 
 func _index(rows: Array, what: String) -> Dictionary:

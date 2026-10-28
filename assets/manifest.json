@@ -1,7 +1,7 @@
 {
  "generated_by": "tools/build_manifest.py",
  "spec": "ART_SPEC \u00a711",
- "count": 233,
+ "count": 236,
  "files": [
   {
    "id": "skeleton_warrior",
@@ -2613,6 +2613,48 @@
    "category": "ui",
    "flags": [],
    "tag": "BSH",
+   "ramp": null,
+   "accent": null,
+   "margin": 6
+  },
+  {
+   "id": "btn_danger_normal",
+   "path": "assets/ui/btn_danger_normal.png",
+   "w": 24,
+   "h": 24,
+   "frame_w": 24,
+   "frames": 1,
+   "category": "ui",
+   "flags": [],
+   "tag": "BDN",
+   "ramp": null,
+   "accent": null,
+   "margin": 6
+  },
+  {
+   "id": "btn_danger_pressed",
+   "path": "assets/ui/btn_danger_pressed.png",
+   "w": 24,
+   "h": 24,
+   "frame_w": 24,
+   "frames": 1,
+   "category": "ui",
+   "flags": [],
+   "tag": "BDP",
+   "ramp": null,
+   "accent": null,
+   "margin": 6
+  },
+  {
+   "id": "btn_danger_hover",
+   "path": "assets/ui/btn_danger_hover.png",
+   "w": 24,
+   "h": 24,
+   "frame_w": 24,
+   "frames": 1,
+   "category": "ui",
+   "flags": [],
+   "tag": "BDH",
    "ramp": null,
    "accent": null,
    "margin": 6

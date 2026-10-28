@@ -3,7 +3,6 @@
   "relics": [
     {
       "id": "RATTLE_DRUM",
-      "name": "Rattle Drum",
       "rarity": "COMMON",
       "price": 5,
       "trigger": "DIE",
@@ -16,12 +15,10 @@
           "op": "add_count",
           "value": 3
         }
-      ],
-      "text": "Each scored BONE die: +3 Count"
+      ]
     },
     {
       "id": "EMBER_JAR",
-      "name": "Ember Jar",
       "rarity": "COMMON",
       "price": 4,
       "trigger": "DIE",
@@ -34,12 +31,10 @@
           "op": "add_power",
           "value": 20
         }
-      ],
-      "text": "Each scored FIRE die: +20 Power"
+      ]
     },
     {
       "id": "FROST_LANTERN",
-      "name": "Frost Lantern",
       "rarity": "COMMON",
       "price": 4,
       "trigger": "SQUAD",
@@ -56,12 +51,10 @@
             "step": 5
           }
         }
-      ],
-      "text": "Squad with ICE: +5 Power per scored die"
+      ]
     },
     {
       "id": "MOSS_CHARM",
-      "name": "Moss Charm",
       "rarity": "COMMON",
       "price": 5,
       "trigger": "DIE",
@@ -74,12 +67,10 @@
           "op": "add_count",
           "value": 2
         }
-      ],
-      "text": "Each scored LEAF die: +2 Count"
+      ]
     },
     {
       "id": "LIGHTNING_ROD",
-      "name": "Lightning Rod",
       "rarity": "COMMON",
       "price": 5,
       "trigger": "DIE",
@@ -96,12 +87,10 @@
           "op": "add_count",
           "value": 1
         }
-      ],
-      "text": "Each scored VOLT die: +10 Power, +1 Count"
+      ]
     },
     {
       "id": "IRON_NAIL",
-      "name": "Iron Nail",
       "rarity": "COMMON",
       "price": 4,
       "trigger": "SQUAD",
@@ -115,12 +104,10 @@
           "op": "add_power",
           "value": 30
         }
-      ],
-      "text": "2+ scored METAL dice: +30 Power"
+      ]
     },
     {
       "id": "GRAVEDIGGER_LAMP",
-      "name": "Gravedigger's Lamp",
       "rarity": "COMMON",
       "price": 4,
       "trigger": "SQUAD",
@@ -132,12 +119,10 @@
           "op": "add_count",
           "value": 4
         }
-      ],
-      "text": "+4 Count"
+      ]
     },
     {
       "id": "TRIO_TOTEM",
-      "name": "Trio Totem",
       "rarity": "COMMON",
       "price": 4,
       "trigger": "SQUAD",
@@ -150,12 +135,10 @@
           "op": "add_count",
           "value": 8
         }
-      ],
-      "text": "Trio: +8 Count"
+      ]
     },
     {
       "id": "MOON_CHARM",
-      "name": "Moon Charm",
       "rarity": "COMMON",
       "price": 5,
       "trigger": "SQUAD",
@@ -168,12 +151,10 @@
           "op": "add_count",
           "value": 10
         }
-      ],
-      "text": "Full Moon: +10 Count"
+      ]
     },
     {
       "id": "BONE_SAW",
-      "name": "Bone Saw",
       "rarity": "COMMON",
       "price": 5,
       "trigger": "SQUAD",
@@ -186,12 +167,10 @@
           "op": "add_power",
           "value": 40
         }
-      ],
-      "text": "Every scored die shows 4+ points: +40 Power"
+      ]
     },
     {
       "id": "WISP_JAR",
-      "name": "Wisp Jar",
       "rarity": "COMMON",
       "price": 4,
       "trigger": "SQUAD",
@@ -204,12 +183,10 @@
           "op": "mul_count",
           "value": 3
         }
-      ],
-      "text": "Rabble: ×3 Count"
+      ]
     },
     {
       "id": "GRAVE_ROBBER",
-      "name": "Grave Robber",
       "rarity": "COMMON",
       "price": 4,
       "trigger": "SPOILS",
@@ -221,12 +198,10 @@
           "op": "add_money",
           "value": 2
         }
-      ],
-      "text": "+$2 in the spoils of every won battle"
+      ]
     },
     {
       "id": "DEEP_FREEZE",
-      "name": "Deep Freeze",
       "rarity": "COMMON",
       "price": 5,
       "trigger": "SQUAD",
@@ -240,12 +215,10 @@
           "op": "mul_count",
           "value": 1.5
         }
-      ],
-      "text": "3+ scored ICE dice: ×1.5 Count"
+      ]
     },
     {
       "id": "LOADED_BONE",
-      "name": "Loaded Bone",
       "rarity": "UNCOMMON",
       "price": 6,
       "trigger": "ROLL",
@@ -258,12 +231,10 @@
           "value": 1,
           "element": "BONE"
         }
-      ],
-      "text": "After a roll with no BONE showing, one die turns to its BONE face"
+      ]
     },
     {
       "id": "THRIFTY_GHOST",
-      "name": "Thrifty Ghost",
       "rarity": "UNCOMMON",
       "price": 6,
       "trigger": "SQUAD",
@@ -279,12 +250,10 @@
             "step": 3
           }
         }
-      ],
-      "text": "+3 Count per reroll left"
+      ]
     },
     {
       "id": "HYBRID_VIGOR",
-      "name": "Hybrid Vigor",
       "rarity": "UNCOMMON",
       "price": 6,
       "trigger": "SQUAD",
@@ -300,12 +269,10 @@
           "op": "add_count",
           "value": 6
         }
-      ],
-      "text": "Duo Pact or Full Moon: +6 Count"
+      ]
     },
     {
       "id": "COPYCAT_COFFIN",
-      "name": "Copycat Coffin",
       "rarity": "UNCOMMON",
       "price": 6,
       "trigger": "SQUAD",
@@ -317,12 +284,10 @@
           "op": "add_count",
           "value": 8
         }
-      ],
-      "text": "Unit already summoned this battle: +8 Count"
+      ]
     },
     {
       "id": "OVERGROWTH",
-      "name": "Overgrowth",
       "rarity": "UNCOMMON",
       "price": 7,
       "counter": {
@@ -350,12 +315,10 @@
             }
           ]
         }
-      ],
-      "text": "Gains +1 Count each time you summon a squad with LEAF (now +{counter})"
+      ]
     },
     {
       "id": "SPIRIT_BOARD",
-      "name": "Spirit Board",
       "rarity": "UNCOMMON",
       "price": 7,
       "trigger": "SQUAD",
@@ -368,12 +331,10 @@
           "op": "mul_count",
           "value": 2
         }
-      ],
-      "text": "Rainbow: ×2 Count"
+      ]
     },
     {
       "id": "PIGGY_COFFIN",
-      "name": "Piggy Coffin",
       "rarity": "UNCOMMON",
       "price": 7,
       "trigger": "SQUAD",
@@ -389,12 +350,10 @@
             "step": 2
           }
         }
-      ],
-      "text": "+2 Power per $1 you hold"
+      ]
     },
     {
       "id": "GILDED_TOOTH",
-      "name": "Gilded Tooth",
       "rarity": "UNCOMMON",
       "price": 6,
       "trigger": "SUMMON",
@@ -410,12 +369,10 @@
             "step": 1
           }
         }
-      ],
-      "text": "Earn $1 per scored BONE die"
+      ]
     },
     {
       "id": "BONE_PILE",
-      "name": "Bone Pile",
       "rarity": "UNCOMMON",
       "price": 6,
       "trigger": "SQUAD",
@@ -431,12 +388,10 @@
             "step": 2
           }
         }
-      ],
-      "text": "+2 Count per held die showing BONE"
+      ]
     },
     {
       "id": "COLD_HEARTH",
-      "name": "Cold Hearth",
       "rarity": "UNCOMMON",
       "price": 6,
       "trigger": "DIE",
@@ -449,12 +404,10 @@
           "op": "add_power",
           "value": 15
         }
-      ],
-      "text": "Each scored die with 1–2 points: +15 Power"
+      ]
     },
     {
       "id": "GRAND_PROCESSION",
-      "name": "Grand Procession",
       "rarity": "UNCOMMON",
       "price": 6,
       "trigger": "SQUAD",
@@ -470,12 +423,10 @@
             "step": 15
           }
         }
-      ],
-      "text": "+15 Power per squad already summoned this battle"
+      ]
     },
     {
       "id": "TACTICIAN_SKULL",
-      "name": "Tactician's Skull",
       "rarity": "RARE",
       "price": 8,
       "trigger": "SQUAD",
@@ -487,12 +438,10 @@
           "op": "mul_power",
           "value": 2
         }
-      ],
-      "text": "First squad of the battle: ×2 Power"
+      ]
     },
     {
       "id": "CROWN_OF_THE_LICH",
-      "name": "Crown of the Lich",
       "rarity": "RARE",
       "price": 9,
       "trigger": "SQUAD",
@@ -509,12 +458,10 @@
           "op": "mul_count",
           "value": 2
         }
-      ],
-      "text": "Ritual, Quartet or Quintet: ×2 Count"
+      ]
     },
     {
       "id": "LAST_RITES",
-      "name": "Last Rites",
       "rarity": "RARE",
       "price": 9,
       "trigger": "SQUAD",
@@ -526,12 +473,10 @@
           "op": "mul_count",
           "value": 3
         }
-      ],
-      "text": "No summons left after this squad: ×3 Count"
+      ]
     },
     {
       "id": "ELEMENTAL_CONVERGENCE",
-      "name": "Elemental Convergence",
       "rarity": "RARE",
       "price": 9,
       "trigger": "SQUAD",
@@ -544,12 +489,10 @@
           "op": "mul_count",
           "value": 3
         }
-      ],
-      "text": "All 6 elements scored this battle: ×3 Count"
+      ]
     },
     {
       "id": "BLOOD_MOON",
-      "name": "Blood Moon",
       "rarity": "RARE",
       "price": 10,
       "trigger": "RESOLVE",
@@ -562,12 +505,10 @@
           "op": "mul_damage",
           "value": 1.5
         }
-      ],
-      "text": "3+ squads in the army: ×1.5 damage"
+      ]
     },
     {
       "id": "BLACK_GRIMOIRE",
-      "name": "Black Grimoire",
       "rarity": "RARE",
       "price": 10,
       "trigger": "RESOLVE",
@@ -583,8 +524,7 @@
             "step": 0.25
           }
         }
-      ],
-      "text": "×1 damage, +0.25 per boss defeated (now ×{value})"
+      ]
     }
   ]
 }

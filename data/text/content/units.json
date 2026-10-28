@@ -1,0 +1,130 @@
+{
+  "SKELETON_WARRIOR": {
+    "name": "Skeleton Warrior",
+    "lore": "Chipped sword, missing ribs, unlimited enthusiasm. Rattles when nervous, which is always."
+  },
+  "FIRE_IMP": {
+    "name": "Fire Imp",
+    "lore": "Small, hot-headed and legally banned from three bakeries."
+  },
+  "FROST_BAT": {
+    "name": "Frost Bat",
+    "lore": "Hangs upside down until its feet freeze to the ceiling. Then just hangs."
+  },
+  "PUMPKINLING": {
+    "name": "Pumpkinling",
+    "lore": "Not carved yet and very worried about October 31st."
+  },
+  "VOLT_GHOST": {
+    "name": "Volt Ghost",
+    "lore": "Haunts power lines. Its favourite word is 'BZZT'."
+  },
+  "HAUNTED_ARMOR": {
+    "name": "Haunted Armor",
+    "lore": "Nobody home. The polish, however, is immaculate."
+  },
+  "FLAME_SKULL": {
+    "name": "Flame Skull",
+    "lore": "A skull that kept its fiery personality and nothing else."
+  },
+  "SCARECROW": {
+    "name": "Scarecrow",
+    "lore": "Scares crows, villagers and the occasional mirror."
+  },
+  "SHIELD_SKELETON": {
+    "name": "Shield Skeleton",
+    "lore": "Its whole strategy is the shield. It has also lost the sword."
+  },
+  "STEAM_SLIME": {
+    "name": "Steam Slime",
+    "lore": "Half lava, half ice, all sauna."
+  },
+  "JACK_O_LANTERN": {
+    "name": "Jack-o'-Lantern",
+    "lore": "The pumpkinling who got carved and took it personally."
+  },
+  "BOG_WITCH": {
+    "name": "Bog Witch",
+    "lore": "Brews soup from frogs, moss and the last hunter who asked for a recipe."
+  },
+  "STORM_BANSHEE": {
+    "name": "Storm Banshee",
+    "lore": "Her wail comes with thunder, frost and an unpaid electricity bill."
+  },
+  "TESLA_SPIDER": {
+    "name": "Tesla Spider",
+    "lore": "Eight legs, one coil, zero respect for wiring codes."
+  },
+  "WISP": {
+    "name": "Wisp",
+    "lore": "Whatever was left over. Glows in the colour of your bad roll."
+  },
+  "HEADLESS_HORSEMAN": {
+    "name": "Headless Horseman",
+    "lore": "Lost his head, kept the horse, found a pumpkin. Fair trade."
+  },
+  "STITCHED_GOLEM": {
+    "name": "Stitched Golem",
+    "lore": "Assembled from spare parts and powered by a very confused thundercloud."
+  },
+  "WITCH_QUEEN": {
+    "name": "Witch Queen",
+    "lore": "Rules a court of crows. The crows did not vote."
+  },
+  "CLOCKWORK_KRAKEN": {
+    "name": "Clockwork Kraken",
+    "lore": "Wound up in a boiler room, it now winds up everyone else."
+  },
+  "LICH": {
+    "name": "Lich",
+    "lore": "Kept his soul in a jar. Then labelled the jar 'pickles'. Nobody suspects a thing."
+  },
+  "HELLHOUND": {
+    "name": "Hellhound",
+    "lore": "Good boy. Very good boy. Please do not pet the fire."
+  },
+  "FROST_WRAITH": {
+    "name": "Frost Wraith",
+    "lore": "Drifts in with the first frost and steals the warmth from your tea."
+  },
+  "MANDRAKE_BRUTE": {
+    "name": "Mandrake Brute",
+    "lore": "Screams when pulled from the ground. Screams louder when pulled from a fight."
+  },
+  "THUNDER_GHOUL": {
+    "name": "Thunder Ghoul",
+    "lore": "Eats lightning for breakfast and storms for lunch. Dinner is you."
+  },
+  "GARGOYLE": {
+    "name": "Gargoyle",
+    "lore": "Sat on a church roof for 300 years. Has opinions about the bells."
+  },
+  "BONE_DRAGON": {
+    "name": "Bone Dragon",
+    "lore": "Every bone in the graveyard answered the call. Some arrived as wings."
+  },
+  "EMBER_COLOSSUS": {
+    "name": "Ember Colossus",
+    "lore": "A walking volcano with a short temper and a long, long fuse."
+  },
+  "FROST_WYRM": {
+    "name": "Frost Wyrm",
+    "lore": "Its breath turns rivers to glass and hunters to statues."
+  },
+  "ELDER_HOLLOW": {
+    "name": "Elder Hollow",
+    "lore": "The oldest tree in the woods finally decided to walk. It is not happy."
+  },
+  "STORM_TITAN": {
+    "name": "Storm Titan",
+    "lore": "Carries a thunderbolt like a walking stick. Never needed to walk."
+  },
+  "IRON_JUGGERNAUT": {
+    "name": "Iron Juggernaut",
+    "lore": "A siege engine that learned to march and forgot how to stop."
+  },
+  "PHANTOM_PARADE": {
+    "name": "Phantom Parade",
+    "lore": "A candle-lit procession of tiny ghosts. Everyone is invited. Nobody leaves."
+  }
+}

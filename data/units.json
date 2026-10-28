@@ -3,7 +3,6 @@
   "units": [
     {
       "id": "SKELETON_WARRIOR",
-      "name": "Skeleton Warrior",
       "kind": "T1",
       "elements": [
         "BONE"
@@ -13,7 +12,6 @@
     },
     {
       "id": "FIRE_IMP",
-      "name": "Fire Imp",
       "kind": "T1",
       "elements": [
         "FIRE"
@@ -23,7 +21,6 @@
     },
     {
       "id": "FROST_BAT",
-      "name": "Frost Bat",
       "kind": "T1",
       "elements": [
         "ICE"
@@ -33,7 +30,6 @@
     },
     {
       "id": "PUMPKINLING",
-      "name": "Pumpkinling",
       "kind": "T1",
       "elements": [
         "LEAF"
@@ -43,7 +39,6 @@
     },
     {
       "id": "VOLT_GHOST",
-      "name": "Volt Ghost",
       "kind": "T1",
       "elements": [
         "VOLT"
@@ -53,7 +48,6 @@
     },
     {
       "id": "HAUNTED_ARMOR",
-      "name": "Haunted Armor",
       "kind": "T1",
       "elements": [
         "METAL"
@@ -63,7 +57,6 @@
     },
     {
       "id": "FLAME_SKULL",
-      "name": "Flame Skull",
       "kind": "HYBRID",
       "elements": [
         "BONE",
@@ -74,7 +67,6 @@
     },
     {
       "id": "SCARECROW",
-      "name": "Scarecrow",
       "kind": "HYBRID",
       "elements": [
         "BONE",
@@ -85,7 +77,6 @@
     },
     {
       "id": "SHIELD_SKELETON",
-      "name": "Shield Skeleton",
       "kind": "HYBRID",
       "elements": [
         "BONE",
@@ -96,7 +87,6 @@
     },
     {
       "id": "STEAM_SLIME",
-      "name": "Steam Slime",
       "kind": "HYBRID",
       "elements": [
         "FIRE",
@@ -107,7 +97,6 @@
     },
     {
       "id": "JACK_O_LANTERN",
-      "name": "Jack-o'-Lantern",
       "kind": "HYBRID",
       "elements": [
         "FIRE",
@@ -118,7 +107,6 @@
     },
     {
       "id": "BOG_WITCH",
-      "name": "Bog Witch",
       "kind": "HYBRID",
       "elements": [
         "ICE",
@@ -129,7 +117,6 @@
     },
     {
       "id": "STORM_BANSHEE",
-      "name": "Storm Banshee",
       "kind": "HYBRID",
       "elements": [
         "ICE",
@@ -140,7 +127,6 @@
     },
     {
       "id": "TESLA_SPIDER",
-      "name": "Tesla Spider",
       "kind": "HYBRID",
       "elements": [
         "VOLT",
@@ -151,7 +137,6 @@
     },
     {
       "id": "WISP",
-      "name": "Wisp",
       "kind": "WISP",
       "elements": [],
       "display": "horde",
@@ -159,7 +144,6 @@
     },
     {
       "id": "HEADLESS_HORSEMAN",
-      "name": "Headless Horseman",
       "kind": "RITUAL",
       "elements": [
         "BONE",
@@ -170,7 +154,6 @@
     },
     {
       "id": "STITCHED_GOLEM",
-      "name": "Stitched Golem",
       "kind": "RITUAL",
       "elements": [
         "BONE",
@@ -181,7 +164,6 @@
     },
     {
       "id": "WITCH_QUEEN",
-      "name": "Witch Queen",
       "kind": "RITUAL",
       "elements": [
         "ICE",
@@ -192,7 +174,6 @@
     },
     {
       "id": "CLOCKWORK_KRAKEN",
-      "name": "Clockwork Kraken",
       "kind": "RITUAL",
       "elements": [
         "FIRE",
@@ -203,7 +184,6 @@
     },
     {
       "id": "LICH",
-      "name": "Lich",
       "kind": "ELITE",
       "elements": [
         "BONE"
@@ -212,7 +192,6 @@
     },
     {
       "id": "HELLHOUND",
-      "name": "Hellhound",
       "kind": "ELITE",
       "elements": [
         "FIRE"
@@ -221,7 +200,6 @@
     },
     {
       "id": "FROST_WRAITH",
-      "name": "Frost Wraith",
       "kind": "ELITE",
       "elements": [
         "ICE"
@@ -230,7 +208,6 @@
     },
     {
       "id": "MANDRAKE_BRUTE",
-      "name": "Mandrake Brute",
       "kind": "ELITE",
       "elements": [
         "LEAF"
@@ -239,7 +216,6 @@
     },
     {
       "id": "THUNDER_GHOUL",
-      "name": "Thunder Ghoul",
       "kind": "ELITE",
       "elements": [
         "VOLT"
@@ -248,7 +224,6 @@
     },
     {
       "id": "GARGOYLE",
-      "name": "Gargoyle",
       "kind": "ELITE",
       "elements": [
         "METAL"
@@ -257,7 +232,6 @@
     },
     {
       "id": "BONE_DRAGON",
-      "name": "Bone Dragon",
       "kind": "LEGEND",
       "elements": [
         "BONE"
@@ -266,7 +240,6 @@
     },
     {
       "id": "EMBER_COLOSSUS",
-      "name": "Ember Colossus",
       "kind": "LEGEND",
       "elements": [
         "FIRE"
@@ -275,7 +248,6 @@
     },
     {
       "id": "FROST_WYRM",
-      "name": "Frost Wyrm",
       "kind": "LEGEND",
       "elements": [
         "ICE"
@@ -284,7 +256,6 @@
     },
     {
       "id": "ELDER_HOLLOW",
-      "name": "Elder Hollow",
       "kind": "LEGEND",
       "elements": [
         "LEAF"
@@ -293,7 +264,6 @@
     },
     {
       "id": "STORM_TITAN",
-      "name": "Storm Titan",
       "kind": "LEGEND",
       "elements": [
         "VOLT"
@@ -302,7 +272,6 @@
     },
     {
       "id": "IRON_JUGGERNAUT",
-      "name": "Iron Juggernaut",
       "kind": "LEGEND",
       "elements": [
         "METAL"
@@ -311,7 +280,6 @@
     },
     {
       "id": "PHANTOM_PARADE",
-      "name": "Phantom Parade",
       "kind": "PARADE",
       "elements": [],
       "display": "single"

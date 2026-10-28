@@ -97,11 +97,12 @@ func test_spoils_and_summon_money() -> void:
 func test_resolve_trinkets() -> void:
 	var enc := Fixtures.battle([], 1.0e9, ["BLOOD_MOON"])
 	for n in 3:
+		if enc.phase == EncounterState.Phase.AWAIT_ROLL:
+			enc.roll()
 		Fixtures.set_tray(enc, F3)
 		Fixtures.pick(enc, [0, 1, 2])
 		enc.summon()
-		if enc.phase == EncounterState.Phase.AWAIT_ROLL:
-			enc.roll()
+	enc.attack()
 	_eq(enc.resolution.army, 297.0, "three trios")
 	_eq(enc.resolution.damage, 446.0, "blood moon ×1.5 rounds half up")
 

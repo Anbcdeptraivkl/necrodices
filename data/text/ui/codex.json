@@ -1,0 +1,21 @@
+{
+  "codex_tab_combos": "COMBOS",
+  "codex_tab_gear": "GEAR",
+  "codex_tab_gems": "GEMS",
+  "codex_tab_hunters": "HUNTERS",
+  "codex_tab_potions": "POTIONS",
+  "codex_tab_runes": "RUNES",
+  "codex_tab_trinkets": "TRINKETS",
+  "codex_tab_units": "MONSTERS",
+  "lbl_combos": "COMBOS (best first)",
+  "lbl_level_short": "Lv%d",
+  "lbl_rituals": "RITUALS (core twice)",
+  "recipe_elite": "Summoned by a Quartet of %s.",
+  "recipe_hybrid": "Summoned by a Duo Pact or Full Moon of %s and %s.",
+  "recipe_legend": "Summoned by a Quintet of %s.",
+  "recipe_parade": "Summoned by a Rainbow: five different elements.",
+  "recipe_ritual": "Summoned by the Ritual of %s, with %s twice.",
+  "recipe_t1": "Summoned by a Trio of %s.",
+  "recipe_wisp": "Shows up for a Rabble, or a Duo Pact with no hybrid.",
+  "title_codex": "CODEX"
+}
