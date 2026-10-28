@@ -1,7 +1,7 @@
 {
   "btn_buy": "BUY",
   "btn_buy_use": "BUY & USE",
-  "btn_buy_use_short": "BUY+USE",
+  "btn_buy_use_short": "BUY&USE",
   "btn_next_fight": "NEXT BATTLE",
   "btn_open": "OPEN",
   "btn_reroll_shop": "REROLL $%d",
@@ -25,5 +25,5 @@
   "msg_sold_out": "Sold out",
   "msg_taken": "Taken",
   "tip_reroll_shop": "New stock for the cards",
-  "title_shop": "CRYPT MARKET"
+  "title_shop": "CRYPT TRADER"
 }

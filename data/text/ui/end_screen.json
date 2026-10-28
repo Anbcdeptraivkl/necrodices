@@ -4,8 +4,8 @@
   "end_most": "Favourite: %s",
   "end_night": "Night reached: %d / %d",
   "end_seed": "Seed: %s",
-  "msg_defeat": "The village hunters win this night.",
-  "msg_victory": "The village falls silent.",
+  "msg_defeat": "The hunters win this night.",
+  "msg_victory": "The village falls to your might.",
   "title_defeated": "DEFEATED",
   "title_game_over": "GAME OVER",
   "title_victory": "VICTORY"

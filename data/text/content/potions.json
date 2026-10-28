@@ -2,12 +2,12 @@
   "ELIXIR_BONE": {
     "name": "Elixir of Bone",
     "effect": "Up to 2 faces become BONE (6 points)",
-    "lore": "Tastes like calcium and regret."
+    "lore": "Tastes like calcium, and regret."
   },
   "ELIXIR_FIRE": {
     "name": "Elixir of Fire",
     "effect": "Up to 2 faces become FIRE",
-    "lore": "Spicy. Very spicy. Fatally spicy."
+    "lore": "Fatally spicy."
   },
   "ELIXIR_ICE": {
     "name": "Elixir of Ice",
@@ -17,71 +17,71 @@
   "ELIXIR_LEAF": {
     "name": "Elixir of Leaf",
     "effect": "Up to 2 faces become LEAF",
-    "lore": "Smells like a forest after rain. Tastes like the forest."
+    "lore": "Smells like a forest after rain. Tastes like the ground of that forest."
   },
   "ELIXIR_VOLT": {
     "name": "Elixir of Volt",
     "effect": "Up to 2 faces become VOLT",
-    "lore": "Fizzy in the way that makes your hair stand up."
+    "lore": "Makes your hair stand up."
   },
   "ELIXIR_METAL": {
     "name": "Elixir of Metal",
     "effect": "Up to 2 faces become METAL",
-    "lore": "Contains iron. A lot of iron. All of it."
+    "lore": "Don't know how to even drink this"
   },
   "STRENGTH_TONIC": {
     "name": "Strength Tonic",
     "effect": "Up to 2 non-BONE faces: +2 points (max 9)",
-    "lore": "Makes a face count for more. Faces love it."
+    "lore": "Splash it on your minions to ragebait them."
   },
   "WHETSTONE_OIL": {
     "name": "Whetstone Oil",
     "effect": "SHARP rune on up to 2 faces",
-    "lore": "Sharpens dice. Do not ask how."
+    "lore": "Sharpens your dices."
   },
   "SWARM_BREW": {
     "name": "Swarm Brew",
     "effect": "SWARM rune on up to 2 faces",
-    "lore": "Buzzing faintly. Something is breeding in there."
+    "lore": "Something is breeding in there."
   },
   "WILD_SPIRITS": {
     "name": "Wild Spirits",
     "effect": "WILD rune on 1 face",
-    "lore": "A rainbow you can drink. It drinks back."
+    "lore": "A rainbow you can drink."
   },
   "GLASS_DRAUGHT": {
     "name": "Glass Draught",
     "effect": "GLASS rune on 1 face",
-    "lore": "Beautiful, powerful and one bad roll from shattering."
+    "lore": "Beautiful, powerful and one bad tumble away from shattering."
   },
   "IRON_DRAUGHT": {
     "name": "Iron Draught",
     "effect": "IRON rune on 1 face",
-    "lore": "Works best when you keep the die in your hand. Like a lucky coin, but heavier."
+    "lore": "You probably could use this as a weapon."
   },
   "GRAVE_DUST": {
     "name": "Grave Dust",
     "effect": "TOMB rune on 1 face",
-    "lore": "Scraped from a very old tombstone. The ghost is still waiting for it."
+    "lore": "Scraped from a very old tombstone. A ghost is still loitering inside."
   },
   "LIQUID_GOLD": {
     "name": "Liquid Gold",
     "effect": "GILDED rune on 1 face",
-    "lore": "Gold you can pour. Pour it on a face and wait for payday."
+    "lore": "Pour it on a dice face, no need for payday."
   },
   "LUCKY_CLOVER": {
     "name": "Lucky Clover",
     "effect": "LUCKY rune on up to 2 faces",
-    "lore": "Four leaves, one wish, small print attached."
+    "lore": "Four leaves, one wish."
   },
   "MIRROR_DRAUGHT": {
     "name": "Mirror Draught",
     "effect": "Pick 2 faces: the second becomes a copy of the first",
-    "lore": "Look into it and one face looks back. Then becomes the other."
+    "lore": "You need to be photogenic for your doppelganger to be strong too."
   },
   "HERMIT_BREW": {
     "name": "Hermit's Brew",
     "effect": "Double your money (max +$20)",
-    "lore": "Brewed by a hermit who never spent a coin. Doubles yours."
+    "lore": "Brewed by a hermit who never spent a coin."
   }
 }

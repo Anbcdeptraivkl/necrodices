@@ -23,7 +23,7 @@
   "lbl_equipment_short": "GEAR",
   "lbl_footer": "v%s\nLast seed %s\nBest night %d",
   "msg_night": "NIGHT %d / %d",
-  "msg_no_equipment_owned": "none yet",
+  "msg_no_equipment_owned": "None",
   "rarity_common": "Common",
   "rarity_rare": "Rare",
   "rarity_uncommon": "Uncommon",
@@ -31,8 +31,8 @@
   "role_champion": "CHAMPION",
   "role_mob": "MOB",
   "tip_codex": "Recipe Codex",
-  "tip_dice": "Your dice: every face",
+  "tip_dice": "Your dices",
   "tip_settings": "Settings",
-  "title_dice": "YOUR DICE",
+  "title_dice": "YOUR DICES",
   "title_how_to_play": "HOW TO PLAY"
 }

@@ -1,56 +1,56 @@
 {
   "hunters": {
     "MOB_TORCH_VILLAGER": {
-      "name": "Torch Villager",
-      "lore": "Brought a torch to a necromancer fight. Bold."
+      "name": "Scout Villager",
+      "lore": "Brought nothing with him but a torch. Pretty bold."
     },
     "MOB_PITCHFORK_FARMER": {
-      "name": "Pitchfork Farmer",
-      "lore": "Farms by day, forks by night."
+      "name": "Farmer",
+      "lore": "Farms by day, pitch his fork by night."
     },
     "MOB_LANTERN_WATCHMAN": {
-      "name": "Lantern Watchman",
-      "lore": "Counts the hours and the skeletons. Loses count of both."
+      "name": "Gravekeeper",
+      "lore": "Counts the hours and the graves. Loses count of both."
     },
     "CHAMP_GUARD_CAPTAIN": {
-      "name": "Guard Captain",
-      "lore": "Polished helmet, red plume, no sense of humour."
+      "name": "Guard",
+      "lore": "Polished helmet, no polished sense of humour."
     },
     "CHAMP_MONSTER_HUNTER": {
       "name": "Monster Hunter",
-      "lore": "Twelve stakes on the belt, three of them sharp."
+      "lore": "Would be pretty dangerous if you are a vampire."
     },
     "BOSS_EXORCIST": {
       "name": "The Exorcist",
-      "lore": "Splashes holy water on anything that rattles, including the plumbing."
+      "lore": "Splashes holy water on anything like a sprinkler."
     },
     "BOSS_WITCH_HUNTER": {
-      "name": "The Witch Hunter",
+      "name": "Witch Hunter",
       "lore": "Confiscates your favourite trinket 'for evidence'."
     },
     "BOSS_BELL_RINGER": {
-      "name": "The Bell Ringer",
-      "lore": "Rings the great bell until something gets stuck. Usually a die."
+      "name": "The Bell Bearer",
+      "lore": "Seems like one of your own kind, or maybe its just the Bell."
     },
     "BOSS_INQUISITOR": {
       "name": "The Inquisitor",
-      "lore": "Asks many questions. Accepts one fewer summon as an answer."
+      "lore": "Asks too many questions. Shame he's too strong for you to cut his tongue off."
     }
   },
   "rules": {
     "EXORCIST": {
       "name": "Holy Water",
-      "short": "Holy Water: BONE dice score 0",
-      "effect": "Holy Water: BONE dice score 0 points."
+      "short": "Holy Water: BONE dices score 0",
+      "effect": "Holy Water: BONE dices score 0 points."
     },
     "WITCH_HUNTER": {
       "name": "Confiscation",
-      "short": "Confiscation: leftmost trinket off",
+      "short": "Confiscation: Disable your leftmost trinket",
       "effect": "Confiscation: your leftmost trinket is disabled."
     },
     "BELL_RINGER": {
       "name": "Toll",
-      "short": "Toll: 1 die chained per roll",
+      "short": "Toll: 1 die disabled per roll",
       "effect": "Toll: after every roll and reroll, 1 random die is shackled."
     },
     "INQUISITOR": {

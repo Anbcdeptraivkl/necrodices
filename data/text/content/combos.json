@@ -2,41 +2,41 @@
   "RABBLE": {
     "name": "Rabble",
     "pattern": "3+ dice, no pattern: only the highest die scores",
-    "lore": "No plan, no pattern, one die does all the work."
+    "lore": "No plan, no pattern, only your highest dice counts for points."
   },
   "DUO_PACT": {
-    "name": "Duo Pact",
+    "name": "Duo",
     "pattern": "2 of one element + 2 of another",
-    "lore": "Two pairs shake hands and summon a hybrid."
+    "lore": "Two pairs: Summon a hybrid."
   },
   "TRIO": {
     "name": "Trio",
     "pattern": "3 of one element",
-    "lore": "Three of a kind: the backbone of every horde."
+    "lore": "Three of a kind!."
   },
   "RAINBOW": {
     "name": "Rainbow",
     "pattern": "5 different elements",
-    "lore": "Five different elements throw a parade."
+    "lore": "Powerful and Flashy."
   },
   "FULL_MOON": {
     "name": "Full Moon",
     "pattern": "3 of one element + 2 of another",
-    "lore": "Three and two under one moon. Wolves approve."
+    "lore": "This ain't poker but its still full."
   },
   "RITUAL": {
     "name": "Ritual",
-    "pattern": "a ritual's 3 elements with its core twice",
-    "lore": "Three elements, the core one twice. Something old wakes up."
+    "pattern": "3 elements, 2 of them have at least 2 dices",
+    "lore": "Anything needs a strong core."
   },
   "QUARTET": {
     "name": "Quartet",
     "pattern": "4 of one element",
-    "lore": "Four of a kind call an elite."
+    "lore": "An elite combo."
   },
   "QUINTET": {
     "name": "Quintet",
     "pattern": "5 of one element",
-    "lore": "Five of a kind. The ground shakes. A legend arrives."
+    "lore": "The ground shakes, you are summoning BIG things."
   }
 }

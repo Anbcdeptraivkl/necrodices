@@ -2,41 +2,41 @@
   "SHARP": {
     "name": "Sharp",
     "effect": "+30 Power when scored.",
-    "lore": "A blood-red edge carved into one face."
+    "lore": "So sharp you could accidentally cut your hand."
   },
   "SWARM": {
     "name": "Swarm",
     "effect": "+4 Count when scored.",
-    "lore": "Moss spores that multiply your squad."
+    "lore": "Moss spores are spreading on it."
   },
   "WILD": {
     "name": "Wild",
-    "effect": "counts as every element.",
-    "lore": "A prism face that answers to every element."
+    "effect": "Counts as every element.",
+    "lore": "A prism light that empowers every element."
   },
   "GLASS": {
     "name": "Glass",
-    "effect": "×2 Count when scored; 1 in 4 it shatters.",
-    "lore": "A crystal face: huge power, fragile."
+    "effect": "×2 Count when scored; 1 in 4 chance each scoring it shatters.",
+    "lore": "A psychic crystal: huge power but fragile."
   },
   "IRON": {
     "name": "Iron",
     "effect": "×1.5 Count while held (not picked) when a squad scores.",
-    "lore": "A steel face that helps from your hand, not the squad."
+    "lore": "A steel face that helps with self defense"
   },
   "TOMB": {
     "name": "Tomb",
     "effect": "+50 Power, no element, no points; always scores.",
-    "lore": "A gravestone face: no element, no points, big Power."
+    "lore": "A gravestone. Kind of useless but you could just throw it."
   },
   "GILDED": {
     "name": "Gilded",
     "effect": "+$3 in the spoils if held after the last summon.",
-    "lore": "A gold face that pays if it stays in your hand at the end."
+    "lore": "Worth 3 gold coins."
   },
   "LUCKY": {
     "name": "Lucky",
     "effect": "1 in 5 +10 Count; 1 in 15 +$20.",
-    "lore": "A clover face that sometimes goes off."
+    "lore": "Clover means lucky!"
   }
 }

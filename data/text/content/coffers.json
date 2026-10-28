@@ -1,15 +1,15 @@
 {
   "COFFER_POTION": {
     "name": "Potion Coffer",
-    "lore": "Rattles with glass."
+    "lore": "Full of Glass bottles."
   },
   "COFFER_POTION_JUMBO": {
     "name": "Jumbo Potion Coffer",
-    "lore": "Rattles with glass."
+    "lore": "Full of Glass bottles."
   },
   "COFFER_POTION_MEGA": {
     "name": "Mega Potion Coffer",
-    "lore": "Rattles with glass."
+    "lore": "Full of Glass bottles."
   },
   "COFFER_GEM": {
     "name": "Gem Coffer",
@@ -25,26 +25,26 @@
   },
   "COFFER_TRINKET": {
     "name": "Trinket Coffer",
-    "lore": "Heavy with curios."
+    "lore": "Heavy."
   },
   "COFFER_TRINKET_JUMBO": {
     "name": "Jumbo Trinket Coffer",
-    "lore": "Heavy with curios."
+    "lore": "Heavy."
   },
   "COFFER_TRINKET_MEGA": {
     "name": "Mega Trinket Coffer",
-    "lore": "Heavy with curios."
+    "lore": "Heavy."
   },
   "COFFER_BONE": {
     "name": "Bone Coffer",
-    "lore": "Full of dice and something that rolls on its own."
+    "lore": "Something moving inside."
   },
   "COFFER_BONE_JUMBO": {
     "name": "Jumbo Bone Coffer",
-    "lore": "Full of dice and something that rolls on its own."
+    "lore": "Something moving inside."
   },
   "COFFER_BONE_MEGA": {
     "name": "Mega Bone Coffer",
-    "lore": "Full of dice and something that rolls on its own."
+    "lore": "Something moving inside."
   }
 }

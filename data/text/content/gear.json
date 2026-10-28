@@ -2,7 +2,7 @@
   "GRAVE_BELL": {
     "name": "Grave Bell",
     "effect": "+1 Summon every battle",
-    "lore": "Rings once and one more corpse gets up."
+    "lore": "Rings like an alarm clock."
   },
   "DEATH_KNELL": {
     "name": "Death Bell",
@@ -12,56 +12,56 @@
   "LOADED_CUP": {
     "name": "Loaded Cup",
     "effect": "+1 Reroll every battle",
-    "lore": "A dice cup with a false bottom."
+    "lore": "There's something in its, tastes bony."
   },
   "SECOND_CUP": {
     "name": "Twin Red Grails",
     "effect": "+1 Reroll every battle",
-    "lore": "When one cup is not enough cheating."
+    "lore": "You can use these to cheat your dice rolls."
   },
   "RELIQUARY": {
     "name": "Reliquary",
     "effect": "+1 Trinket slot",
-    "lore": "A velvet box with room for one more trinket."
+    "lore": "A box with room for one more trinket."
   },
   "OSSUARY": {
     "name": "Ossuary",
     "effect": "+1 Trinket slot",
-    "lore": "A whole wall of trinket shelves."
+    "lore": "A giant banner to showcase your trinket shelves."
   },
   "HAGGLER_LANTERN": {
     "name": "Haggler's Lantern",
-    "effect": "Market rerolls cost $2 less",
-    "lore": "The shopkeeper hates this lantern."
+    "effect": "Trader rerolls cost $2 less",
+    "lore": "Flash the shopkeepers for some quickies."
   },
   "BLACK_MARKET": {
     "name": "Market Helmet",
     "effect": "Market rerolls cost $2 less",
-    "lore": "Prices nobody can explain."
+    "lore": "Self preservation for professional thieves."
   },
   "OVERSTOCK": {
     "name": "Ancient Puzzles",
-    "effect": "+1 card in the Market",
-    "lore": "Solve one and the shopkeeper finds another shelf."
+    "effect": "+1 slot in the Market",
+    "lore": "For the shopkeeper to kill some times."
   },
   "OVERFLOWING_CRYPT": {
     "name": "Overflowed Basket",
-    "effect": "+1 card in the Market",
-    "lore": "More stock than coffins."
+    "effect": "+1 slot in the Market",
+    "lore": "A gift basket for the handsome shopkeeper."
   },
   "GRAVE_GOODS": {
     "name": "Grave Lamp",
     "effect": "Interest cap +$5",
-    "lore": "Its light finds the coins the dead left behind."
+    "lore": "Light to find the coins the dead left behind."
   },
   "DRAGON_HOARD": {
     "name": "Dragon Remains",
     "effect": "Interest cap +$5",
-    "lore": "The dragon is gone. The gold stayed."
+    "lore": "The dragon is gone but the golds stayed."
   },
   "POCKET_CRYPT": {
     "name": "Pocket Crypt",
     "effect": "+1 Potion / Gem slot",
-    "lore": "A tiny crypt for one more potion."
+    "lore": "A tiny crypt statue, fitted inside your robe."
   }
 }

@@ -1,9 +1,9 @@
 {
-  "howto_1": "ROLL all your dice. Pick 3-5 of them in order: matching elements form a combo (Trio, Duo Pact, Full Moon, Quartet...). REROLL the picked dice twice per battle.",
-  "howto_2": "SUMMON scores the squad: combo base, then each scored die's points left to right, then trinkets. Strength = Power × Count. 3 summons per battle.",
-  "howto_3": "The army's total hits the hunter. Beat its HP and the battle ends at once; unused summons pay $1 each. BONE faces are always 6.",
+  "howto_1": "ROLL your dices and pick minimum 3 of them: matching elements form a combo (Trio, Duo Pact, Full Moon, Quartet) will summon units. You can cherry pick dices to REROLL.",
+  "howto_2": "SUMMON your units based on combos and elements. The score on each dice nets you points, from left to right. Then trinkets will be applied. 3 summons per battle.",
+  "howto_3": "The army attacks the hunter. Beat its number of HP and the battle ends at once; unused summons pay $1 each.",
   "howto_4": "In the Crypt Market buy trinkets, potions (rewrite faces, add runes), gems (level combos), new dice and gear. Survive 8 nights.",
-  "tut_first_roll": "ROLL your dice, pick 3-5 that form a combo (3 of an element, 2+2, a ritual...), then SUMMON.",
-  "tut_first_shop": "Trinkets trigger left to right. Drag to reorder. Dice are the strongest upgrade.",
-  "tut_first_summon": "Squad strength = Power × Count. When the army beats the hunter's HP the battle ends."
+  "tut_first_roll": "ROLL your dice, pick dices and form a combo if possible (3 of an element, 2+2, a ritual...), then SUMMON.",
+  "tut_first_shop": "Trinkets trigger left to right. Drag to reorder.",
+  "tut_first_summon": "Army strength = Power × Count. When the army beats the hunter (or not) the battle ends (or you lose)."
 }
