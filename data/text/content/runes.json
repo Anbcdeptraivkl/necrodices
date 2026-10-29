@@ -21,7 +21,7 @@
   },
   "IRON": {
     "name": "Iron",
-    "effect": "×1.5 Count while held (not picked) when a squad scores.",
+    "effect": "×1.5 Count while held (not picked) when a group scores.",
     "lore": "A steel face that helps with self defense"
   },
   "TOMB": {

@@ -16,7 +16,7 @@
   "lbl_pick_combo": "%s  Lv%d",
   "lbl_pick_header": "CURRENT DICE",
   "lbl_rerolls": "REROLL %d",
-  "lbl_squads": "SQUADS",
+  "lbl_squads": "GROUPS",
   "lbl_summons": "SUMMON %d",
   "lbl_total": "%s × %s = %s",
   "msg_confirm_attack": "Dealing %s of %s HP. Attack anyway?",
@@ -33,5 +33,5 @@
   "tip_attack": "Send the army now. Every summon you did not use pays $1.",
   "tip_essence": "Scored dice per element this battle",
   "tip_reroll": "Re-roll the picked dice",
-  "tip_roll": "Roll every die"
+  "tip_roll": "Roll all dice"
 }

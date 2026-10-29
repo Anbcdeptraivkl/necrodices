@@ -326,7 +326,7 @@ y  28 ├──────────────┼────────�
       │ = 146        │        COMBO BANNER / SLAM           │ [d][d][d][d][d]    │ Pick tray
       │ ARMY 210/1.2K│                                      │  73 × 2 = 146      │
       │●1 ●2 ●0 …    │           BATTLEFIELD (army)         ├────────────────────┤
-      │[P1][P2]      │      squads in centred columns       │ SQUADS             │
+      │[P1][P2]      │      squads in centred columns       │ GROUPS             │
       │ INFO PANEL   │                                      │ [icon Rabble   64] │
       │              │   [d][d][d][d][d][d][d][d]           │ hint               │
       │              │                                      │ [REROLL][ROLL/SUMMON]│
@@ -345,7 +345,7 @@ y 270 └──────────────┴────────�
 | Battlefield | centre, between HP text and tray | Squads in columns, centred when they do not fill it; horde squads = soldiers, single / legend = one body + aura |
 | Dice tray | bottom of the centre column, dice 20×23, gap 6 | All dice (5–8). Picked dice raised with the `G1` ring; shackled dice dimmed |
 | Counters | 356, 28 | SUMMON n / REROLL n chips |
-| Pick tray | 356, ~52, 120 | Header "CURRENT DICE" (muted, left, like "SQUADS"), the picked dice in pick order, combo + level and the preview `P × C = S` (`G1`) once a combo forms; no hint text |
+| Pick tray | 356, ~52, 120 | Header "CURRENT DICE" (muted, left, like "GROUPS"), the picked dice in pick order, combo + level and the preview `P × C = S` (`G1`) once a combo forms; no hint text |
 | Squads | below, flexible | A grid of 22×22 unit icons, one per summoned squad; combo, P × C and strength in the tooltip |
 | Pick actions | bottom right, stacked | REROLL (secondary, 120×26) over SUMMON (`BigButton`: primary, 12 px text, 120×36) |
 | Big actions | centre of the stage, between summons | ROLL (`BigButton` with a tumbling die icon) and ATTACK! (`DangerButton`: the blood-red button, sword-slash icon) at 96×36; ATTACK! breathes gold once the army beats the HP; only ATTACK! when the summons are spent |

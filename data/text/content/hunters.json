@@ -50,8 +50,8 @@
     },
     "BELL_RINGER": {
       "name": "Toll",
-      "short": "Toll: 1 die disabled per roll",
-      "effect": "Toll: after every roll and reroll, 1 random die is shackled."
+      "short": "Toll: 1 dice disabled per roll",
+      "effect": "Toll: after every roll and reroll, 1 random dice is shackled."
     },
     "INQUISITOR": {
       "name": "Interrogation",

@@ -141,7 +141,7 @@
   },
   "BLOOD_MOON": {
     "name": "Blood Moon",
-    "effect": "On Attack, with 3+ squads: x1.5 damage.",
+    "effect": "On Attack, with 3 or more groups: x1.5 damage.",
     "lore": "Everything hits a little harder when painted red."
   },
   "BLACK_GRIMOIRE": {

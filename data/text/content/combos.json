@@ -1,7 +1,7 @@
 {
   "RABBLE": {
     "name": "Rabble",
-    "pattern": "3+ dice, no pattern: only the highest die scores",
+    "pattern": "3 or more dice, no pattern: only the highest dice scores",
     "lore": "No plan, no pattern, only your highest dice counts for points."
   },
   "DUO_PACT": {
