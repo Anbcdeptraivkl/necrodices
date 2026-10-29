@@ -343,7 +343,7 @@ y 270 └──────────────┴────────�
 | Hunter | centre: name y 1, HP bar y 12 (160×7), HP text y 20; the 32×32 hunter stands **on the ground** below them (feet at stage y 80, a 24×2 `N0` shadow), never on the village roofline | HP bar shows army + preview as the `G1` segment |
 | Banner / slam | centred, just above the army (stage y ~88) | Combo banner "TRIO Lv2" (`G1`), strength slam "P × C = S", result banners |
 | Battlefield | centre, between HP text and tray | Squads in columns, centred when they do not fill it; horde squads = soldiers, single / legend = one body + aura |
-| Dice tray | bottom of the centre column, dice 20×23, gap 6 | All dice (5–8). Picked dice raised with the `G1` ring; shackled dice dimmed |
+| Dice tray | bottom of the centre column, dice 20×23, gap 8 (room for the ×1.4 scoring punch: 8 dice = 216 px) | All dice (5–8). Picked dice raised with the `G1` ring; shackled dice dimmed |
 | Counters | 356, 28 | SUMMON n / REROLL n chips |
 | Pick tray | 356, ~52, 120 | Header "CURRENT DICE" (muted, left, like "GROUPS"), the picked dice in pick order, combo + level and the preview `P × C = S` (`G1`) once a combo forms; no hint text |
 | Squads | below, flexible | A grid of 22×22 unit icons, one per summoned squad; combo, P × C and strength in the tooltip |
@@ -523,7 +523,8 @@ Counters tick by interpolating displayed value over the step duration (GAME_SPEC
 | Screen shake | Max 3 px, 200 ms, disabled by setting |
 | Reduce motion | No clone burst beyond 1 per group, no shake, no flashes; tween durations ×0.5 |
 | Dice roll (v2) | Every die tumbles; each lands at its own random time 0.35–0.9 s, one die always last; a small hop and a click per landing |
-| Number pop (v2) | Each scored die / rune / trinket step pops its label (`+5 Power` `I1`, `+3 Count` `R1`) above the die or trinket, rising 10 px and fading |
+| Number pop (v2) | Each scored die / rune / trinket step pops its label (`+5 Power` `I1`, `+3 Count` `R1`) above the die or trinket: punch ×1.6 → 1, rising 10 px and fading |
+| Scoring dice (v2) | During a summon the summoned dice stay raised: scoring ones with the lit ring, unscored ones at 45 % alpha. The die being scored punches ×1.4 → 1 (never touching its neighbours), flashes white and shakes ±1 px; the trinket whose turn it is wobbles ±2 px. Rest look is exact again when playback ends or is skipped |
 | Aura tiers (v2) | Single units and legends: Count ≥ 10 → `vfx/aura` ring tinted with the element light colour; ≥ 40 → + `vfx/flame` crown; ≥ 160 → flame ×2 |
 | Charge (v2) | One squad at a time flies at the hunter (3 waves), impact flash + shake, the HP bar drains by that squad's share, `-damage` pops |
 | Result (v2) | Win: dissolve, `$` burst, banner "THE HUNTER FALLS!"; loss: the hunter laughs (fast idle), the army drifts and fades, banner "THE HUNTERS PREVAIL" |

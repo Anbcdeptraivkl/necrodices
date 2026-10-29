@@ -380,6 +380,7 @@ Smallest playable test: Night 1-2 with the v2 rules and placeholder-quality new 
 | V2-M4 art | 13 units (6 legends 32×32), 30 trinkets, 17 potions, 8 gems, 12 coffers, 13 gear, 8 rune bodies + tiles, points badges, flame VFX, how-to pages re-captured | `ART OK (233 files)` | designer repaint |
 | V2-M5 juice | staggered roll landing, per-die / rune / trinket bounce + pops, clone bursts, aura tiers, one charge per squad with HP drain, win / lose banners | captures `summoning`, `charge`, `horde`, `result` | frame-time check in a browser |
 | V2-M6 balance | curve + boss multipliers by bot (D-G13) | 1,000 runs: 60.2% Night 4, 3.4% win; Night 1 Mob 97% | human playtest, web export |
+| V2-M7 scoring beat | Latin-square starting dice (D-G15), trinket-major scoring order (D-G16), Balatro-style summon playback: lit / dimmed summoned dice, left→right shakes, trinket turns, chain speed-up 5 % per step, floor 50 % (D-P01) | 62 headless cases (`test_trinket_turns`, Latin square over 4 seeds, `playback` timing); captures `summoning`, `summon_relics`; 1,000 runs after the change: 60.2% Night 4, 3.1% win | human playtest of the feel at ×1 / ×4 |
 
 Next (in order): human playtest of Nights 1–3 with the playtest record (game-design-review);
 decide keep / change / cut on the money lines (+$2 / +$1 idea) and on die finishes / marks;

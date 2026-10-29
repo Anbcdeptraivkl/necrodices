@@ -3,21 +3,25 @@ extends RefCounted
 ## Turns what the battle model already decided into presentation beats (GAME_SPEC §11): the
 ## staggered roll, a summon's trace (combo → dice / runes / trinkets → strength → commit) and
 ## the resolve (RESOLVE trinkets → one charge per squad → result). Durations are nominal at ×1;
-## a summon is compressed to ≤ SUMMON_BUDGET and a resolve to ≤ RESOLVE_BUDGET, then divided
-## by the game speed. Skipping is owned by the screen: it skips the queue, then snaps the view
+## within each stage of a summon (combo shakes, dice, trinkets) every step is SPEEDUP shorter
+## than the one before, never below SPEEDUP_FLOOR — so a long chain plays at most twice as
+## fast (D-P01). A resolve is compressed to ≤ RESOLVE_BUDGET. Everything is then divided by the
+## game speed. Skipping is owned by the screen: it skips the queue, then snaps the view
 ## to the model.
 
 const LAND_MIN := 0.35
 const LAND_MAX := 0.9
-const COMBO_TIME := 0.35
-const STEP_TIME := 0.16
-const TRINKET_TIME := 0.22
+const COMBO_TIME := 0.3        # banner + base soldiers, plus one COMBO_GAP per scoring die shake
+const COMBO_GAP := 0.14
+const STEP_TIME := 0.26
+const TRINKET_TIME := 0.32
+const SPEEDUP := 0.95
+const SPEEDUP_FLOOR := 0.5
 const STRENGTH_TIME := 0.35
 const COMMIT_TIME := 0.3
 const RESOLVE_STEP_TIME := 0.3
 const CHARGE_TIME := 0.6
 const RESULT_TIME := 1.0
-const SUMMON_BUDGET := 4.0
 const RESOLVE_BUDGET := 5.0
 
 
@@ -44,23 +48,54 @@ static func roll(view: CombatView, indices: PackedInt32Array, seed: int, speed: 
 	return out
 
 
+## The chain factor of the `n`-th step (0-based) within one stage: SPEEDUP^n, floored.
+static func speedup(n: int) -> float:
+	return maxf(SPEEDUP_FLOOR, pow(SPEEDUP, n))
+
+
+## Nominal ×1 delays of the combo beat's dice shakes (one per scoring die), sped up like a stage.
+static func combo_shakes(n: int) -> Array[float]:
+	var out: Array[float] = []
+	var at := 0.0
+	for k in n:
+		out.append(at)
+		at += COMBO_GAP * speedup(k)
+	return out
+
+
+static func combo_time(n: int) -> float:
+	var shakes := combo_shakes(n)
+	return COMBO_TIME + (shakes[-1] if not shakes.is_empty() else 0.0)
+
+
+## Nominal ×1 seconds of the steps between COMBO and STRENGTH. The dice stage (points, runes,
+## held runes, boss rules) and the trinket stage each start at full length and speed up on their
+## own.
+static func step_times(steps: Array[TraceStep]) -> Array[float]:
+	var out: Array[float] = []
+	var dice_n := 0
+	var relic_n := 0
+	for k in range(1, steps.size() - 1):
+		if steps[k].kind == TraceStep.Kind.TRINKET:
+			out.append(TRINKET_TIME * speedup(relic_n))
+			relic_n += 1
+		else:
+			out.append(STEP_TIME * speedup(dice_n))
+			dice_n += 1
+	return out
+
+
 static func summon(view: CombatView, gi: int, squad: Squad, army_before: float, speed: float) -> Array[PresentationState]:
 	var steps := squad.result.trace
-	var raw := 0.0
-	for k in range(1, steps.size() - 1):
-		raw += TRINKET_TIME if steps[k].kind == TraceStep.Kind.TRINKET else STEP_TIME
-	var fixed := COMBO_TIME + STRENGTH_TIME + COMMIT_TIME
-	var squeeze := 1.0
-	if raw + fixed > SUMMON_BUDGET and raw > 0.0:
-		squeeze = maxf(0.1, (SUMMON_BUDGET - fixed) / raw)
+	var times := step_times(steps)
 	var out: Array[PresentationState] = []
 	var first := steps[0]
-	out.append(Beat.new(func(t: Tween, d: float) -> void: view.show_combo(t, gi, squad, first, d), COMBO_TIME / speed))
+	out.append(Beat.new(func(t: Tween, d: float) -> void: view.show_combo(t, gi, squad, first, d),
+		combo_time(squad.scored.size()) / speed))
 	for k in range(1, steps.size() - 1):
 		var s := steps[k]
-		var dur := (TRINKET_TIME if s.kind == TraceStep.Kind.TRINKET else STEP_TIME) * squeeze / speed
 		var n := k
-		out.append(Beat.new(func(t: Tween, d: float) -> void: view.show_step(t, gi, s, d, n), dur))
+		out.append(Beat.new(func(t: Tween, d: float) -> void: view.show_step(t, gi, s, d, n), times[k - 1] / speed))
 	var after := army_before + squad.result.strength
 	out.append(Beat.new(func(t: Tween, d: float) -> void: view.show_strength(t, gi, squad, army_before, after, d),
 		STRENGTH_TIME / speed))

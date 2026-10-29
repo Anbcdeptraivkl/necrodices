@@ -5,7 +5,8 @@ extends Node
 ## Presets are rows in PRESETS; a missing situation is a new row, not a new branch.
 ## Battle presets: `squads` summons played by the balance bot's pick through the screen's own
 ## handlers; `pick` leaves the last pick unsummoned; `roll` presses ROLL; `wait` = seconds of
-## playback before the shot. Saves go to user://sav_capture.
+## playback before the shot (`--wait=<s>` overrides it; `--time_scale=0.1` slows the game so a
+## 0.1 s punch can be caught). Saves go to user://sav_capture.
 
 const PRESETS := {
 	"title": {"screen": "title"},
@@ -18,6 +19,10 @@ const PRESETS := {
 	"rolling": {"screen": "encounter", "seed": "CAPTURE1", "roll": true, "wait": 0.45},
 	"summoning": {"screen": "encounter", "seed": "CAPTURE3", "squads": 1, "wait": 1.1,
 		"relics": ["RATTLE_DRUM", "HYBRID_VIGOR", "GRAVEDIGGER_LAMP"], "dice": 6},
+	"summon_8": {"screen": "encounter", "seed": "CAPTURE4", "squads": 1, "dice": 8, "runes": true, "wait": 0.9,
+		"relics": ["EMBER_JAR", "MOSS_CHARM", "LIGHTNING_ROD"]},
+	"summon_relics": {"screen": "encounter", "seed": "CAPTURE1", "squads": 1, "wait": 2.0,
+		"relics": ["EMBER_JAR", "MOSS_CHARM", "GRAVEDIGGER_LAMP", "LIGHTNING_ROD"], "dice": 6},
 	"boss": {"screen": "encounter", "seed": "CAPTURE2", "night": 8, "encounter": 2, "squads": 2, "pick": true,
 		"relics": ["BONE_PILE", "BLOOD_MOON", "TACTICIAN_SKULL", "WISP_JAR", "GRAVEDIGGER_LAMP"], "dice": 8, "wait": 6.0},
 	"horde": {"screen": "encounter", "seed": "CAPTURE4", "squads": 3, "levels": 6, "dice": 8, "runes": true, "pick": true,
@@ -65,6 +70,7 @@ func _capture() -> void:
 	game.profile = game.store.load_profile()
 	game.profile["tutorial"] = {"tut_first_roll": true, "tut_first_summon": true, "tut_first_shop": true}
 	var preset: Dictionary = PRESETS[_args.get("preset", "title")]
+	Engine.time_scale = float(_args.get("time_scale", 1.0))
 	await _build(game, db, preset)
 	if preset.has("hover"):
 		var target: Control = null
@@ -78,7 +84,7 @@ func _capture() -> void:
 		motion.position = target.get_global_rect().get_center() * Vector2(get_window().size) / get_viewport().get_visible_rect().size
 		Input.parse_input_event(motion)
 		get_viewport().warp_mouse(target.get_global_rect().get_center())  # tooltips sit at the pointer
-	await get_tree().create_timer(float(preset.get("wait", 0.6))).timeout
+	await get_tree().create_timer(float(_args.get("wait", preset.get("wait", 0.6)))).timeout
 	await RenderingServer.frame_post_draw
 	var img := get_viewport().get_texture().get_image()
 	var out: String = _args.get("out", "captures/capture.png")

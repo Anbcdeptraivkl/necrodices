@@ -10,8 +10,7 @@ static func new_run(db: ContentDb, run_seed: String) -> RunState:
 	run.seed = run_seed
 	run.rng = RngStreams.create(run_seed)
 	run.money = int(db.economy["start_money"])
-	for i in int(db.economy["start_dice"]):
-		run.dice.append(Die.random(run.rng.stream("DICE")))
+	run.dice.append_array(Die.starting_set(run.rng.stream("DICE"), int(db.economy["start_dice"])))
 	run.night = 1
 	NightGen.generate(db, run)
 	run.phase = RunState.Phase.NIGHT_MAP

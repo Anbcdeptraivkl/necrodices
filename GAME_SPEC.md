@@ -27,12 +27,12 @@
 | D-01 | Engine / target | Godot 4.6.3, GDScript, 2D. Web desktop (itch.io) first, mobile landscape second |
 | D-02 | Resolution | 480 × 270 landscape, integer scale (ART_SPEC §2) |
 | D-03 | Dice | 6 faces; a face = **element + points + optional rune**. Start with **5** dice, max **8** |
-| D-04 | Points | BONE faces are always **6**. The other five elements carry **1–5**, in a different order on every die |
+| D-04 | Points | BONE faces are always **6**. The other five elements carry **1–5**, in a different order on every die. The **starting five dice form a Latin square**: each element shows 1, 2, 3, 4 and 5 once across them (like a deck holding every rank of every suit); market dice are shuffled freely |
 | D-05 | Elements | `BONE, FIRE, ICE, LEAF, VOLT, METAL` (canonical order) |
 | D-06 | Rolling | Every roll rolls **all** your dice. No bag, no draw pile. Dice are added, never discarded |
 | D-07 | Per battle | **3 Summons**, **2 Rerolls** (shared). A summon = roll → pick → confirm one squad |
 | D-08 | Squad | Pick **3–5** dice in order; they form one **combo** (§4.3). Score = `floor(Power × Count)` |
-| D-09 | Order | Squad: combo base → scored dice left→right (points, rune) → held-dice runes → trinkets left→right |
+| D-09 | Order | Squad: combo base → scored dice left→right (points, rune) → held-dice runes → **each trinket left→right takes its turn**: its per-die effects over the scored dice left→right, then its group effect |
 | D-10 | Battle end | The player presses **ATTACK!** between summons (or when the summons run out): the army's damage (Σ squads, then RESOLVE trinkets) hits the hunter; ≥ HP wins. Every summon left unused pays $1 (D-G14) |
 | D-11 | Run | 8 Nights × (Mob, Champion, Boss) = 24 battles |
 | D-12 | Determinism | Seeded run; all randomness from named RNG streams (§10.1). The scorer has no RNG: luck is rolled before scoring |
@@ -207,9 +207,10 @@ P = combo.base_p + (L−1)·lvl_p ;  C = combo.base_c + (L−1)·lvl_c        CO
 for each scored die, pick order:
     P += points (Exorcist: BONE → 0)                                       DIE step
     rune: SHARP +P | SWARM +C | GLASS ×C | TOMB +P | LUCKY (+C if proc)    RUNE step
-    DIE trinkets left→right whose cond matches this die                    TRINKET step
 for each held die: IRON ×1.5 C                                             HELD step
-SQUAD trinkets left→right                                                  TRINKET step
+for each trinket, left→right (its turn):
+    its DIE blocks for each scored die, pick order, whose cond matches     TRINKET step
+    its SQUAD blocks                                                       TRINKET step
 strength = floor(P × C)                                                    STRENGTH step
 ```
 Every × rounds half up immediately (`floor(x + 0.5)`).
@@ -233,8 +234,8 @@ last squad step equals the squad's strength; the last resolve step equals the da
 
 ### 5.6 Worked example (test fixture)
 Dice picked: FIRE-4, FIRE-2 (SHARP), FIRE-5, ICE-3; trinkets Ember Jar, Three-faced Totem; Trio L1.
-COMBO 30 × 3 → DIE F4 34 → Ember 54 → DIE F2 56 → SHARP 86 → Ember 106 → DIE F5 111 → Ember 131
-→ Three-faced Totem C 11 → strength **1,441**. ICE-3 is unscored.
+COMBO 30 × 3 → DIE F4 34 → DIE F2 36 → SHARP 66 → DIE F5 71 → Ember (F4) 91 → Ember (F2) 111
+→ Ember (F5) 131 → Three-faced Totem C 11 → strength **1,441**. ICE-3 is unscored.
 
 ---
 
@@ -449,15 +450,15 @@ Coffer, Spoils, Confirm, How to Play.
 | Beat | Time | What plays |
 |---|---|---|
 | Roll | 0.35–0.9 s per die, random, last die slowest | dice tumble in the tray and land one by one with a bounce and a click |
-| Combo | 0.35 s | combo banner slams; the squad's base soldiers pop onto the field |
-| Die / rune / held | 0.16 s each | the die bounces, its number pops, Power / Count bounce; +Count adds soldiers, ×Count clone-bursts the squad |
-| Trinket | 0.22 s each | the trinket shakes, the number bounces |
+| Combo | 0.3 s + 0.14 s per scoring die | combo banner slams; the summoned dice stay raised (scoring: lit ring, unscored: dimmed); the scoring dice shake left→right; the group's base soldiers pop onto the field at base Power × Count |
+| Die / rune / held | 0.26 s each | the die punches (×1.4 → 1) and shakes, its number pops on the die, Power / Count punch and tick; +Count adds soldiers, ×Count clone-bursts the group |
+| Trinket | 0.32 s each | the trinket whose turn it is wobbles; each die it fires on shakes and pops its number; Power / Count punch |
 | Strength | 0.35 s | "P × C = strength" slam; the army total ticks up |
 | Resolve trinkets | 0.3 s each | trinket shakes, army total × |
 | Charge | 0.6 s per squad | the squad flies into the hunter: impact flash, shake, HP drains by that squad's share |
 | Result | 1.0 s | win: hunter dissolves, coin burst, banner; loss: hunter laughs, army scatters and fades, banner |
 
-A summon's playback is compressed to ≤ 4 s and the resolve to ≤ 5 s at ×1. Visible soldiers
+Chain speed-up (Balatro feel): within each stage of a summon — the combo's dice shakes, the dice stage (points, runes, held runes), the trinket stage — every step is 5 % shorter than the one before (× 0.95ⁿ), never below half its base time, so a long chain plays at most twice as fast (≈ 10–14 steps in). A summon has no further cap; the resolve is compressed to ≤ 5 s at ×1. Visible soldiers
 per horde squad: `c` up to 12, then `12 + floor(6 log2(c / 12))`, cap 40; tiers by total
 (≤ 60 full sprites, ≤ 240 minis, else LEGION banners). Single units: aura tier by Count
 (≥ 10, ≥ 40, ≥ 160).

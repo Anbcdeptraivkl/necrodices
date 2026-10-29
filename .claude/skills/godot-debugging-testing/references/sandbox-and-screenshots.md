@@ -41,6 +41,9 @@ How it must work:
    borderless, small and no-focus so it cannot take over the screen or steal keyboard input.
 6. Park the mouse (warp to a corner) first, or whatever it hovers has a tooltip open in the shot.
 7. Use the console binary so a failed capture prints something.
+8. To catch a transient (a 0.1 s punch or shake), slow the game rather than guessing the
+   frame: an `Engine.time_scale` argument (e.g. 0.1) plus a wait in game seconds. At full
+   speed the first frames of a fresh window hitch, so a timed shot lands between beats.
 
 Why a viewport read, not a desktop grab: nothing needs focus or to be on top (no stray
 windows in the frame), and no DPI trap — a non-DPI-aware desktop grab on a 125% display

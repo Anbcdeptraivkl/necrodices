@@ -27,6 +27,15 @@ func test_new_run_setup() -> void:
 		_eq(sorted, [1, 2, 3, 4, 5], "points 1..5 once each")
 		layouts[str(pts)] = true
 	_check(layouts.size() > 1, "dice differ from each other")
+	for seed_text in ["A", "B", "CAPTURE1", "LATIN"]:
+		var dice := RunFlow.new_run(Fixtures.db(), seed_text).dice
+		for k in range(1, 6):
+			var column: Array = []
+			for d in dice:
+				column.append(d.faces[k].points)
+			column.sort()
+			_eq(column, [1, 2, 3, 4, 5], "seed %s: %s shows 1..5 across the five dice" % [seed_text,
+				RulesRegistry.ELEMENTS[k]])
 	var db := Fixtures.db()
 	var base: float = db.curve["night_base"][0]
 	_eq(run.night_plan[0]["hp"], roundf(base * db.curve["role_mult"]["MOB"]), "night 1 mob HP")

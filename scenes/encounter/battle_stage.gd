@@ -99,8 +99,14 @@ func snap(squads: Array[Squad], damage: float, done: bool, win: bool) -> void:
 	show_army(squads)
 	for d in dice:
 		d.stop_roll()
+		d.reset_fx()
 	for p in _popups:
 		p.visible = false
+		p.scale = Vector2.ONE
+	if top_bar != null:
+		top_bar.reset_fx()
+	if score_panel != null:
+		score_panel.reset_fx()
 	_hurt = false
 	_laughing = false
 	_mat.set_shader_parameter(&"flash", 0.0)
@@ -158,9 +164,19 @@ func show_combo(t: Tween, gi: int, squad: Squad, step: TraceStep, dur: float) ->
 	var appeared := _horde.add_group(squad.unit_id, squad.unit_elements, step.c_after)
 	_horde.set_highlight(gi, true)
 	_pop(t, appeared)
-	for i in squad.dice:
+	# The summoned dice stay raised; the scoring ones light up and shake left to right.
+	for k in squad.dice.size():
+		var i := squad.dice[k]
 		if i < dice.size():
-			dice[i].bounce(t, 2.0)
+			dice[i].mark(DieView.Mark.SCORING if squad.scored.has(k) else DieView.Mark.UNSCORED)
+	# Nominal shake times scaled to this beat's length (game speed): each comes 5 % sooner.
+	var shakes := BattlePlayer.combo_shakes(squad.scored.size())
+	var fit := dur / BattlePlayer.combo_time(squad.scored.size())
+	for n in shakes.size():
+		var i := squad.dice[squad.scored[n]]
+		if i < dice.size():
+			dice[i].shake(t, shakes[n] * fit, minf(0.16, dur * 0.5), not reduce_motion)
+			t.tween_callback(Audio.play_tick.bind(n)).set_delay(shakes[n] * fit)
 	Audio.play("summon")
 
 
@@ -171,9 +187,9 @@ func show_step(t: Tween, gi: int, step: TraceStep, dur: float, n: int) -> void:
 		colour = Art.colour("M1")
 	_popup(t, step.label, at, colour, dur)
 	if step.die >= 0 and step.die < dice.size():
-		dice[step.die].bounce(t)
+		dice[step.die].shake(t, 0.0, minf(0.16, dur * 0.8), not reduce_motion)
 	if step.kind == TraceStep.Kind.TRINKET:
-		_pulse_relic(step.source_id, t)
+		_pulse_relic(step.source_id, t, dur)
 	score_panel.tween_squad(t, step.p_after, step.c_after, dur)
 	if gi < _horde.groups.size() and not is_equal_approx(float(_horde.groups[gi]["count"]), step.c_after):
 		var appeared := _horde.set_count(gi, step.c_after)
@@ -212,7 +228,7 @@ func show_commit(t: Tween, squad: Squad, dur: float) -> void:
 
 
 func show_resolve_step(t: Tween, step: TraceStep, dur: float) -> void:
-	_pulse_relic(step.source_id, t)
+	_pulse_relic(step.source_id, t, dur)
 	_popup(t, step.label, _relic_anchor(step.source_id), Art.colour("G1"), dur)
 	score_panel.tween_army(t, step.p_after / maxf(step.value, 1.0) if step.op == "mul_d" else step.p_after - step.value,
 		step.p_after, dur)
@@ -335,17 +351,26 @@ func _popup(t: Tween, text: String, at: Vector2, colour: Color, dur: float, dela
 	l.modulate.a = 1.0
 	var rise := maxf(0.2, dur)
 	t.tween_callback(func() -> void: l.visible = true).set_delay(delay)
+	if not reduce_motion:
+		l.pivot_offset = (l.size / 2.0).floor()
+		t.tween_property(l, "scale", Vector2.ONE, minf(0.12, rise * 0.5)).from(Vector2(1.6, 1.6)) 			.set_delay(delay).set_trans(Tween.TRANS_BACK).set_ease(Tween.EASE_OUT)
 	t.tween_property(l, "position", start - Vector2(0, 10), rise).from(start).set_delay(delay) \
 		.set_trans(Tween.TRANS_QUAD).set_ease(Tween.EASE_OUT)
 	t.tween_property(l, "modulate:a", 0.0, rise * 0.4).set_delay(delay + rise * 0.6)
 	t.tween_callback(func() -> void: l.visible = false).set_delay(delay + rise)
 
 
-func _pulse_relic(relic_id: String, t: Tween) -> void:
+## The trinket whose turn it is wobbles (±2 px), so the player sees which one is firing.
+func _pulse_relic(relic_id: String, t: Tween, dur: float = 0.16) -> void:
 	var slot := top_bar.relic_slot_by_id(relic_id) if top_bar != null else null
 	if slot == null:
 		return
-	t.tween_property(slot, "shake", 0.0, 0.16).from(2.0).set_trans(Tween.TRANS_SINE)
+	if reduce_motion:
+		t.tween_property(slot, "modulate", Color.WHITE, minf(0.2, dur)).from(Color(1.6, 1.6, 1.6))
+		return
+	var step := minf(0.2, dur) / 4.0
+	for k in 4:
+		t.tween_property(slot, "shake", float([2, -2, 1, 0][k]), step).set_delay(k * step)
 
 
 func _clone_burst(t: Tween, gi: int) -> void:

@@ -14,9 +14,24 @@ func test_worked_example() -> void:
 	var kinds: Array = []
 	for s in r.trace:
 		kinds.append(TraceStep.Kind.keys()[s.kind])
-	_eq(kinds, ["COMBO", "DIE", "TRINKET", "DIE", "RUNE", "TRINKET", "DIE", "TRINKET", "TRINKET", "STRENGTH"],
-		"trace order")
+	_eq(kinds, ["COMBO", "DIE", "DIE", "RUNE", "DIE", "TRINKET", "TRINKET", "TRINKET", "TRINKET", "STRENGTH"],
+		"trace order: dice first, then each trinket takes its turn (D-09)")
 	_eq(r.trace[-1].p_after * r.trace[-1].c_after, 1441.0, "last step = strength")
+
+
+## Trinket-major order (D-09): a trinket's DIE and SQUAD blocks fire in its own turn, so the
+## trinket row order decides whether a + lands before or after a ×.
+func test_trinket_turns() -> void:
+	var dice := ["LEAF5", "FIRE1", "ICE2"]  # Rabble: only LEAF-5 scores, 10 × 1
+	_eq(Fixtures.score(dice, ["WISP_JAR", "MOSS_CHARM"]).count, 5.0, "×3 first, then +2: 1 × 3 + 2")
+	_eq(Fixtures.score(dice, ["MOSS_CHARM", "WISP_JAR"]).count, 9.0, "+2 first, then ×3: (1 + 2) × 3")
+	var r := Fixtures.score(["FIRE4", "FIRE2", "FIRE5"], ["EMBER_JAR", "TRIO_TOTEM"])
+	var ids: Array = []
+	for s in r.trace:
+		if s.kind == TraceStep.Kind.TRINKET:
+			ids.append([s.source_id, s.die])
+	_eq(ids, [["EMBER_JAR", 0], ["EMBER_JAR", 1], ["EMBER_JAR", 2], ["TRIO_TOTEM", -1]],
+		"Ember Jar walks the dice left to right, then Three-faced Totem fires for the group")
 
 
 func test_rabble_and_levels() -> void:

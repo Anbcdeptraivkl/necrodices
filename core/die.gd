@@ -24,6 +24,39 @@ static func random(rng: RandomNumberGenerator) -> Die:
 	return die
 
 
+## The starting set (GAME_SPEC D-04): like a deck holding every rank of every suit, the first
+## five dice form a Latin square — each element shows 1..5 once across them and each die
+## carries 1..5 once. Rows, columns and values are shuffled; dice past the fifth are random.
+static func starting_set(rng: RandomNumberGenerator, n: int) -> Array[Die]:
+	var size := RulesRegistry.ELEMENTS.size() - 1
+	var rows := _shuffled(rng, size)
+	var cols := _shuffled(rng, size)
+	var values := _shuffled(rng, size)
+	var out: Array[Die] = []
+	for i in n:
+		if i >= size:
+			out.append(random(rng))
+			continue
+		var die := Die.new()
+		die.faces.append(Face.new("BONE"))
+		for k in size:
+			die.faces.append(Face.new(RulesRegistry.ELEMENTS[k + 1], values[(rows[i] + cols[k]) % size] + 1))
+		out.append(die)
+	return out
+
+
+static func _shuffled(rng: RandomNumberGenerator, n: int) -> Array[int]:
+	var out: Array[int] = []
+	for i in n:
+		out.append(i)
+	for i in range(n - 1, 0, -1):
+		var j := rng.randi_range(0, i)
+		var t := out[i]
+		out[i] = out[j]
+		out[j] = t
+	return out
+
+
 ## Test helper / fixed layout: FIRE 1, ICE 2, LEAF 3, VOLT 4, METAL 5.
 static func standard() -> Die:
 	var die := Die.new()

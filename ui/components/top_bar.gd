@@ -77,6 +77,13 @@ func set_draggable(on: bool) -> void:
 		s.draggable = on and s.icon != null
 
 
+## Rest look after a skipped playback: no trinket left mid-wobble or brightened.
+func reset_fx() -> void:
+	for s in _relic_slots:
+		s.shake = 0.0
+		s.modulate = Color.WHITE
+
+
 func relic_slot_by_id(relic_id: String) -> ItemSlot:
 	for i in mini(_run.relics.size(), _relic_slots.size()):
 		if _run.relics[i].id == relic_id:

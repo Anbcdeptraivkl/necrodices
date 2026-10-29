@@ -1,8 +1,10 @@
 class_name Scorer
 extends RefCounted
 ## The one scorer (GAME_SPEC §5). Previews, the battle, bots and tests all call it.
-## Squad order: combo base → each scored die in pick order (points, rune, DIE trinkets left to
-## right) → IRON runes on held dice → SQUAD trinkets left to right → strength = floor(P × C).
+## Squad order (D-09): combo base → each scored die in pick order (points, rune) → IRON runes on
+## held dice → each trinket left to right takes its turn: its DIE blocks over the scored dice in
+## pick order, then its SQUAD blocks → strength = floor(P × C). Trinket-major, like Balatro's
+## jokers after the cards, so the playback can show one trinket at a time.
 ## Resolve: army = Σ strength → RESOLVE trinkets left to right → damage.
 ## Pure: no RNG (luck arrives on the squad), no side effects; commit-time effects (counters,
 ## money, glass breaks) live in EncounterState, so a preview can never change the run.
@@ -27,7 +29,12 @@ static func score_squad(db: ContentDb, squad: Squad, relics: Array[RelicInstance
 			var op := RelicEval.apply(iron["op"], float(iron["value"]), ctx)
 			trace.append(TraceStep.make(TraceStep.Kind.HELD, squad.held[h], "IRON", op, float(iron["value"]),
 				ctx.p, ctx.c, RelicEval.label(db, iron["op"], float(iron["value"]))))
-	_fire(db, "SQUAD", relics, ctx, -1, trace)
+	for r in relics:
+		if r.disabled:
+			continue
+		for k in squad.scored:
+			_fire_relic(db, "DIE", r, ctx, k, trace)
+		_fire_relic(db, "SQUAD", r, ctx, -1, trace)
 	result.power = ctx.p
 	result.count = ctx.c
 	result.strength = floorf(ctx.p * ctx.c)
@@ -59,24 +66,20 @@ static func _score_die(db: ContentDb, squad: Squad, k: int, relics: Array[RelicI
 			var op := RelicEval.apply(row["op"], v, ctx)
 			trace.append(TraceStep.make(TraceStep.Kind.RUNE, tray, f.rune, op, v, ctx.p, ctx.c,
 				RelicEval.label(db, row["op"], v)))
-	_fire(db, "DIE", relics, ctx, k, trace)
 
 
-## Every enabled trinket block of `trigger` whose condition holds, left to right.
-static func _fire(db: ContentDb, trigger: String, relics: Array[RelicInstance], ctx: ScoreCtx, k: int,
+## The trinket's blocks of `trigger` whose condition holds (`k` = scored position, -1 = squad).
+static func _fire_relic(db: ContentDb, trigger: String, r: RelicInstance, ctx: ScoreCtx, k: int,
 		trace: Array[TraceStep]) -> void:
 	var tray := ctx.squad.dice[k] if k >= 0 else -1
-	for r in relics:
-		if r.disabled:
+	for block: Dictionary in RulesRegistry.relic_blocks(db.relics[r.id]):
+		if block["trigger"] != trigger or not RelicEval.cond(block["cond"], ctx, k):
 			continue
-		for block: Dictionary in RulesRegistry.relic_blocks(db.relics[r.id]):
-			if block["trigger"] != trigger or not RelicEval.cond(block["cond"], ctx, k):
-				continue
-			for effect: Dictionary in block["effects"]:
-				var v := RelicEval.value(effect["value"], r.counter, ctx)
-				var op := RelicEval.apply(effect["op"], v, ctx)
-				trace.append(TraceStep.make(TraceStep.Kind.TRINKET, tray, r.id, op, v, ctx.p, ctx.c,
-					RelicEval.label(db, effect["op"], v)))
+		for effect: Dictionary in block["effects"]:
+			var v := RelicEval.value(effect["value"], r.counter, ctx)
+			var op := RelicEval.apply(effect["op"], v, ctx)
+			trace.append(TraceStep.make(TraceStep.Kind.TRINKET, tray, r.id, op, v, ctx.p, ctx.c,
+				RelicEval.label(db, effect["op"], v)))
 
 
 ## Army damage (§5.2). `strengths` in summon order; ctx.squad stays null.

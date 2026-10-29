@@ -55,6 +55,12 @@ func tween_army(t: Tween, from: float, to: float, dur: float) -> void:
 		_render(), from, to, dur)
 
 
+## Rest look after a skipped playback: no box left mid-punch.
+func reset_fx() -> void:
+	for box: Control in [_power_box, _count_box, _army_label]:
+		box.scale = Vector2.ONE
+
+
 func _punch(t: Tween, box: Control) -> void:
 	if Settings.get_value("reduce_motion"):
 		return

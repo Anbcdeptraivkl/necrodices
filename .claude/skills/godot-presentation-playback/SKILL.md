@@ -50,6 +50,15 @@ is `roguelike-scoring-pipeline`; pixel-perfect rendering rules are `godot-pixel-
   the view methods, which only add tweeners — so skipping kills one Tween per state.
 - The screen owns skipping: `queue.skip_all()` then `view.snap_final(final numbers)`; states
   need no per-state end look.
+- Long scoring chains speed up like Balatro's: step *n* of a stage lasts `base × decay^n`
+  with a floor (e.g. 0.95, floor 0.5 = at most twice as fast), restarting per stage (cards,
+  then jokers) and per hand. A total-time squeeze on top breaks the floor, so pick one: a
+  designer-stated "never faster than ×2" means no squeeze. Put the timing in a pure static
+  function so a test can assert "each step 5 % shorter, never below the floor".
+- Items that act on several targets in turn (a joker over each card) read best item-major: the
+  scorer emits all of one item's steps together, so the view can wobble that item for its turn.
+- Snap must also reset transients on nodes *outside* the stage (top-bar slots, score boxes):
+  a killed tween leaves them mid-wobble or mid-punch.
 - Soldiers on the field = each scored hand's own Count (hands scored one by one); the playback
   adds the hand's column at its base Count and updates only that column per step. Sharing one
   running Count across groups made sizes depend on resolve order and confused players.
