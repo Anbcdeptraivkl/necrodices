@@ -232,9 +232,9 @@ preview). The same functions drive the UI, the bot and tests.
 last squad step equals the squad's strength; the last resolve step equals the damage.
 
 ### 5.6 Worked example (test fixture)
-Dice picked: FIRE-4, FIRE-2 (SHARP), FIRE-5, ICE-3; trinkets Ember Jar, Trio Totem; Trio L1.
+Dice picked: FIRE-4, FIRE-2 (SHARP), FIRE-5, ICE-3; trinkets Ember Jar, Three-faced Totem; Trio L1.
 COMBO 30 × 3 → DIE F4 34 → Ember 54 → DIE F2 56 → SHARP 86 → Ember 106 → DIE F5 111 → Ember 131
-→ Trio Totem C 11 → strength **1,441**. ICE-3 is unscored.
+→ Three-faced Totem C 11 → strength **1,441**. ICE-3 is unscored.
 
 ---
 

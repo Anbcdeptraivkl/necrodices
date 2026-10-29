@@ -1,152 +1,152 @@
 {
   "RATTLE_DRUM": {
     "name": "Rattle Drum",
-    "effect": "On Summon: +3 Count for each BONE die that scores.",
-    "lore": "Skin of a tambourine, sticks of a femur. Skeletons dance to it involuntarily."
+    "effect": "On Summon: +3 Count per scoring BONE dice.",
+    "lore": "A drum made of skins and femurs. But ain't that just normal for drums?"
   },
   "EMBER_JAR": {
     "name": "Ember Jar",
-    "effect": "On Summon: +20 Power for each FIRE die that scores.",
+    "effect": "On Summon: +20 Power per scoring FIRE dice.",
     "lore": "Do not open indoors. Do not open outdoors either."
   },
   "FROST_LANTERN": {
     "name": "Frost Lantern",
-    "effect": "On Summon, if a scoring die is ICE: +5 Power per scoring die.",
-    "lore": "Burns cold and blue. Moths file complaints."
+    "effect": "On Summon: +5 Power per scoring ICE dice.",
+    "lore": "Moody and Blue atmosphere."
   },
   "MOSS_CHARM": {
     "name": "Moss Charm",
-    "effect": "On Summon: +2 Count for each LEAF die that scores.",
-    "lore": "Grows a little every time you are not looking."
+    "effect": "On Summon: +2 Count per scoring LEAF dice.",
+    "lore": "Grows a little greener every time you take a look."
   },
   "LIGHTNING_ROD": {
     "name": "Lightning Rod",
-    "effect": "On Summon: +10 Power and +1 Count for each VOLT die that scores.",
-    "lore": "Attracts storms, ghosts and the occasional angry wizard."
+    "effect": "On Summon: +10 Power and +1 Count per scoring VOLT dice.",
+    "lore": "Attracts storms."
   },
   "IRON_NAIL": {
     "name": "Iron Nail",
-    "effect": "On Summon, with 2+ METAL dice scoring: +30 Power.",
-    "lore": "Pulled from a coffin. The coffin wants it back."
+    "effect": "On Summon, with at least 2 METAL dices scoring: +30 Power.",
+    "lore": "Pulled from your own coffin."
   },
   "GRAVEDIGGER_LAMP": {
-    "name": "Gravedigger's Lamp",
+    "name": "Digger Lamp",
     "effect": "On Summon: +4 Count.",
-    "lore": "Lights the way to every grave. Some of them are occupied."
+    "lore": "Lights the way for those who dig their own graves."
   },
   "TRIO_TOTEM": {
-    "name": "Trio Totem",
+    "name": "Three-faced Totem",
     "effect": "On Summon of a Trio: +8 Count.",
-    "lore": "Three faces, one opinion: more skeletons."
+    "lore": "Three faces, one opinion - more sacrifices!"
   },
   "MOON_CHARM": {
     "name": "Moon Charm",
     "effect": "On Summon of a Full Moon: +10 Count.",
-    "lore": "Hums softly when the moon is full and loudly when it is not."
+    "lore": "Glows softly when the moon is full."
   },
   "BONE_SAW": {
     "name": "Bone Saw",
-    "effect": "On Summon, if every scoring die shows 4+ points: +40 Power.",
-    "lore": "Only cuts through the very best bones."
+    "effect": "On Summon, if every scoring dice face is 4 or more: +40 Power.",
+    "lore": "Only cuts the very best of bones."
   },
   "WISP_JAR": {
     "name": "Wisp Jar",
     "effect": "On Summon of a Rabble: x3 Count.",
-    "lore": "A jar of leftover wisps. They are fine with it."
+    "lore": "A jar of leftover souls. They are fine with the die-ing condition."
   },
   "GRAVE_ROBBER": {
-    "name": "Grave Robber",
-    "effect": "After a won battle: +$2.",
-    "lore": "A sack, a shovel and a flexible attitude toward property."
+    "name": "Graverobber Boons",
+    "effect": "After battle: +$2.",
+    "lore": "A sack, a shovel and a flexible attitude toward what counts as your."
   },
   "DEEP_FREEZE": {
-    "name": "Deep Freeze",
-    "effect": "On Summon, with 3+ ICE dice scoring: x1.5 Count.",
-    "lore": "A skull frozen in an ice cube. It is still thinking."
+    "name": "Deep Freezer",
+    "effect": "On Summon, with 3 or more ICE dices scoring: x1.5 Count.",
+    "lore": "A skull frozen in an ice cube. Chilling thoughts."
   },
   "LOADED_BONE": {
     "name": "Loaded Bone",
-    "effect": "On Roll: if no BONE shows, one die flips to its BONE face.",
-    "lore": "Weighted with lead and a little cheating."
+    "effect": "On Roll: if no BONE faces, one random dice flips to its BONE face.",
+    "lore": "A bone dice, weighted with lead for a little cheating here and there."
   },
   "THRIFTY_GHOST": {
     "name": "Thrifty Ghost",
     "effect": "On Summon: +3 Count for each Reroll you still have.",
-    "lore": "Saves every coin. Has nothing to spend it on. Being dead is cheap."
+    "lore": "Saved every coin. Has nothing to spend it on now."
   },
   "HYBRID_VIGOR": {
     "name": "Hybrid Vigor",
-    "effect": "On Summon of a Duo Pact or Full Moon: +6 Count.",
-    "lore": "Two potions in one bottle. Shake before summoning."
+    "effect": "On Summon of a Duo or Full Moon: +6 Count.",
+    "lore": "A LOTS of potions in one bottle. Shake well before drinking."
   },
   "COPYCAT_COFFIN": {
     "name": "Copycat Coffin",
-    "effect": "On Summon of a monster already in your army: +8 Count.",
-    "lore": "Two identical coffins. Nobody knows which one is the original."
+    "effect": "On Summon of a monster type already in your army: +8 Count.",
+    "lore": "Two identical coffins. Don't know what inside, but there are probably 2 of them."
   },
   "OVERGROWTH": {
     "name": "Overgrowth",
-    "effect": "On Summon: +1 Count for every LEAF squad you ever summoned (now +{counter}).",
+    "effect": "On Summon: +1 Count for every LEAF group you ever summoned (now +{counter}).",
     "lore": "A vine that remembers every leaf it has ever met."
   },
   "SPIRIT_BOARD": {
     "name": "Spirit Board",
     "effect": "On Summon of a Rainbow: x2 Count.",
-    "lore": "Spells out R-A-I-N-B-O-W, then goes very quiet."
+    "lore": "It wants to say something but the letters are too faded to be readable."
   },
   "PIGGY_COFFIN": {
     "name": "Piggy Coffin",
     "effect": "On Summon: +2 Power for each $1 you hold.",
-    "lore": "A piggy bank shaped like a coffin. Oink, rest in peace."
+    "lore": "Oink in peace."
   },
   "GILDED_TOOTH": {
     "name": "Gilded Tooth",
-    "effect": "On Summon: earn $1 for each BONE die that scores.",
-    "lore": "Pulled from a pirate skeleton. The pirate is still looking."
+    "effect": "On Summon: earn $1 per scoring BONE dice.",
+    "lore": "Pulled from a pirate skeleton."
   },
   "BONE_PILE": {
-    "name": "Bone Pile",
-    "effect": "On Summon: +2 Count for each unpicked die showing BONE.",
-    "lore": "Just a pile of bones. Probably. Do not count them."
+    "name": "Bone Hairpin",
+    "effect": "On Summon: +2 Count for each unplayed dice with BONE face.",
+    "lore": "Carved from a finger bone could be yours but you don't remember."
   },
   "COLD_HEARTH": {
     "name": "Cold Hearth",
-    "effect": "On Summon: +15 Power for each scoring die with 1-2 points.",
-    "lore": "A fireplace that went out centuries ago and is still sulking."
+    "effect": "On Summon: +15 Power for each scoring dice with 1 or 2 points.",
+    "lore": "A fireplace that makes you cold. Very modern design."
   },
   "GRAND_PROCESSION": {
-    "name": "Grand Procession",
-    "effect": "On Summon: +15 Power for each squad already in your army.",
-    "lore": "A tiny banner that makes every march feel important."
+    "name": "Grand Progress",
+    "effect": "On Summon: +15 Power for each group of monsters already in your army.",
+    "lore": "A tiny banner that makes you feel important."
   },
   "TACTICIAN_SKULL": {
     "name": "Tactician's Skull",
     "effect": "On your first Summon of a battle: x2 Power.",
-    "lore": "Wore a general's helmet once. Still gives orders."
+    "lore": "He looks like he's judging your gameplay."
   },
   "CROWN_OF_THE_LICH": {
     "name": "Crown of the Lich",
     "effect": "On Summon of a Ritual, Quartet or Quintet: x2 Count.",
-    "lore": "Heavy is the head that wears it. Heavier when the head is a skull."
+    "lore": "Heavy is the head that wears the heavy crown."
   },
   "LAST_RITES": {
     "name": "Last Rites",
     "effect": "On your last Summon of a battle: x3 Count.",
-    "lore": "Spoken once, at the very end. Loudly."
+    "lore": "The last remains of a glorious battle."
   },
   "ELEMENTAL_CONVERGENCE": {
-    "name": "Elemental Convergence",
+    "name": "Elemental Bracelet",
     "effect": "On Summon, once all 6 elements have scored this battle: x3 Count.",
-    "lore": "Six coloured stones that only glow together."
+    "lore": "Six coloured stones that glow together."
   },
   "BLOOD_MOON": {
     "name": "Blood Moon",
     "effect": "On Attack, with 3+ squads: x1.5 damage.",
-    "lore": "When it rises, everything hits a little harder."
+    "lore": "Everything hits a little harder when painted red."
   },
   "BLACK_GRIMOIRE": {
-    "name": "Black Grimoire",
+    "name": "Side-eyed Grimoire",
     "effect": "On Attack: x1 damage, +0.25 for each boss defeated (now x{value}).",
-    "lore": "Lists every boss you have ever beaten, in alphabetical order."
+    "lore": "Lists every enemies you have ever beaten, in alphabetical order."
   }
 }

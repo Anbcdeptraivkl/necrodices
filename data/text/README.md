@@ -38,5 +38,5 @@ Each file is `"key": "text"`. Change the text, never the key. A key may appear i
 Keep these exactly as they are; the game fills them in:
 
 - `%s` text or a number, `%d` a whole number — keep how many there are and their order.
-- `{counter}` (Overgrowth) and `{value}` (Black Grimoire) — live trinket numbers.
+- `{counter}` (Overgrowth) and `{value}` (Side-eyed Grimoire) — live trinket numbers.
 - `\n` — a line break.

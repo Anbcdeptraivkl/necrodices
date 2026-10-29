@@ -256,7 +256,7 @@ badge leave the body visible. Source: `tools/art/dice_runes.py`.
 
 ## 5. Icons — 16×16
 
-- 1 px transparent margin (live area 14×14), `N0` outline, max 6 colours, centred, top-left light.
+- 1 px transparent margin (live area 14×14), `N0` outline, max 6 colours (trinket / relic icons 7), centred, top-left light.
 - One readable idea per icon; no text inside icons.
 - Each item kind has one family look (designer request 2026-10-23): **trinkets** = small charms and
   curios, **potions** = bottles, **gems** = cut gems, **gear** = equipment / tools, **coffers** = small

@@ -34,7 +34,7 @@ PALETTE_GPL = ASSETS / "palette" / "hallow32.gpl"
 
 COLOUR_LIMITS = {
     "unit": 7, "legion": 7, "legend": 12, "mini": 4, "enemy": 12, "shopkeeper": 12,
-    "relic_icon": 6, "consumable_icon": 6, "coffer_icon": 6, "equipment_icon": 6, "stat_icon": 6, "num": 3,
+    "relic_icon": 7, "consumable_icon": 6, "coffer_icon": 6, "equipment_icon": 6, "stat_icon": 6, "num": 3,
     "bg": 16,
 }
 BORDER_ICONS = {"relic_icon", "consumable_icon", "coffer_icon", "equipment_icon"}
