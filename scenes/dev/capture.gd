@@ -3,7 +3,8 @@ extends Node
 ## waits for layout and animation to settle, saves the viewport as PNG, quits.
 ##   godot --path . --resolution 960x540 res://scenes/dev/capture.tscn -- --preset=encounter --out=captures/x.png
 ## Presets are rows in PRESETS; a missing situation is a new row, not a new branch.
-## Battle presets: `enemy` / `rules` force the hunter of the battle (art review); `squads` summons played by the balance bot's pick through the screen's own
+## Battle presets: `enemy` / `rules` force the hunter of the battle (art review; `--enemy=<ID>` on the
+## command line overrides a preset's hunter, its rules follow the enemy row); `squads` summons played by the balance bot's pick through the screen's own
 ## handlers; `pick` leaves the last pick unsummoned; `roll` presses ROLL; `wait` = seconds of
 ## playback before the shot (`--wait=<s>` overrides it; `--time_scale=0.1` slows the game so a
 ## 0.1 s punch can be caught). Saves go to user://sav_capture.
@@ -45,6 +46,8 @@ const PRESETS := {
 		"rules": ["BELL_RINGER"], "wait": 1.0},
 	"hunter_enraged": {"screen": "encounter", "seed": "CAPTURE2", "night": 8, "encounter": 2,
 		"enemy": "BOSS_BELL_RINGER", "rules": ["BELL_RINGER", "ENRAGED"], "wait": 1.0},
+	"hunter_pose_hurt": {"screen": "encounter", "seed": "CAPTURE2", "night": 3, "encounter": 2,
+		"enemy": "BOSS_BELL_RINGER", "rules": ["BELL_RINGER"], "pose": "hurt", "wait": 1.0},
 	"hunter_hurt": {"screen": "encounter", "seed": "CAPTURE5", "enemy": "BOSS_BELL_RINGER", "rules": ["BELL_RINGER"],
 		"squads": 1, "dice": 6, "hp": 0.01, "attack": true, "wait": 2.4},
 }
@@ -54,6 +57,8 @@ var _args := {}
 
 func _ready() -> void:
 	for a in OS.get_cmdline_user_args():
+		if not a.begins_with("--"):  # screenshot.cmd also forwards its positional arguments
+			continue
 		var kv := a.trim_prefix("--").split("=")
 		_args[kv[0]] = kv[1] if kv.size() > 1 else "1"
 	_detach.call_deferred()
@@ -76,9 +81,20 @@ func _capture() -> void:
 	game.store = SaveStore.new("user://sav_capture")
 	game.profile = game.store.load_profile()
 	game.profile["tutorial"] = {"tut_first_roll": true, "tut_first_summon": true, "tut_first_shop": true}
-	var preset: Dictionary = PRESETS[_args.get("preset", "title")]
+	var preset: Dictionary = PRESETS[_args.get("preset", "title")].duplicate()
+	if _args.has("enemy"):
+		if not db.enemies.has(_args["enemy"]):
+			push_error("capture: unknown enemy %s" % _args["enemy"])
+			get_tree().quit(1)
+			return
+		var rule: Variant = db.enemies[_args["enemy"]]["rule"]
+		preset["enemy"] = _args["enemy"]
+		preset["rules"] = [rule] if rule != null else []
 	Engine.time_scale = float(_args.get("time_scale", 1.0))
 	await _build(game, db, preset)
+	if preset.get("pose", "") == "hurt":  # hold the hunter's hurt frame (art review, no timing luck)
+		await get_tree().process_frame
+		get_tree().current_scene.find_child("Stage", true, false).set(&"_hurt", true)
 	if preset.has("hover"):
 		var target: Control = null
 		for i in 30:  # the scene change is deferred: wait until the target exists

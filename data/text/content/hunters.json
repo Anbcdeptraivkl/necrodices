@@ -17,7 +17,7 @@
       "lore": "Polished helmet, no polished sense of humour."
     },
     "CHAMP_MONSTER_HUNTER": {
-      "name": "Monster Hunter",
+      "name": "Rogue",
       "lore": "Would be pretty dangerous if you are a vampire."
     },
     "BOSS_EXORCIST": {
@@ -25,7 +25,7 @@
       "lore": "Splashes holy water on anything like a sprinkler."
     },
     "BOSS_WITCH_HUNTER": {
-      "name": "Witch Hunter",
+      "name": "Hunter",
       "lore": "Confiscates your favourite trinket 'for evidence'."
     },
     "BOSS_BELL_RINGER": {
@@ -34,7 +34,7 @@
     },
     "BOSS_INQUISITOR": {
       "name": "The Inquisitor",
-      "lore": "Asks too many questions. Shame he's too strong for you to cut his tongue off."
+      "lore": "The hat asks the questions. The man underneath is just how it gets around."
     }
   },
   "rules": {

@@ -194,7 +194,8 @@ Used when the army exceeds 60 visible sprites (GAME_SPEC §11.2).
 
 #### 4.5a Hunter style — designer reference `BOSS_BELL_RINGER` (repaint 2026-10-30)
 
-Every hunter repaint follows the Bell Ringer. Measured on its sheet (10 colours, bbox 29×32):
+Every hunter repaint follows the Bell Ringer; the champion and boss repaints of 2026-10-30 confirm it.
+Measured on its sheet (10 colours, bbox 29×32):
 
 | Trait | Rule |
 |---|---|
@@ -209,6 +210,9 @@ Every hunter repaint follows the Bell Ringer. Measured on its sheet (10 colours,
 | Colours | ≤ 12 (Bell Ringer: 10): `N0`, body mid + shade, accent 2 tones, wood 2 tones, skin 2 tones, `N7` |
 | `idle1` | The head and shoulders (the rows above the cloak's widest line) move **down 1 px**; hem, legs, hand, tool and prop stay |
 | `hurt` | Distorted and grimacing, drawn by hand (no row shear): the head mass **deforms** (pinched up into two points, like hair standing on end), the eye slit **breaks** into a scribble of accent pixels across 2–3 rows, the head shifts 1 px away from the hit, the free arm is **flung out** diagonally (2–3 px of skin). Legs, tool and prop do not move; lowest row stays 31 |
+| `hurt` vocabulary | Pick 2–3 per hunter: **X eyes** (a 3×3 `x` in `N0` or the accent) — every repaint uses them; **head deform** into two points (Bell Ringer, Exorcist); **flung arms** out of the robe (Exorcist, Bell Ringer); **red hit marks**: small `R1` crosses scattered on the body / armour (Guard, Hunter), eyes turning `R1`. When the headgear *is* the character (Inquisitor's eye hat), the headgear takes the hit: it crumples and an X covers its eye. No new colours in `hurt` |
+| Faces | Hidden behind the costume (Bell Ringer slit, Hunter brim, Exorcist hood, Rogue scarf) or a small skin band with 1 px dash eyes (Guard, the man under the Inquisitor's hat) |
+| Colour budget | As few as the role needs: the bosses use 6–7 colours, the champions 11–12; the limit stays 12 |
 
 Checklist for the next repaint: silhouette first at ×1; count colours (≤ 12); 1 px `N0` between parts;
 diff `idle0` / `idle1` (only the upper rows moved 1 px); diff `idle0` / `hurt` (feet and props
@@ -220,12 +224,12 @@ hunter) after `godot --headless --import`.
 | MOB_TORCH_VILLAGER | Peasant in patched tunic holding a torch high | Fire |
 | MOB_PITCHFORK_FARMER | Straw hat, overalls, pitchfork | Metal |
 | MOB_LANTERN_WATCHMAN | Hooded night watchman with lantern and rattle | Gold |
-| CHAMP_GUARD_CAPTAIN | Helmet with red plume, halberd, small shield | Metal + R1 |
-| CHAMP_MONSTER_HUNTER | Long coat, crossbow, wooden stakes on belt | B0 leather + R1 |
-| BOSS_EXORCIST | White-robed priest, sun-disc pendant, holy-water flask splashing | I2 + G1 |
-| BOSS_WITCH_HUNTER | Wide-brimmed hat, net over shoulder, silver dagger, red sash | R1 + M2 |
+| CHAMP_GUARD_CAPTAIN | "Guard": steel helmet with red plume, spear, round red shield, red tabard stripe | M0 / M1 + R1 |
+| CHAMP_MONSTER_HUNTER | "Rogue": spiky black hair, red scarf over the mouth, tan cloak, crossbow at the hip | B1 cloak + R1 |
+| BOSS_EXORCIST | White robe block with a pale hood hiding the face, gold cross on the chest, icy shine streaks | N7 / I2 + G1 |
+| BOSS_WITCH_HUNTER | "Hunter": wide-brimmed hat with a pointed crown hiding the face (white band glint), long dark coat, a dagger in each hand | N3 / N4 + M2 (R1 only when hurt) |
 | BOSS_BELL_RINGER | Hunched figure dragging a huge bronze bell | G0 + G1 |
-| BOSS_INQUISITOR | Tall red hat with open-eye emblem, red robes, long scroll | R0 + R1 |
+| BOSS_INQUISITOR | Tall red hat with a big open eye — the hat is the real Inquisitor, the small man below just carries it; red robe with cream trim | R0 / R1 + N7 |
 | SHOPKEEPER_UNDERTAKER | Skeletal merchant in top hat behind a coffin counter (2 frames, 64×32 sheet) | N4 + G1 |
 
 **Enraged** (Night 8): no new sprite. Runtime: modulate toward `R1` 35%, 1 px `R1` outline shader, `vfx/aura` loop behind.
