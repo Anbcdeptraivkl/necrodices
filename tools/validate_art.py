@@ -7,7 +7,7 @@ Checks:
   - exact pixel size; width / frame_w is an integer equal to `frames`
   - mode RGBA, alpha in {0, 255}
   - every opaque pixel in Hallow32 (files flagged `mask`: mask key colours + #0d0a14 only;
-    files flagged `tint` may also use pure white)
+    files flagged `tint` or `white` may also use pure white)
   - colour-count limits: units/legion 7, legends 12, minis 4, enemies/shopkeeper 12, icons 6, digits 3,
     backgrounds 16
   - 16x16 icons: 1 px transparent border
@@ -66,7 +66,7 @@ def check_entry(e: dict) -> list[str]:
     px = img.load()
     flags = set(e.get("flags", []))
     allowed = MASK_RGB if "mask" in flags else HALLOW32_RGB
-    if "tint" in flags:
+    if "tint" in flags or "white" in flags:
         allowed = allowed | {WHITE}
     bad_alpha = 0
     bad_colours: set[tuple[int, int, int]] = set()

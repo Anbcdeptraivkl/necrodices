@@ -669,18 +669,18 @@ GLYPHS = {
 }
 
 GLYPHS8 = {
-    "bone": ["c....c", ".cBBb.", "..Bb..", "..Bb..", ".cBBb.", "c....b"],
-    "fire": ["..F...", "..FF..", ".FgF..", ".FggF.", "FgggFf", ".fFff."],
+    "bone": ["cccccc", "c#cc#c", "c#cc#c", "cccccc", ".cccc.", ".c##c."],  # skull, as glyph_bone
+    "fire": ["..F...", "..FF..", ".FgF..", ".FggF.", "FggggF", ".FFFF."],
     "ice": ["j.j.j.", ".III..", "jIjIj.", ".III..", "j.j.j.", "......"],
     "leaf": ["....mL", "..mLLL", ".mLLlL", ".LLlL.", ".Ll...", "l....."],
-    "volt": ["..wVV.", ".wVV..", "wVVVV.", "..VVv.", ".VVv..", ".Vv..."],
-    "metal": [".uTT..", "uT##t.", "T####t", "T####t", ".t##t.", "..tt.."],
+    "volt": ["..wVV.", ".wVV..", "wVVVV.", "..VVV.", ".VV...", ".V...."],
+    "metal": [".uuuu.", "uTTTTu", "uT##Tu", "uT##Tu", "uTTTTu", ".uuuu."],
     "wild": [".7777.", "77OO77", "7OOOO7", "7OOOO7", "77OO77", ".7777."],
 }
 
 PIP_RAMP = {"bone": "B", "fire": "F", "ice": "I", "leaf": "L", "volt": "V", "metal": "T"}
 PIPS = {  # 4x4 marks inside a 6x6 dot
-    "bone": ["c.cc", ".cc.", ".cc.", "cc.c"],
+    "bone": ["cccc", "c##c", "cccc", ".cc."],
     "fire": [".g..", ".gg.", "gggg", ".gg."],
     "ice": ["j.j.", ".jj.", ".jj.", "j..j"],
     "leaf": ["..mm", ".mm.", "mmm.", "m..."],
@@ -690,19 +690,19 @@ PIPS = {  # 4x4 marks inside a 6x6 dot
 
 FACE_TILE = [
     ".##############.",
-    "#7ccccccccccccB#",
-    "#cccccccccccccB#",
-    "#cccccccccccccB#",
-    "#cccccccccccccB#",
-    "#cccccccccccccB#",
-    "#cccccccccccccB#",
-    "#cccccccccccccB#",
-    "#cccccccccccccB#",
-    "#cccccccccccccB#",
-    "#cccccccccccccB#",
-    "#cccccccccccccB#",
-    "#cccccccccccccB#",
-    "#ccccccccccccBB#",
+    "#7ccccccccccccc#",
+    "#cccccccccccccc#",
+    "#cccccccccccccc#",
+    "#cccccccccccccc#",
+    "#cccccccccccccc#",
+    "#cccccccccccccc#",
+    "#cccccccccccccc#",
+    "#cccccccccccccc#",
+    "#cccccccccccccc#",
+    "#cccccccccccccc#",
+    "#cccccccccccccc#",
+    "#cccccccccccccc#",
+    "#cccccccccccccc#",
     "#BBBBBBBBBBBBBB#",
     ".##############.",
 ]

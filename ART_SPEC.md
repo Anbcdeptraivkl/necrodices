@@ -210,28 +210,28 @@ Used when the army exceeds 60 visible sprites (GAME_SPEC §11.2).
 
 | Asset | Size | Spec |
 |---|---|---|
-| `dice/die_body.png` | 20×20 | Rounded square (2 px stepped corners), `N0` outline, face area top 17 px in `B2` with `B1` shading, bottom 3 px "side" in `B0` (2.5D) |
+| `dice/die_body.png` | 20×20 | Rounded square (2 px stepped corners), `N0` outline, flat face area top 16 px in `B2` with an `N7` top-left light (no right shade column, designer repaint 2026-10-29), a `B1` band row, bottom 3 px "side" in `B0` (2.5D) |
 | `dice/die_roll.png` | 80×20 | 4-frame tumble (blank faces), played 50 ms/frame before landing |
 | `dice/glyph_<element>.png` ×6 + `glyph_wild.png` | 12×12 | Face glyph, drawn centred on face area at offset `(4, 3)`. Element ramp colours + `N0` outline |
 | `dice/glyph8_<element>.png` ×6 + `glyph8_wild.png` | 8×8 | Small glyph for icons, essence pips, recipe book |
 | `dice/pip_<element>.png` ×6 | 6×6 | Essence pip (simplified glyph in a dot) |
-| `dice/die_body_<rune>.png` ×8 | 20×20 | The die's **material** while a rune face is up (§4.6b); same silhouette and side as `die_body` |
+| `dice/die_body_<rune>.png` ×8 | 20×20 | The die's **material** while a rune face is up (§4.6b); same silhouette and side as `die_body`. GLASS shine streaks may be pure white `#ffffff` (D-A16) |
 | `dice/num_1..9.png` | 7×9 | Points badge: `N0` rounded badge, `N7` digit; drawn at `(13, 11)` on the die |
 | `dice/die_select.png` | 22×22 | 1 px `G1` outline ring (drawn at die −1,−1). A picked die is also raised 3 px |
 | `dice/die_bound.png` | 22×22 | (unused in v2) 1 px white ring, tintable |
 | `dice/die_shackle.png` | 20×20 | Chain overlay `M0/M1`; die dimmed via `N0` 50% checker pattern (no alpha) |
-| `dice/face_tile.png`, `face_tile_<rune>.png` ×8 | 16×16 | Face square for the Dice Inspector / market dice: glyph8 at (2, 2), points digit bottom-right |
+| `dice/face_tile.png`, `face_tile_<rune>.png` ×8 | 16×16 | Face square for the Dice Inspector / market dice / Codex runes: glyph8 at (4, 4), points digit bottom-right. Follows the die body: flat face, `N7` top-left light, the body's band colour on the bottom row, the rune material in the same corners / edges |
 
 Glyph shapes (must differ in silhouette):
 
 | Element | Glyph |
 |---|---|
-| BONE | Crossed bones (X) |
+| BONE | Skull with slanted eyes and two teeth (8 px: upright eyes) |
 | FIRE | Teardrop flame |
 | ICE | 6-arm snowflake |
 | LEAF | Single leaf with vein, tilted |
 | VOLT | Zig-zag bolt |
-| METAL | Hex nut (hexagon with hole) |
+| METAL | Round nut: `M2` rim, `M1` ring, `N0` hole (8 px: square nut) |
 | WILD | Open eye with star pupil, `G1` + `N7` |
 
 ### 4.6b Runes (GAME_SPEC §4.6) — the die body changes material

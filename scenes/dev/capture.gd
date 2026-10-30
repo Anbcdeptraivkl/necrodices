@@ -40,6 +40,7 @@ const PRESETS := {
 	"codex_trinkets": {"screen": "night_map", "seed": "CAPTURE1", "overlay": "run_info", "page": "trinkets"},
 	"codex_runes": {"screen": "night_map", "seed": "CAPTURE1", "overlay": "run_info", "page": "runes"},
 	"end": {"screen": "end", "seed": "CAPTURE6"},
+	"dice_chart": {"screen": "dice_chart"},
 }
 
 var _args := {}
@@ -96,6 +97,9 @@ func _capture() -> void:
 func _build(game: Node, db: ContentDb, p: Dictionary) -> void:
 	if p["screen"] == "title":
 		game.goto("title")
+		return
+	if p["screen"] == "dice_chart":
+		_dice_chart()
 		return
 	var run := RunFlow.new_run(db, p.get("seed", "CAPTURE"))
 	game.run = run
@@ -165,3 +169,51 @@ func _play(enc: EncounterState, screen: Node, bot: SimBot, p: Dictionary) -> voi
 		screen.call(&"_on_roll")
 	if p.get("attack", false):
 		screen.call(&"_do_attack")
+
+
+## Art review sheet: every rune body (rows) with every element glyph and points badge (columns),
+## a picked and a shackled die, then the same faces as 16×16 tiles. Built from the game's own
+## DieView / FaceTile, so overlaps show exactly as in play.
+func _dice_chart() -> void:
+	const COLS := [["BONE", 6], ["FIRE", 1], ["ICE", 2], ["LEAF", 3], ["VOLT", 4], ["METAL", 5], ["FIRE", 9]]
+	var runes: Array[String] = [""]
+	for r in RulesRegistry.RUNES:
+		runes.append(r)
+	var bg := ColorRect.new()
+	bg.color = Art.colour("N1")
+	bg.size = Vector2(480, 270)
+	get_tree().root.add_child(bg)
+	var heads: Array = []
+	for c: Array in COLS:
+		heads.append("%s%d" % [String(c[0]).substr(0, 1), c[1]])
+	heads.append_array(["PICK", "SHKL"])
+	for k in heads.size():
+		_chart_label(bg, heads[k], Vector2(52 + k * 26, 4))
+	for k in COLS.size():
+		_chart_label(bg, heads[k], Vector2(296 + k * 22, 4))
+	var die_scene: PackedScene = load("res://ui/components/die_view.tscn")
+	for r in runes.size():
+		var rune: String = runes[r]
+		var y := 16 + r * 27
+		_chart_label(bg, rune if rune != "" else "PLAIN", Vector2(4, y + 7))
+		for k in COLS.size() + 2:
+			var c: Array = COLS[k] if k < COLS.size() else ["FIRE", 3]
+			var face := Face.new(c[0], c[1], rune)
+			var d: DieView = die_scene.instantiate()
+			d.mouse_filter = Control.MOUSE_FILTER_IGNORE
+			d.position = Vector2(52 + k * 26, y)
+			bg.add_child(d)
+			d.show_state(face, k == COLS.size(), k == COLS.size() + 1, false)
+			if k < COLS.size():
+				var tile := FaceTile.new()
+				tile.position = Vector2(296 + k * 22, y + 4)
+				bg.add_child(tile)
+				tile.show_face(face, 0, k)
+
+
+func _chart_label(parent: Control, text: String, at: Vector2) -> void:
+	var l := Label.new()
+	l.text = text
+	l.position = at
+	l.add_theme_color_override(&"font_color", Art.colour("N5"))
+	parent.add_child(l)

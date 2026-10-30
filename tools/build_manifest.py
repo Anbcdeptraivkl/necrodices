@@ -3,7 +3,7 @@
     python tools/build_manifest.py
 
 Entry fields: id, path (relative to project root), w, h, frame_w, frames, category,
-flags (subset of: mask, floating, tint), tag (2-3 letter placeholder label),
+flags (subset of: mask, floating, tint, white), tag (2-3 letter placeholder label),
 ramp / accent (colour hints: element name or Hallow32/mask key), margin (9-slice margin, UI only).
 """
 
@@ -128,7 +128,9 @@ def build() -> tuple[list[dict], dict[str, str]]:
     for el in ids.ELEMENTS:
         add(f"{D}/pip_{el.lower()}.png", 6, 6, "pip", ramp=el, tag_text=el[:2])
     for rune, col in ids.RUNES.items():
-        add(f"{D}/die_body_{rune}.png", 20, 20, "dice", ramp=col, tag_text=rune[:2].upper())
+        # GLASS shine is pure white by the designer's choice (D-A16), not a runtime tint.
+        add(f"{D}/die_body_{rune}.png", 20, 20, "dice", ramp=col, tag_text=rune[:2].upper(),
+            flags=["white"] if rune == "glass" else None)
         add(f"{D}/face_tile_{rune}.png", 16, 16, "dice_overlay", ramp=col, tag_text=rune[:2].upper())
     for n in range(1, 10):
         add(f"{D}/num_{n}.png", 7, 9, "num", ramp="N7", tag_text=str(n))

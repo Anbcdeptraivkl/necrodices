@@ -1042,7 +1042,9 @@
    "frame_w": 20,
    "frames": 1,
    "category": "dice",
-   "flags": [],
+   "flags": [
+    "white"
+   ],
    "tag": "GL",
    "ramp": "I2",
    "accent": null
