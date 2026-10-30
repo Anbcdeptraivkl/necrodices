@@ -1,7 +1,7 @@
 {
   "hunters": {
     "MOB_TORCH_VILLAGER": {
-      "name": "Scout Villager",
+      "name": "Villager",
       "lore": "Brought nothing with him but a torch. Pretty bold."
     },
     "MOB_PITCHFORK_FARMER": {
@@ -9,8 +9,8 @@
       "lore": "Farms by day, pitch his fork by night."
     },
     "MOB_LANTERN_WATCHMAN": {
-      "name": "Gravekeeper",
-      "lore": "Counts the hours and the graves. Loses count of both."
+      "name": "Watchman",
+      "lore": "Walk around with his trusty lantern and onesie pyjama. Suspicious"
     },
     "CHAMP_GUARD_CAPTAIN": {
       "name": "Guard",
