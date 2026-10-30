@@ -70,6 +70,10 @@ def character(rows: list[str], legend: dict | None = None, *, dx: int = 0,
               props: list[tuple[list[str], int, int]] | None = None) -> Image.Image:
     """Grid -> 96x32 sheet: idle0, idle1 (1 px breath, feet fixed), hurt (recoil, eyes shut).
 
+    The row-shear hurt is a placeholder: the designer's style (ART_SPEC §4.5a, boss_bell_ringer.png,
+    hand-painted) distorts the head and breaks the eyes by hand. Repainted sheets are kept on a plain
+    run; never regenerate them with --only / --all.
+
     `props` are grounded part grids (x, y in body-grid coordinates) that do not breathe or
     recoil; each gets its own N0 ring so it stays separated from the body it overlaps.
     """

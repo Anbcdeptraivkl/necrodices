@@ -3,7 +3,7 @@ extends Node
 ## waits for layout and animation to settle, saves the viewport as PNG, quits.
 ##   godot --path . --resolution 960x540 res://scenes/dev/capture.tscn -- --preset=encounter --out=captures/x.png
 ## Presets are rows in PRESETS; a missing situation is a new row, not a new branch.
-## Battle presets: `squads` summons played by the balance bot's pick through the screen's own
+## Battle presets: `enemy` / `rules` force the hunter of the battle (art review); `squads` summons played by the balance bot's pick through the screen's own
 ## handlers; `pick` leaves the last pick unsummoned; `roll` presses ROLL; `wait` = seconds of
 ## playback before the shot (`--wait=<s>` overrides it; `--time_scale=0.1` slows the game so a
 ## 0.1 s punch can be caught). Saves go to user://sav_capture.
@@ -41,6 +41,12 @@ const PRESETS := {
 	"codex_runes": {"screen": "night_map", "seed": "CAPTURE1", "overlay": "run_info", "page": "runes"},
 	"end": {"screen": "end", "seed": "CAPTURE6"},
 	"dice_chart": {"screen": "dice_chart"},
+	"hunter": {"screen": "encounter", "seed": "CAPTURE2", "night": 3, "encounter": 2, "enemy": "BOSS_BELL_RINGER",
+		"rules": ["BELL_RINGER"], "wait": 1.0},
+	"hunter_enraged": {"screen": "encounter", "seed": "CAPTURE2", "night": 8, "encounter": 2,
+		"enemy": "BOSS_BELL_RINGER", "rules": ["BELL_RINGER", "ENRAGED"], "wait": 1.0},
+	"hunter_hurt": {"screen": "encounter", "seed": "CAPTURE5", "enemy": "BOSS_BELL_RINGER", "rules": ["BELL_RINGER"],
+		"squads": 1, "dice": 6, "hp": 0.01, "attack": true, "wait": 2.4},
 }
 
 var _args := {}
@@ -148,6 +154,9 @@ func _build(game: Node, db: ContentDb, p: Dictionary) -> void:
 			game.goto("end")
 		"encounter":
 			var entry: Dictionary = run.night_plan[run.encounter_index]
+			if p.has("enemy"):
+				entry["enemy"] = p["enemy"]
+				entry["rules"] = p.get("rules", [])
 			entry["hp"] = float(entry["hp"]) * float(p.get("hp", 1000.0 if p.has("squads") else 1.0))
 			game.start_encounter()
 			await get_tree().process_frame

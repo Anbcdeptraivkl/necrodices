@@ -258,7 +258,7 @@ func charge(t: Tween, gi: int, share: float, hp_before: float, hp_after: float, 
 		Audio.play("hit")).set_delay(hit_time)
 	t.tween_method(func(v: float) -> void: _mat.set_shader_parameter(&"flash", v), 1.0, 0.0, dur * 0.25) \
 		.set_delay(hit_time)
-	_popup(t, "-" + Settings.fmt(share), _enemy_anchor(), Art.colour("R1"), dur, hit_time)
+	_popup(t, "-" + Settings.fmt(share), _enemy_head_anchor(), Art.colour("R1"), dur, hit_time)
 	t.tween_property(_hp_bar, "shown_hp", hp_after, dur * 0.5).from(hp_before).set_delay(hit_time)
 	t.tween_method(_set_hp_text, hp_before, hp_after, dur * 0.5).set_delay(hit_time)
 	t.tween_property(_hp_bar, "projected", 0.0, 0.01)
@@ -337,6 +337,12 @@ func _money_anchor() -> Vector2:
 
 func _enemy_anchor() -> Vector2:
 	return (_enemy.position + Vector2(16, 8)).round()
+
+
+## Damage numbers start just above the 32 px canvas, so the hurt frame's face stays visible
+## (ART_SPEC §4.5a) and the rise ends below the HP text.
+func _enemy_head_anchor() -> Vector2:
+	return (_enemy.position + Vector2(16, -5)).round()
 
 
 ## A number that pops above `at`, rises 10 px and fades (pool of labels; skip hides them).

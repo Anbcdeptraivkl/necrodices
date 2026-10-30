@@ -185,11 +185,35 @@ Used when the army exceeds 60 visible sprites (GAME_SPEC §11.2).
 - LEGION banner (> 240): `units/legion_banner.png` 16×16, a tattered flag on a bone pole, `N3`/`N5` cloth; the unit icon is drawn on it at runtime.
 
 ### 4.5 Enemies — 32×32
-- Sheet `96×32` = `idle0, idle1, hurt`. Idle at 2 fps (1 px breathing). Hurt = recoil pose, eyes shut.
+- Sheet `96×32` = `idle0, idle1, hurt`. Idle at 2 fps (1 px breathing). Hurt = the shape distorts and the
+  face grimaces (§4.5a), shown from the impact to the end of each charge (≈ 0.4 s at ×1, white flash first).
 - Pivot bottom-centre `(16, 32)`, lowest opaque row `y = 31`.
 - Max 12 colours. Humans use `S0/S1` skin + neutrals + **one signature accent**.
 - Bosses fill ≥ 28×28 of the canvas, have a unique accessory and a 2-tone signature accent.
 - Use **invented** holy/order symbols (sun disc, open eye, bell) — no real religious iconography (store-safety).
+
+#### 4.5a Hunter style — designer reference `BOSS_BELL_RINGER` (repaint 2026-10-30)
+
+Every hunter repaint follows the Bell Ringer. Measured on its sheet (10 colours, bbox 29×32):
+
+| Trait | Rule |
+|---|---|
+| Silhouette | Simple geometric masses, readable as a black shape: a small rounded head mass (hood / hat, 8–10 wide) on a body that **widens to the ground** (bell / trapezoid, 14–16 wide), 1 px stepped corners. No anatomy beyond what the role needs: stub legs (3 px, the shade colour) under the hem, one visible hand |
+| Face | Hidden or minimal: a horizontal `N0` slit across the head with **two 1 px glowing eyes** in the accent colour, 3 px apart. No skin face, no mouth, no nose. A human hunter may show skin, but keep the same "2 dots on a dark band" reading |
+| Fills | Flat. Body = one mid tone (`N5`-like) + its shade (`N4`-like) laid as **bands**, not pillow shading: the band under the head brim, the back / lower hem triangle, the legs. No dithering, no noise, no per-pixel highlights on cloth |
+| Accent | One signature accent ramp (2 tones, e.g. `G0/G1`). It colours the **signature prop** and repeats once on the body as a 1 px **trim / sash** running diagonally from the hem toward the prop, tying the two together. Eyes use the accent too |
+| Signature prop | Big — about a third of the canvas — standing on the ground in front of the body, with its **own `N0` outline** where it overlaps. Highlight = one vertical 3–4 px streak of `N7`; a darker rim / mouth band at its base |
+| Held tool | Full-height vertical shaft on the far side (`B0` wood) with a block head (`B0/B1`); the hand is 2×2 `S1` + 1 px `S0`, wrapped by `N0` lines that cross the shaft, so the grip reads |
+| Outline | 1 px `N0` around the whole figure **and between overlapping parts** (hand / shaft, prop / body) |
+| Ground | Three ground contacts on row 31: legs, prop base, shaft foot |
+| Colours | ≤ 12 (Bell Ringer: 10): `N0`, body mid + shade, accent 2 tones, wood 2 tones, skin 2 tones, `N7` |
+| `idle1` | The head and shoulders (the rows above the cloak's widest line) move **down 1 px**; hem, legs, hand, tool and prop stay |
+| `hurt` | Distorted and grimacing, drawn by hand (no row shear): the head mass **deforms** (pinched up into two points, like hair standing on end), the eye slit **breaks** into a scribble of accent pixels across 2–3 rows, the head shifts 1 px away from the hit, the free arm is **flung out** diagonally (2–3 px of skin). Legs, tool and prop do not move; lowest row stays 31 |
+
+Checklist for the next repaint: silhouette first at ×1; count colours (≤ 12); 1 px `N0` between parts;
+diff `idle0` / `idle1` (only the upper rows moved 1 px); diff `idle0` / `hurt` (feet and props
+identical); capture with `tools\screenshot.cmd hunter` / `hunter_hurt` (preset `enemy` picks the
+hunter) after `godot --headless --import`.
 
 | ID | Concept | Accent |
 |---|---|---|
@@ -526,7 +550,7 @@ Counters tick by interpolating displayed value over the step duration (GAME_SPEC
 | Number pop (v2) | Each scored die / rune / trinket step pops its label (`+5 Power` `I1`, `+3 Count` `R1`) above the die or trinket: punch ×1.6 → 1, rising 10 px and fading |
 | Scoring dice (v2) | During a summon the summoned dice stay raised: scoring ones with the lit ring, unscored ones at 45 % alpha. The die being scored punches ×1.4 → 1 (never touching its neighbours), flashes white and shakes ±1 px; the trinket whose turn it is wobbles ±2 px. Rest look is exact again when playback ends or is skipped |
 | Aura tiers (v2) | Single units and legends: Count ≥ 10 → `vfx/aura` ring tinted with the element light colour; ≥ 40 → + `vfx/flame` crown; ≥ 160 → flame ×2 |
-| Charge (v2) | One squad at a time flies at the hunter (3 waves), impact flash + shake, the HP bar drains by that squad's share, `-damage` pops |
+| Charge (v2) | One squad at a time flies at the hunter (3 waves), impact flash + shake, the HP bar drains by that squad's share, `-damage` pops just above the hunter's canvas (never over its face) |
 | Result (v2) | Win: dissolve, `$` burst, banner "THE HUNTER FALLS!"; loss: the hunter laughs (fast idle), the army drifts and fades, banner "THE HUNTERS PREVAIL" |
 
 VFX sprites (`vfx/`):
