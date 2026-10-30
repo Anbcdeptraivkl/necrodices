@@ -179,7 +179,9 @@ A palette-swap shader (`fx/palette_swap.gdshader`) receives 6 target colours. Sa
 ### 4.4 Crowd minis — 8×8
 Used when the army exceeds 60 visible sprites (GAME_SPEC §11.2).
 - Sheet `16×8`, 2 frames, pivot `(4, 8)`, max 4 colours.
-- One per element + Wisp mask: `mini_bone` (tiny skull), `mini_fire` (flame imp), `mini_ice` (snow bat), `mini_leaf` (pumpkin), `mini_volt` (spark ghost), `mini_metal` (helmet), `mini_wisp_mask`.
+- One per element + Wisp mask: `mini_bone` (tiny skull), `mini_fire` (flame imp), `mini_ice` (snow bat), `mini_leaf` (leaf with a dark vein), `mini_volt` (round spark face), `mini_metal` (helmet), `mini_wisp_mask`.
+- Designer repaint 2026-10-30: 2–4 colours each, frame 1 is the same shape 1 px higher (bob). Check with
+  `tools\screenshot.cmd crowd` (7 groups × 100: minis) and `crowd_legion` (× 400: minis + LEGION banners).
 - Only horde units (T1, hybrids, Wisp) have minis: the `mini` field of their data row. Single units and legends
   are always drawn full size.
 - LEGION banner (> 240): `units/legion_banner.png` 16×16, a tattered flag on a bone pole, `N3`/`N5` cloth; the unit icon is drawn on it at runtime.

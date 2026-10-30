@@ -50,7 +50,11 @@ const PRESETS := {
 		"enemy": "BOSS_BELL_RINGER", "rules": ["BELL_RINGER"], "pose": "hurt", "wait": 1.0},
 	"hunter_hurt": {"screen": "encounter", "seed": "CAPTURE5", "enemy": "BOSS_BELL_RINGER", "rules": ["BELL_RINGER"],
 		"squads": 1, "dice": 6, "hp": 0.01, "attack": true, "wait": 2.4},
+	# Crowd tiers (§4.4): one group per mini; > 60 visible soldiers draw minis, > 240 add LEGION banners.
+	"crowd": {"screen": "encounter", "seed": "CAPTURE1", "army": 100, "wait": 1.0},
+	"crowd_legion": {"screen": "encounter", "seed": "CAPTURE1", "army": 400, "wait": 1.0},
 }
+const CROWD_UNITS := ["SKELETON_WARRIOR", "FIRE_IMP", "FROST_BAT", "PUMPKINLING", "VOLT_GHOST", "HAUNTED_ARMOR", "WISP"]
 
 var _args := {}
 
@@ -95,6 +99,11 @@ func _capture() -> void:
 	if preset.get("pose", "") == "hurt":  # hold the hunter's hurt frame (art review, no timing luck)
 		await get_tree().process_frame
 		get_tree().current_scene.find_child("Stage", true, false).set(&"_hurt", true)
+	if preset.has("army"):  # every horde mini on the field at once (art review)
+		await get_tree().process_frame
+		var horde: HordeRenderer = get_tree().current_scene.find_child("Horde", true, false)
+		for unit in CROWD_UNITS:
+			horde.add_group(unit, PackedStringArray(["FIRE", "ICE"] if unit == "WISP" else []), float(preset["army"]))
 	if preset.has("hover"):
 		var target: Control = null
 		for i in 30:  # the scene change is deferred: wait until the target exists
