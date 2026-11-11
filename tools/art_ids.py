@@ -125,8 +125,10 @@ UI_FILES = [
     ("rarity_stripe_common", 4, 4, None), ("rarity_stripe_uncommon", 4, 4, None),
     ("rarity_stripe_rare", 4, 4, None),
     ("stamp_defeated", 64, 20, None), ("divider", 8, 1, None),
+    # frames that code used to draw as plain rectangles (D-A19)
+    ("panel_tray", 24, 24, 6), ("frame_select", 16, 16, 4),
 ]
-assert len(UI_FILES) == 27
+assert len(UI_FILES) == 29
 # Drawn at the largest canvas (ART_SPEC §2, 640x300) and centred; the 480x270 centre is the
 # safe area every screen size shows.
 BACKGROUNDS = [("bg_title", 640, 300), ("bg_map", 640, 300), ("bg_battle", 640, 300),

@@ -50,7 +50,7 @@ func _draw() -> void:
 	if ring.a > 0.0 and icon != null:
 		Art.draw_ring(self, Rect2(Vector2.ZERO, size), ring)
 	if hovered and not selected:
-		Art.draw_ring(self, Rect2(Vector2(1, 1), size - Vector2(2, 2)), Art.colour("N5"))
+		Art.draw_ring(self, Rect2(Vector2(1, 1), size - Vector2(2, 2)), Art.colour("N5"), 1)
 	if icon != null:
 		var at := ((size - icon.get_size()) / 2.0).floor() + Vector2(roundf(shake), 0)
 		draw_texture(icon, at)

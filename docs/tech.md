@@ -31,7 +31,11 @@ tools\balance_sim.cmd --mode=baseline --trials=2000    :: Night 1 Mob with the s
 tools\balance_sim.cmd --mode=runs --trials=1000        :: GAME_SPEC §12 bot: reach / win / deaths by rule
 tools\export_web.cmd                  :: Web release → build\web + build\roll_the_bones_web.zip (needs 4.6.3 templates)
 tools\serve_web.cmd [port]            :: play the Web build at http://127.0.0.1:8060/ (opening index.html from disk fails: file:// blocks fetch)
-python tools\art\<units|legends|enemies_dice|dice_runes|icons|items|scenery|backgrounds|ui_buttons|howto>.py [--only id | --all] [--preview out.png]   :: art generators: no flag = create missing files only (hand edits are never overwritten); --only rewrites the named ids; --all rewrites every changed id
+python tools\art\<units|legends|enemies_dice|dice_runes|icons|items|scenery|backgrounds|ui_kit|ui_buttons|howto>.py [--only id | --all] [--preview out.png]   :: art generators: no flag = create missing files only (hand edits are never overwritten); --only rewrites the named ids; --all rewrites every changed id; designer files are LOCKED whatever the flag (ART_SPEC §9.4)
+python tools\art\classify.py [--list | --dump <id>]   :: who owns each art file (designer / generator / pending); --dump prints a file as a palette-key grid
+python tools\art\<group>.py --only <ids> --propose art_source\proposals\<batch>   :: write redone art for review, outside assets/
+tools\screenshot.cmd <preset> <out.png> 960x540 --art=art_source/proposals/<batch>   :: capture with the proposed art loaded over assets/ (nothing is written)
+tools\screenshot.cmd crowd <out.png> 960x540 --units=A,B,C --army=9   :: put the named units on the field (≤ 60 soldiers = full 16×16 sprites)
 "%GODOT_EXE%" --path . --resolution 1600x900 res://scenes/dev/display_probe.tscn  :: print scale / canvas for a window size
 ```
 

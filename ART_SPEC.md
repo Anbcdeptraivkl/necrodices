@@ -120,6 +120,24 @@ Semantic mapping:
 - At least 40% of a unit's opaque pixels must be from mid/light ramps (pops against the dark battlefield).
 - Sprite sheets: frames laid out horizontally, no padding, frame size exact.
 
+### 4.1a Designer style — what every sprite and icon follows (study of 2026-11-11)
+
+Measured on the 130 files the designer repainted (generator recipe → designer file; details in
+`docs/ART_REWORK_PLAN.md` §2). New and redone art follows these before any concept note below.
+
+| Habit | Rule |
+|---|---|
+| One tone less | A material is a flat fill plus one shade; no three-step "pillow" band along the outline. Typical counts: units 4–6 colours, legends 6–8, icons 4–5, minis 3 |
+| Two-mark faces | One of three types. **Angry sockets**: two slanted `N0` eyes, the outer pixel on top (Fire Imp, Flame Skull, the bone glyph). **Dark band**: a 1–2 row `N0` / `N1` slit with two light dash eyes (Frost Wraith, Ember Colossus, Bell Ringer). **Dot face**: two 1 px dots and at most a 2 px mouth (Thrifty Ghost, `mini_volt`). No noses, tooth rows, pupils or open mouths |
+| Chunky silhouette | The shape widens to the ground; no limb thinner than 2 px unless it is the prop; loose appendages are cut |
+| One accent | A single accent colour at the focal point; no scattered rivets, sparks or second props |
+| `N0` interior lines | Parts are separated with outline-colour lines (ribs, joints, visors), not with a darker ramp step |
+| Things stand on a lip | Objects (dice, coffers, jars, UI slabs) get a darker 2–3 px band at the bottom instead of side shading; light is a 1–2 px glint in one corner |
+| One object per icon | Centred, filling the canvas; no second object for context |
+
+A unit may keep one light column on its left and one dark column on its right (Fire Imp, `mini_metal`).
+The crowd mini of an element is the brief for its Tier 1 unit: the unit is the mini with a body.
+
 ### 4.2 Units — 16×16
 - Sheet: `32×16` = 2 idle frames. Idle at 3 fps (frame 2 = 1 px squash or flicker/blink).
 - Pivot: bottom-centre `(8, 16)`; lowest opaque pixel on row `y = 15` (floating units: shadow pixel row at y=15 in `N0`, 4–6 px wide).
@@ -448,33 +466,44 @@ explains itself in its tooltip.
 
 ## 7. UI components — construction rules
 
+The kit is built on the designer's die body (`die_body.png`, D-A19): every box is one of three
+constructions drawn by `tools/art/ui_kit.py`.
+
+| Construction | Shape | Used by |
+|---|---|---|
+| **Slab** (raised) | 1 px `N0` outline with **2 px chamfered corners**, one flat face tone, a 2 px glint in the top-left corner (one ramp step lighter), a darker **lip** at the bottom (2 rows; 1 row on the small Power / Count boxes) | Buttons, `panel_card`, `power_box`, `count_box`, `hp_frame` (no lip) |
+| **Frame** | The same outline, a 1 px ring inside it that follows the chamfer, a flat floor (after the inset ring of `die_body_iron.png`) | `panel_dark`, `panel_tray`, `panel_tooltip`, `chip`, `slot_selected` |
+| **Socket** (sunken) | The same outline, a shaded row under the top edge, a lit rim row at the bottom | `slot` |
+
 | Rule | Spec |
 |---|---|
-| Construction | Everything is 9-slice (`NinePatchRect`) or tiled; no full-size baked panels |
-| Outline | 1 px `N0` outer outline on every panel/button |
-| Bevel | 1 px highlight on top edge (lighter ramp step), 1 px shadow on bottom edge (darker step) |
-| Corners | 1 px notched (cut) corners on all 9-slices |
-| Fills | Flat colours only, no gradients, no dithering inside UI |
-| Pressed button | Shift content down 1 px, swap highlight/shadow |
-| Disabled | Fill `N2`, text `N4`, no bevel |
+| Construction | Everything is 9-slice (`StyleBoxTexture`) or tiled; no full-size baked panels |
+| Fills | Flat colours only: no top highlight row, no side shading, no gradients, no dithering inside UI |
+| Hover | The same slab with face and glint one ramp step lighter; the text lifts 1 px |
+| Pressed button | The slab sinks by its lip: 2 transparent rows on top, no lip, the text moves down 2 px. Every state keeps the same minimum size (content margins top / bottom: normal 2 / 3, hover 1 / 4, pressed 4 / 1) |
+| Disabled | `N2` slab with an `N1` lip, no glint, text `N4` |
+| Rings drawn in code | `Art.draw_ring(item, rect, colour, cut)` follows the same chamfer (cut 2), so a kind / rarity / selection ring laid over a card, slot or Codex cell replaces its outline exactly; cut 1 for the 16×16 face tiles and for a ring 1 px inside a slab. `Art.draw_box` fills the same shape |
 | Text colours | Primary `N7`, secondary `N6`, muted `N5`; on primary (`F1`) buttons text `N0` |
 
 9-slice assets (`ui/`):
 
-| File | Size | Margins | Fill / border |
+| File | Size | Margins | Construction, colours |
 |---|---|---|---|
-| `panel_dark.png` | 24×24 | 6 | `N1` fill, `N3` inner border, `N0` outline |
-| `panel_card.png` | 24×24 | 6 | `N2` fill, `N4` top highlight |
-| `panel_tooltip.png` | 16×16 | 4 | `N0` fill, `N5` border |
-| `chip.png` | 16×12 | 4 | `N3` fill, `N5` border |
-| `btn_primary_{normal,pressed,disabled}.png` | 24×24 | 6 | `F1` fill, `F2` highlight, `F0` shadow |
-| `btn_secondary_{normal,pressed,disabled}.png` | 24×24 | 6 | `N4` fill, `N5` highlight, `N2` shadow |
+| `btn_primary_{normal,pressed,disabled}.png` | 24×24 | 6 | Slab: `F1` face, `F0` lip, `F2` glint |
+| `btn_secondary_{normal,pressed,disabled}.png` | 24×24 | 6 | Slab: `N4` face, `N2` lip, `N5` glint |
 | `btn_{primary,secondary}_hover.png` | 24×24 | 6 | The normal button one ramp step lighter (`F1→F2`, `F2→V2` / `N4→N5`, `N5→N6`), derived by `tools/art/ui_buttons.py` (D-R09) |
-| `slot.png`, `slot_selected.png` | 20×20 | – | Empty slot `N2` with `N3` dashed inner border; selected `G1` ring |
-| `hp_frame.png` | 16×7 | 3 | `N0` outline, `N2` inner |
+| `btn_danger_{normal,pressed,hover}.png` | 24×24 | 6 | The primary button in the blood ramp (`R1` / `R0`), derived by `ui_buttons.py` |
+| `panel_dark.png` | 24×24 | 6 | Frame: `N3` ring, `N1` floor |
+| `panel_card.png` | 24×24 | 6 | Slab: `N2` face, `N1` lip, `N3` glint |
+| `panel_tray.png` | 24×24 | 6 | Frame: `N2` ring, `N0` floor (shop shelves, Codex grid) |
+| `panel_tooltip.png` | 16×16 | 4 | Frame: `N5` ring, `N0` floor |
+| `chip.png` | 16×12 | 4 | Frame: `N5` ring, `N3` floor |
+| `slot.png`, `slot_selected.png` | 20×20 | – | Socket `N2` (shade `N1`, rim `N3`); selected = frame with a `G1` ring |
+| `frame_select.png` | 16×16 | 4 | Only the outline path in `G1`, see-through centre (the current encounter card) |
+| `hp_frame.png` | 16×7 | 3 | Slab without lip, `N2`; `hp_bar.gd` redraws the four diagonal outline pixels over the fill |
 | `hp_fill.png` | 1×5 | tile | `R1` rows 0–3, `R0` row 4 |
 | `hp_preview.png` | 1×5 | tile | `G1` |
-| `power_box.png`, `count_box.png` | 16×14 | 4 | `I1`/`I0` and `R1`/`R0` |
+| `power_box.png`, `count_box.png` | 16×14 | 4 | Slabs with a 1-row lip: `I1` / `I0` / `I2` and `R1` / `R0` / `S1` — two dice being multiplied |
 | `rarity_stripe_{common,uncommon,rare}.png` | 4×4 | tile | `I1` / `L1` / `R1` |
 | `stamp_defeated.png` | 64×20 | – | `R1` stamp, pre-rotated |
 | `divider.png` | 8×1 | tile | `N3` |
@@ -536,6 +565,20 @@ Counters tick by interpolating displayed value over the step duration (GAME_SPEC
 - Icons: 1 px transparent border. Units: lowest opaque pixel on row 15 (unless flagged `floating` with shadow row). Enemies: row 31.
 - No fully transparent frames.
 
+### 9.4 Ownership and proposals
+
+- **A generator overwrites only what a generator wrote.** `assets/generated.json` holds, per id, a hash
+  of the pixels a tool last wrote (`tools/art_lock.py`). A file whose pixels no longer match (or that has
+  no entry) is the designer's: `--only`, `--all` and `--force` all refuse it and print `LOCKED`. Editing a
+  file is enough to lock it; nothing is declared. `python tools/art/classify.py` lists who owns what
+  (`designer` / `generator` / `pending` = recipe ahead of the file / `no-recipe`).
+- **Redone art is proposed first.** `python tools/art/<group>.py --only <ids> --propose art_source/proposals/<batch>`
+  writes the files under that folder at their path below `assets/` (the folder has a `.gdignore`; the game
+  cannot load it). Review them in the running game without touching `assets/`:
+  `tools\screenshot.cmd <preset> <out.png> 960x540 --art=art_source/proposals/<batch>`.
+- Approval is the only thing that writes into `assets/`: the same command with `--only <approved ids>` and
+  no `--propose`. Batches and progress: `docs/ART_REWORK_PLAN.md`.
+
 ---
 
 ## 10. Animation & juice reference (procedural, no extra frames)
@@ -596,7 +639,7 @@ VFX sprites (`vfx/`):
 | Coffer icons | `assets/icons/coffers/<coffer_id>.png` | 16×16 | 1 | 12 |
 | Gear icons | `assets/icons/equipment/<equipment_id>.png` | 16×16 | 1 | 13 |
 | Stat icons | `assets/icons/stats/<name>.png` | 8×8 | 1 | 9 |
-| UI 9-slices & parts | `assets/ui/*.png` (§7) | various | 1 | 22 |
+| UI 9-slices & parts | `assets/ui/*.png` (§7) | various | 1 | 29 |
 | Backgrounds | `assets/bg/bg_title.png`, `bg_map.png`, `bg_battle.png` | 640×300 (largest canvas), drawn centred; the 480×270 centre at (80, 15) is the safe area | 1 | 3 |
 | Shop decor | `assets/bg/shop_decor.png` | 120×182 (shop column C1) | 1 | 1 |
 | VFX | `assets/vfx/*.png` (§10) | various | various | 8 |

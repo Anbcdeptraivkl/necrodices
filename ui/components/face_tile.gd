@@ -53,11 +53,11 @@ func _draw() -> void:
 			Art.colour("N0"))
 		draw_string(_font, Vector2(10, 15), str(face.points), HORIZONTAL_ALIGNMENT_LEFT, -1, 8, Art.colour("N7"))
 	if selected:
-		Art.draw_ring(self, Rect2(Vector2.ZERO, size), Art.colour("G1"))
+		Art.draw_ring(self, Rect2(Vector2.ZERO, size), Art.colour("G1"), 1)
 		if order > 0 and _font != null:
 			draw_string(_font, Vector2(1, 7), str(order), HORIZONTAL_ALIGNMENT_LEFT, -1, 8, Art.colour("G1"))
 	elif hovered:
-		Art.draw_ring(self, Rect2(Vector2.ZERO, size), Art.colour("N5"))
+		Art.draw_ring(self, Rect2(Vector2.ZERO, size), Art.colour("N5"), 1)
 
 
 func _gui_input(event: InputEvent) -> void:

@@ -8,12 +8,17 @@ draw_fn() returns a PIL RGBA image at the exact manifest size, and calls `run(AS
     python tools/art/<group>.py --only frost_*  # (re)write the matching ids
     python tools/art/<group>.py --all           # rewrite every id whose pixels differ
     python tools/art/<group>.py --preview out.png  # x6 contact sheet, writes no asset
+    python tools/art/<group>.py --only frost_* --propose art_source/proposals/pilot
+                                                # write the ids for review, outside the game
 
 Rules enforced here:
   - the image size must equal the manifest entry (path, w, h);
   - every opaque pixel must be a Hallow32 colour (or a mask key for `mask` files);
-  - an existing PNG is the designer's truth: it is overwritten only when its id is named with
-    `--only` or with `--all` (skill godot-pixel-art-generation rule 11);
+  - an existing PNG is overwritten only when its id is named with `--only` or with `--all`
+    (skill godot-pixel-art-generation rule 11), and never when the designer drew or edited it:
+    a file whose pixels are not what a generator last wrote is locked (tools/art_lock.py);
+  - `--propose <dir>` writes the selected ids under <dir> at their path below assets/ and never
+    touches assets/ (review first, ART_SPEC §9.4);
   - a file is written only when its pixels changed (no byte churn in git).
 Run `python tools/validate_art.py` afterwards; it is the gate.
 """
@@ -30,6 +35,7 @@ from PIL import Image, ImageChops
 
 ROOT = Path(__file__).resolve().parents[2]
 sys.path.insert(0, str(ROOT / "tools"))
+import art_lock  # noqa: E402
 from palette import HALLOW32_RGB, MASK_RGB, TINT_WHITE, hex_to_rgb, rgba  # noqa: E402
 
 MANIFEST = ROOT / "assets" / "manifest.json"
@@ -203,9 +209,13 @@ def run(assets: dict[str, Callable[[], Image.Image]], argv: list[str]) -> int:
     entries = manifest_entries()
     only = [argv[i + 1] for i, a in enumerate(argv) if a == "--only" and i + 1 < len(argv)]
     preview = next((argv[i + 1] for i, a in enumerate(argv) if a == "--preview" and i + 1 < len(argv)), None)
+    propose = next((argv[i + 1] for i, a in enumerate(argv) if a == "--propose" and i + 1 < len(argv)), None)
     ids = [i for i in assets if not only or any(fnmatch.fnmatch(i, g) for g in only)]
     overwrite = bool(only) or "--all" in argv
-    problems, written, same, kept, images = [], 0, 0, 0, {}
+    problems, written, same, kept, locked, images = [], 0, 0, 0, [], {}
+    if propose and not only:
+        print("--propose needs --only <ids>")
+        return 1
     for asset_id in ids:
         if asset_id not in entries:
             problems.append(f"{asset_id}: not in manifest")
@@ -223,23 +233,40 @@ def run(assets: dict[str, Callable[[], Image.Image]], argv: list[str]) -> int:
         if preview:
             continue
         path = ROOT / e["path"]
+        if propose:
+            out = ROOT / propose / Path(e["path"]).relative_to("assets")
+            out.parent.mkdir(parents=True, exist_ok=True)
+            img.save(out)
+            written += 1
+            continue
         if path.exists() and _same(Image.open(path), img):
             same += 1
             continue
+        if not art_lock.owned(asset_id, path):
+            locked.append(asset_id)  # drawn or edited by the designer: never overwritten
+            continue
         if path.exists() and not overwrite:
-            kept += 1  # differs from the recipe: maybe hand-edited; name it with --only to replace
+            kept += 1  # generator art that differs from the recipe: name it with --only to replace
             continue
         path.parent.mkdir(parents=True, exist_ok=True)
         img.save(path)
+        art_lock.record(asset_id, img)
         written += 1
+    if written and not propose:
+        art_lock.save()
     if preview and images:
         _contact_sheet(images).save(preview)
         print(f"preview: {preview} ({len(images)} assets)")
     for p in problems:
         print("PROBLEM", p)
-    if not preview:
-        print(f"art: wrote {written}, unchanged {same}, kept {kept} (differ, not overwritten), problems {len(problems)}")
-    return 1 if problems else 0
+    if overwrite and locked:
+        print("LOCKED (designer art, not written): " + " ".join(locked))
+    if propose:
+        print(f"proposed: {written} files under {propose}")
+    elif not preview:
+        print(f"art: wrote {written}, unchanged {same}, kept {kept} (differ, not overwritten), "
+              f"locked {len(locked)} (designer), problems {len(problems)}")
+    return 1 if problems or (overwrite and locked and not propose) else 0
 
 
 def _contact_sheet(images: dict[str, Image.Image], zoom: int = 6) -> Image.Image:

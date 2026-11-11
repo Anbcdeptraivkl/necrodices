@@ -31,3 +31,20 @@ func test_pixel_font() -> void:
 	var font: FontFile = load("res://assets/fonts/fusion_pixel/fusion_pixel_12px.otf")
 	_eq(font.antialiasing, TextServer.FONT_ANTIALIASING_NONE, "font imported without antialiasing")
 	_check(not font.allow_system_fallback, "no system fallback")
+
+
+## A button must not change size when its state changes (hover lifts the text 1 px, pressed
+## sinks it 2 px with the slab): every state's style box has the same minimum size.
+func test_button_states_keep_their_size() -> void:
+	var theme: Theme = load("res://ui/theme/pixel_theme.tres")
+	for type: String in ["Button", "SecondaryButton", "DangerButton"]:
+		var normal := theme.get_stylebox("normal", type).get_minimum_size()
+		for state: String in ["hover", "pressed", "hover_pressed", "disabled"]:
+			_eq(theme.get_stylebox(state, type).get_minimum_size(), normal, "%s %s minimum size" % [type, state])
+
+
+## Frames that code used to draw as rectangles are 9-slices of the UI kit (ART_SPEC §7).
+func test_frames_come_from_the_kit() -> void:
+	var theme: Theme = load("res://ui/theme/pixel_theme.tres")
+	for type: String in ["TrayPanel", "CurrentBorder", "CardPanel", "ChipPanel", "TooltipPanel"]:
+		_check(theme.get_stylebox("panel", type) is StyleBoxTexture, "%s uses a kit texture" % type)

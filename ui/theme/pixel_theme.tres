@@ -1,4 +1,4 @@
-[gd_resource type="Theme" load_steps=44 format=3]
+[gd_resource type="Theme" load_steps=46 format=3]
 
 [ext_resource type="FontFile" path="res://assets/fonts/fusion_pixel/fusion_pixel_8px.otf" id="f8"]
 [ext_resource type="FontFile" path="res://assets/fonts/fusion_pixel/fusion_pixel_12px.otf" id="f12"]
@@ -19,6 +19,8 @@
 [ext_resource type="Texture2D" path="res://assets/ui/chip.png" id="chip"]
 [ext_resource type="Texture2D" path="res://assets/ui/power_box.png" id="power_box"]
 [ext_resource type="Texture2D" path="res://assets/ui/count_box.png" id="count_box"]
+[ext_resource type="Texture2D" path="res://assets/ui/panel_tray.png" id="panel_tray"]
+[ext_resource type="Texture2D" path="res://assets/ui/frame_select.png" id="frame_select"]
 
 [sub_resource type="StyleBoxTexture" id="p_normal"]
 texture = ExtResource("pn")
@@ -38,9 +40,9 @@ texture_margin_top = 6.0
 texture_margin_right = 6.0
 texture_margin_bottom = 6.0
 content_margin_left = 3.0
-content_margin_top = 3.0
+content_margin_top = 4.0
 content_margin_right = 3.0
-content_margin_bottom = 2.0
+content_margin_bottom = 1.0
 
 [sub_resource type="StyleBoxTexture" id="p_disabled"]
 texture = ExtResource("pd")
@@ -71,9 +73,9 @@ texture_margin_top = 6.0
 texture_margin_right = 6.0
 texture_margin_bottom = 6.0
 content_margin_left = 3.0
-content_margin_top = 3.0
+content_margin_top = 4.0
 content_margin_right = 3.0
-content_margin_bottom = 2.0
+content_margin_bottom = 1.0
 
 [sub_resource type="StyleBoxTexture" id="s_disabled"]
 texture = ExtResource("sd")
@@ -176,30 +178,28 @@ content_margin_top = 0.0
 content_margin_right = 2.0
 content_margin_bottom = 1.0
 
-[sub_resource type="StyleBoxFlat" id="current_border"]
+[sub_resource type="StyleBoxTexture" id="current_border"]
+texture = ExtResource("frame_select")
+texture_margin_left = 4.0
+texture_margin_top = 4.0
+texture_margin_right = 4.0
+texture_margin_bottom = 4.0
 draw_center = false
-border_width_left = 1
-border_width_top = 1
-border_width_right = 1
-border_width_bottom = 1
-border_color = Color(1, 0.878431, 0.4, 1)
-anti_aliasing = false
 
 [sub_resource type="StyleBoxFlat" id="dim"]
 bg_color = Color(0.0509804, 0.0392157, 0.0784314, 0.7)
 anti_aliasing = false
 
-[sub_resource type="StyleBoxFlat" id="tray_box"]
+[sub_resource type="StyleBoxTexture" id="tray_box"]
+texture = ExtResource("panel_tray")
+texture_margin_left = 6.0
+texture_margin_top = 6.0
+texture_margin_right = 6.0
+texture_margin_bottom = 6.0
 content_margin_left = 4.0
 content_margin_top = 4.0
 content_margin_right = 4.0
 content_margin_bottom = 4.0
-bg_color = Color(0.0509804, 0.0392157, 0.0784314, 1)
-border_width_left = 1
-border_width_top = 1
-border_width_right = 1
-border_width_bottom = 1
-border_color = Color(0.156863, 0.113725, 0.231373, 1)
 
 [sub_resource type="StyleBoxTexture" id="d_normal"]
 texture = ExtResource("dn")
@@ -219,9 +219,9 @@ texture_margin_top = 6.0
 texture_margin_right = 6.0
 texture_margin_bottom = 6.0
 content_margin_left = 3.0
-content_margin_top = 3.0
+content_margin_top = 4.0
 content_margin_right = 3.0
-content_margin_bottom = 2.0
+content_margin_bottom = 1.0
 
 [sub_resource type="StyleBoxTexture" id="d_hover"]
 texture = ExtResource("dh")

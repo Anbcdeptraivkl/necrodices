@@ -19,6 +19,7 @@ from pathlib import Path
 
 from PIL import Image, ImageDraw
 
+import art_lock
 import mini_font
 from palette import ELEMENT_RAMP, ROOT, TINT_WHITE, ramp, rgba, write_palette_files
 
@@ -658,6 +659,7 @@ def main(argv: list[str] | None = None) -> int:
     bases: dict[str, Image.Image] = {}
     written: dict[str, int] = {}
     skipped = 0
+    locked: list[str] = []
     for e in order:
         path = ROOT / e["path"]
         if args.only:
@@ -665,17 +667,25 @@ def main(argv: list[str] | None = None) -> int:
         else:
             write = args.force or not path.exists()
         img = None
+        if write and not art_lock.owned(e["id"], path):
+            locked.append(e["id"])  # designer art: no flag overwrites it (tools/art_lock.py)
+            write = False
         if write:
             # Generate glyph/base sources lazily via the cache below.
             img = render(e, glyphs, bases)
             assert img.size == (e["w"], e["h"]), (e["path"], img.size)
             path.parent.mkdir(parents=True, exist_ok=True)
             img.save(path)
+            art_lock.record(e["id"], img)
             written[e["category"]] = written.get(e["category"], 0) + 1
         else:
             skipped += 1
 
     total = sum(written.values())
+    if total:
+        art_lock.save()
+    if locked and (args.only or args.force):
+        print("LOCKED (designer art, not written): " + " ".join(locked))
     print(f"placeholders: wrote {total}, kept {skipped} existing (of {len(entries)})")
     if written:
         print("  " + ", ".join(f"{k} {v}" for k, v in written.items()))

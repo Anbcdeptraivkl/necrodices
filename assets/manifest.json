@@ -1,7 +1,7 @@
 {
  "generated_by": "tools/build_manifest.py",
  "spec": "ART_SPEC \u00a711",
- "count": 236,
+ "count": 238,
  "files": [
   {
    "id": "skeleton_warrior",
@@ -2875,6 +2875,34 @@
    "tag": "DIV",
    "ramp": null,
    "accent": null
+  },
+  {
+   "id": "panel_tray",
+   "path": "assets/ui/panel_tray.png",
+   "w": 24,
+   "h": 24,
+   "frame_w": 24,
+   "frames": 1,
+   "category": "ui",
+   "flags": [],
+   "tag": "PAT",
+   "ramp": null,
+   "accent": null,
+   "margin": 6
+  },
+  {
+   "id": "frame_select",
+   "path": "assets/ui/frame_select.png",
+   "w": 16,
+   "h": 16,
+   "frame_w": 16,
+   "frames": 1,
+   "category": "ui",
+   "flags": [],
+   "tag": "FS",
+   "ramp": null,
+   "accent": null,
+   "margin": 4
   },
   {
    "id": "logo",

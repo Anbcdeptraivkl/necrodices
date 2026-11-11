@@ -61,11 +61,22 @@ follow the art spec until (or instead of) hand-drawn art. How pixels reach the s
     write a sheet whose cells did not change (no byte churn in version control), and never
     "regenerate" to verify: test the recipe in memory instead. Generating art is done on
     request only; before running, confirm with the requester which ids and which sheet files
-    will be written.
+    will be written. **A tool overwrites only what a tool wrote**: keep a registry of a hash of
+    the pixels each generator last wrote per id; a file that no longer matches its entry was
+    hand-edited and is refused whatever the flag. A hand edit then locks itself, with nothing
+    to declare.
 12. **Prototype art lives apart from approved art.** Sheets under review go to their own folder
     that the game does not load; approval moves the file to the approved folder. Generators may
     create prototype sheets freely (still on request), and must never touch approved cells
-    while doing so: namespace the targets of sheets whose ids repeat other sheets' ids.
+    while doing so: namespace the targets of sheets whose ids repeat other sheets' ids. Judge a
+    prototype in the running game through a dev-only load override (the capture tool reads the
+    prototype folder over the asset paths for that run), not by copying it into the approved
+    folder "just to look".
+13. **Before redoing art to match a designer, measure what the designer changed.** Diff each
+    hand-edited file against the recipe it came from (colour count, changed pixels, faces,
+    limbs, accents) and write the habits down as rules; rebuild one of their sprites with the
+    grids to prove the method; then draw a small pilot (one sprite per rule that differs) for
+    review before any batch.
 
 ## Procedure — a new generated asset
 
@@ -130,5 +141,7 @@ is right, then diff the engine output against the preview pixel for pixel.
 | A decor-rich battle map pushed into the unit batch every frame | Thousands of static sprites sorted and uploaded each frame | Bake flat decor into the ground; y-sort only standing props, and cull them to the camera view |
 | Asset ids reused across folders in the manifest (a `coin` stat icon and a `coin` VFX sheet) | A generator keyed by id writes the wrong file or fails the size check | Make ids unique when building the manifest (prefix by category) and key every generator by id |
 | A generator whose plain run "writes every id whose pixels differ from the recipe" | The designer's hand-edited PNG differs from the recipe, so the next plain run silently overwrites it | Plain run = create missing files only; overwrite only ids named with `--only`, or everything with an explicit `--all`; print how many differing files were kept |
+| Hand-edited files protected by convention or by a list of locked ids | The list is stale the day the designer edits one more file; a targeted run (`--only`) replaces their work | Ownership by hash registry (rule 11): the tool refuses any file whose pixels it did not write |
+| UI boxes drawn as plain rectangles with a highlight row and a shadow row while the game's objects are chunky slabs | Buttons and panels look like a different game from the sprites | Take the kit's construction from an object the designer drew (outline, corner cut, flat face, bottom lip, corner glint) and build every 9-slice from that one function; pressed = the same slab sunk by its lip |
 | A big character built from stacked part grids that share one outline pass | Head and shoulders merge into one blob at 1x | Outline each part grid on its own before stacking (back to front); a symmetric big sprite is a mirrored half grid with the right side shaded darker |
 | An aura / flame ring sized to the sprite canvas behind a full-canvas sprite | Only the ring's sides show; the top crown is hidden by the body | Put the ring's bright band near the canvas edge, or draw it larger (integer scale) than the body |

@@ -1,5 +1,7 @@
 """Derived button states (ART_SPEC §7): hover states and the danger (ATTACK!) button are recoloured
-from the normal 9-slices on disk, so a hand-edited normal button carries its edits into them.
+from the normal 9-slices. The source is the file on disk when the designer drew it (a hand-edited
+normal button carries its edits into them), else the `ui_kit.py` recipe, so a proposal derives
+from the proposed button and not from the file it is about to replace.
 
     python tools/art/ui_buttons.py --only "btn_*_hover"   # rebuild after editing a normal button
 
@@ -15,7 +17,9 @@ from pathlib import Path
 from PIL import Image
 
 sys.path.insert(0, str(Path(__file__).resolve().parent))
-from pixelgrid import ROOT, recolor, run  # noqa: E402
+from pixelgrid import ROOT, recolor, run  # noqa: E402  (adds tools/ to the path)
+import art_lock  # noqa: E402
+import ui_kit  # noqa: E402
 
 UI = ROOT / "assets" / "ui"
 # normal colour -> hover colour (palette keys)
@@ -32,7 +36,10 @@ HOVER = {
 def hover(asset_id: str):
     def draw() -> Image.Image:
         src, mapping = HOVER[asset_id]
-        return recolor(Image.open(UI / f"{src}.png").convert("RGBA"), mapping)
+        path = UI / f"{src}.png"
+        if src in ui_kit.ASSETS and art_lock.owned(src, path):
+            return recolor(ui_kit.ASSETS[src](), mapping)
+        return recolor(Image.open(path).convert("RGBA"), mapping)
     return draw
 
 

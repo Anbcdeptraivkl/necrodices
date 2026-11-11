@@ -104,7 +104,9 @@ git config core.hooksPath .githooks
   `DECISIONS.md` (ID, date, decision, why).
 - Art: `python tools/gen_placeholders.py` only creates missing files; it overwrites only ids
   named with `--only` or with `--force`, and only on the user's request. Modified art files in
-  the working tree are the designer's work — never revert, regenerate or "clean" them.
+  the working tree are the designer's work — never revert, regenerate or "clean" them. The art
+  tools enforce it (ART_SPEC §9.4): a file a generator did not write is `LOCKED`. Redone art goes
+  to `art_source/proposals/` first and into `assets/` only after the designer approves it.
 - Before handing over: `python tools/check_data.py`, `python tools/validate_art.py`,
   `tools\test.cmd`, `tools\ui_test.cmd`; for a visible change also `tools\screenshot.cmd <preset>`
   and look at the PNG.

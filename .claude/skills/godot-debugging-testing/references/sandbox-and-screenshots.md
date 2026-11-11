@@ -54,6 +54,24 @@ captures a downscaled frame and upsamples it, adding blur that is not in the gam
 **Judging a capture:** crop and upscale with **nearest-neighbour**. It magnifies without
 inventing blur, so any softness you see is genuinely in the frame.
 
+### Previewing unapproved assets in a capture
+
+To judge proposed art on the real screens without writing it into the asset folder, give the
+capture tool an override folder laid out like the asset folder. Before building the screen:
+
+1. Load each PNG with `Image.load_from_file` into an `ImageTexture` (no import step).
+2. Re-point resources that are **already loaded** and hold the old texture: walk the project
+   theme (`ThemeDB.get_project_theme()`, `get_stylebox_type_list` / `get_stylebox_list`) and
+   swap `StyleBoxTexture.texture` where `resource_path` matches. Do this before step 3, which
+   clears the old texture's path.
+3. `texture.take_over_path("res://…")` so every later `load()` of that path returns the override.
+4. Clear the game's own texture caches (a static `Dictionary` of loaded textures).
+5. **Keep the override textures in a member variable.** The resource cache holds no strong
+   reference: a texture nobody keeps is freed, and the next `load()` reads the original file
+   again with no error (the override then works only for resources something grabbed at once).
+
+Skip review boards in that folder (a name prefix), or they are loaded as assets too.
+
 ### Driving UI in a capture
 
 - Hover and click through the capture's SubViewport: `viewport.push_input(event)` with an

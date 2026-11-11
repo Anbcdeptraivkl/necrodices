@@ -35,6 +35,8 @@ const PRESETS := {
 	"shop": {"screen": "shop", "seed": "CAPTURE5", "relics": ["RATTLE_DRUM", "OVERGROWTH"], "money": 23,
 		"consumables": ["IRON_DRAUGHT"], "dice": 7, "runes": true, "gear": ["GRAVE_BELL", "LOADED_CUP"]},
 	"shop_tip": {"screen": "shop", "seed": "CAPTURE5", "money": 23, "hover": "Gear", "wait": 0.8},
+	# Pressed button (ART_SPEC §7): the slab sinks 2 px; `title_hover` shows the hovered one.
+	"title_press": {"screen": "title", "hover": "HowToPlay", "press": true, "wait": 0.5},
 	"shop_coffer": {"screen": "shop", "seed": "CAPTURE7", "money": 23, "coffer": "COFFER_POTION_JUMBO"},
 	"codex": {"screen": "night_map", "seed": "CAPTURE1", "overlay": "run_info", "levels": 2},
 	"codex_units": {"screen": "night_map", "seed": "CAPTURE1", "overlay": "run_info", "page": "units"},
@@ -57,6 +59,7 @@ const PRESETS := {
 const CROWD_UNITS := ["SKELETON_WARRIOR", "FIRE_IMP", "FROST_BAT", "PUMPKINLING", "VOLT_GHOST", "HAUNTED_ARMOR", "WISP"]
 
 var _args := {}
+var _overrides := {}
 
 
 func _ready() -> void:
@@ -95,6 +98,8 @@ func _capture() -> void:
 		preset["enemy"] = _args["enemy"]
 		preset["rules"] = [rule] if rule != null else []
 	Engine.time_scale = float(_args.get("time_scale", 1.0))
+	if _args.has("art"):
+		_override_art(_args["art"])
 	await _build(game, db, preset)
 	if preset.get("pose", "") == "hurt":  # hold the hunter's hurt frame (art review, no timing luck)
 		await get_tree().process_frame
@@ -102,8 +107,10 @@ func _capture() -> void:
 	if preset.has("army"):  # every horde mini on the field at once (art review)
 		await get_tree().process_frame
 		var horde: HordeRenderer = get_tree().current_scene.find_child("Horde", true, false)
-		for unit in CROWD_UNITS:
-			horde.add_group(unit, PackedStringArray(["FIRE", "ICE"] if unit == "WISP" else []), float(preset["army"]))
+		var units: Array = Array(_args["units"].split(",")) if _args.has("units") else CROWD_UNITS  # --units=A,B
+		for unit: String in units:
+			horde.add_group(unit, PackedStringArray(["FIRE", "ICE"] if unit == "WISP" else []),
+					float(_args.get("army", preset["army"])))
 	if preset.has("hover"):
 		var target: Control = null
 		for i in 30:  # the scene change is deferred: wait until the target exists
@@ -116,6 +123,13 @@ func _capture() -> void:
 		motion.position = target.get_global_rect().get_center() * Vector2(get_window().size) / get_viewport().get_visible_rect().size
 		Input.parse_input_event(motion)
 		get_viewport().warp_mouse(target.get_global_rect().get_center())  # tooltips sit at the pointer
+		if preset.get("press", false):  # hold the button down: nothing fires before the release
+			await get_tree().process_frame
+			var down := InputEventMouseButton.new()
+			down.button_index = MOUSE_BUTTON_LEFT
+			down.pressed = true
+			down.position = motion.position
+			Input.parse_input_event(down)
 	await get_tree().create_timer(float(_args.get("wait", preset.get("wait", 0.6)))).timeout
 	await RenderingServer.frame_post_draw
 	var img := get_viewport().get_texture().get_image()
@@ -123,6 +137,44 @@ func _capture() -> void:
 	img.save_png(ProjectSettings.globalize_path("res://") + out)
 	print("captured %s %s" % [out, img.get_size()])
 	get_tree().quit()
+
+
+## `--art=<dir>`: shows proposed art in the game without writing assets/ (ART_SPEC §9.4). Every
+## PNG under <dir>, laid out like assets/, replaces the texture at its res://assets path for this
+## run: the theme's style boxes are re-pointed and later loads come from the resource cache.
+func _override_art(dir: String) -> void:
+	var base := ProjectSettings.globalize_path("res://") + dir
+	var swapped := {}
+	for rel in _png_files(base, ""):
+		swapped["res://assets/" + rel] = ImageTexture.create_from_image(Image.load_from_file(base + "/" + rel))
+	if swapped.is_empty():
+		push_error("capture: no PNG under %s" % dir)
+		get_tree().quit(1)
+		return
+	var theme := ThemeDB.get_project_theme()
+	for type in theme.get_stylebox_type_list():
+		for box_name in theme.get_stylebox_list(type):
+			var box := theme.get_stylebox(box_name, type) as StyleBoxTexture
+			if box != null and box.texture != null and swapped.has(box.texture.resource_path):
+				box.texture = swapped[box.texture.resource_path]
+	for path: String in swapped:
+		swapped[path].take_over_path(path)
+	Art._cache.clear()
+	_overrides = swapped  # the resource cache does not keep them alive
+	print("capture: %d art files overridden from %s" % [swapped.size(), dir])
+
+
+func _png_files(base: String, rel: String) -> PackedStringArray:
+	var out := PackedStringArray()
+	var dir := DirAccess.open(base + "/" + rel)
+	if dir == null:
+		return out
+	for d in dir.get_directories():
+		out.append_array(_png_files(base, rel.path_join(d)))
+	for f in dir.get_files():
+		if f.ends_with(".png") and not f.begins_with("_"):  # _*.png are review boards
+			out.append(rel.path_join(f))
+	return out
 
 
 func _build(game: Node, db: ContentDb, p: Dictionary) -> void:

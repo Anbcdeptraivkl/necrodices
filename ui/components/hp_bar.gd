@@ -35,3 +35,6 @@ func _draw() -> void:
 	if preview_w > 0:
 		draw_texture_rect(Art.ui("hp_preview"),
 			Rect2(inner.position + Vector2(hp_w - preview_w, 0), Vector2(preview_w, inner.size.y)), true)
+	# The frame's corners are cut by 2 px: its four diagonal outline pixels sit inside `inner`.
+	for at: Vector2 in [Vector2(1, 1), Vector2(size.x - 2, 1), Vector2(1, size.y - 2), size - Vector2(2, 2)]:
+		draw_rect(Rect2(at, Vector2.ONE), Art.colour("N0"))

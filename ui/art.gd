@@ -25,12 +25,31 @@ const MASK_KEYS := {
 static var _cache := {}
 
 
-## A 1 px rectangle outline on whole pixels (draw_rect with filled = false lands on half pixels).
-static func draw_ring(item: CanvasItem, r: Rect2, c: Color) -> void:
-	item.draw_rect(Rect2(r.position, Vector2(r.size.x, 1)), c)
-	item.draw_rect(Rect2(r.position + Vector2(0, r.size.y - 1), Vector2(r.size.x, 1)), c)
-	item.draw_rect(Rect2(r.position, Vector2(1, r.size.y)), c)
-	item.draw_rect(Rect2(r.position + Vector2(r.size.x - 1, 0), Vector2(1, r.size.y)), c)
+## A 1 px outline on whole pixels (draw_rect with filled = false lands on half pixels) with its
+## corners cut by `cut` px: the path of the UI slab's outline (ART_SPEC §7), so a ring laid over
+## a card, slot or cell replaces its outline exactly. `cut` 1 fits the 16×16 face tiles and a
+## ring drawn 1 px inside a slab; 0 is a plain rectangle.
+static func draw_ring(item: CanvasItem, r: Rect2, c: Color, cut: int = 2) -> void:
+	var p := r.position
+	var w := r.size.x
+	var h := r.size.y
+	item.draw_rect(Rect2(p + Vector2(cut, 0), Vector2(w - 2 * cut, 1)), c)
+	item.draw_rect(Rect2(p + Vector2(cut, h - 1), Vector2(w - 2 * cut, 1)), c)
+	item.draw_rect(Rect2(p + Vector2(0, cut), Vector2(1, h - 2 * cut)), c)
+	item.draw_rect(Rect2(p + Vector2(w - 1, cut), Vector2(1, h - 2 * cut)), c)
+	for i in range(1, cut):  # the diagonal step(s) of each corner
+		for at: Vector2 in [Vector2(i, cut - i), Vector2(w - 1 - i, cut - i),
+				Vector2(i, h - 1 - cut + i), Vector2(w - 1 - i, h - 1 - cut + i)]:
+			item.draw_rect(Rect2(p + at, Vector2.ONE), c)
+
+
+## A filled box with the same cut corners (the floor under `draw_ring`).
+static func draw_box(item: CanvasItem, r: Rect2, c: Color, cut: int = 2) -> void:
+	for i in cut:
+		var row := Vector2(r.size.x - 2 * (cut - i), 1)
+		item.draw_rect(Rect2(r.position + Vector2(cut - i, i), row), c)
+		item.draw_rect(Rect2(r.position + Vector2(cut - i, r.size.y - 1 - i), row), c)
+	item.draw_rect(Rect2(r.position + Vector2(0, cut), Vector2(r.size.x, r.size.y - 2 * cut)), c)
 
 
 static func colour(key: String) -> Color:

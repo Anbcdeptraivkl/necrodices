@@ -38,7 +38,7 @@ func show_entry(p_key: String, tex: Texture2D, p_ring: Color) -> void:
 
 
 func _draw() -> void:
-	draw_rect(Rect2(Vector2.ZERO, SIZE), Art.colour("N1"))
+	Art.draw_box(self, Rect2(Vector2.ZERO, SIZE), Art.colour("N1"))
 	if texture != null:
 		var s := texture.get_size()
 		var k := maxf(1.0, floorf(32.0 / maxf(s.x, s.y)))
