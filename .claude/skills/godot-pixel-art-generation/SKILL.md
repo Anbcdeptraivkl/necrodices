@@ -76,7 +76,15 @@ follow the art spec until (or instead of) hand-drawn art. How pixels reach the s
     hand-edited file against the recipe it came from (colour count, changed pixels, faces,
     limbs, accents) and write the habits down as rules; rebuild one of their sprites with the
     grids to prove the method; then draw a small pilot (one sprite per rule that differs) for
-    review before any batch.
+    review before any batch. **Rules transfer only within the kind of art they were measured
+    on**: habits read from solid objects and characters (fewer tones, chunky shapes, no loose
+    pixels) say nothing about fire, glow or smoke. Redo by generator only where the designer
+    has drawn the construction to copy (a box, a letter, a die); for a kind they have not
+    sampled, ask for one sample first or leave the art as it is.
+14. **Judge a redo by looking, against the art it replaces, not by the rules it satisfies.**
+    "Two tones, no stray pixels" can be true of a sprite that is plainly worse. Before showing
+    a proposal, put old and new side by side in game and answer one question: would the old
+    one be missed? If yes, the proposal is not ready, whatever the checklist says.
 
 ## Procedure — a new generated asset
 
@@ -143,5 +151,6 @@ is right, then diff the engine output against the preview pixel for pixel.
 | A generator whose plain run "writes every id whose pixels differ from the recipe" | The designer's hand-edited PNG differs from the recipe, so the next plain run silently overwrites it | Plain run = create missing files only; overwrite only ids named with `--only`, or everything with an explicit `--all`; print how many differing files were kept |
 | Hand-edited files protected by convention or by a list of locked ids | The list is stale the day the designer edits one more file; a targeted run (`--only`) replaces their work | Ownership by hash registry (rule 11): the tool refuses any file whose pixels it did not write |
 | UI boxes drawn as plain rectangles with a highlight row and a shadow row while the game's objects are chunky slabs | Buttons and panels look like a different game from the sprites | Take the kit's construction from an object the designer drew (outline, corner cut, flat face, bottom lip, corner glint) and build every 9-slice from that one function; pressed = the same slab sunk by its lip |
+| Hand-placed effect frames (flames, auras) replaced by a ring plus generated tongues to "clean them up" | Fire that reads as a crown or a blob: flat-topped mounds where gaps were filled, steps where a tongue leaves the ring's side, a solid mass when the game draws it ×2; the designer rejects it as worse than the frames it replaced | Effects are organic: keep the hand-placed frames (rule 10 applies to them as much as to characters). A tone pass, if wanted, is a recolour of those frames, checked at every scale the game draws them |
 | A big character built from stacked part grids that share one outline pass | Head and shoulders merge into one blob at 1x | Outline each part grid on its own before stacking (back to front); a symmetric big sprite is a mirrored half grid with the right side shaded darker |
 | An aura / flame ring sized to the sprite canvas behind a full-canvas sprite | Only the ring's sides show; the top crown is hidden by the body | Put the ring's bright band near the canvas edge, or draw it larger (integer scale) than the body |

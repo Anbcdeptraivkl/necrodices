@@ -1,4 +1,4 @@
-# ROLL THE BONES — Game Loop Spec v2.0
+# NECRODICER — Game Loop Spec v2.0
 
 > Halloween 2026 dice-summoning roguelike: roll bone dice, pick a combo, summon a squad,
 > send the army at a human monster-hunter. Balatro-shaped scoring with battle / necromancy

@@ -1,4 +1,4 @@
-# ROLL THE BONES — Art Spec v2.0
+# NECRODICER — Art Spec v2.0
 
 > Companion to `GAME_SPEC.md`. IDs used here (units, relics, enemies…) are defined there and must not be renamed.
 > Audience: artists, AI-image pipelines, and LLM coding agents integrating assets.
@@ -445,7 +445,10 @@ explains itself in its tooltip.
   holding a button, and after a click until the pointer reaches another target.
 
 ### 6.5 Title
-- `bg_title` centred; logo 160×48 centred at y 40.
+- `bg_title` centred; logo 160×48 centred at y 40: **NECRO** over **DICER** in 18 px block capitals
+  that stand on a lip like the dice (flat face, darker rows at the bottom, corner glint, `N0`
+  outline); NECRO in bone with the designer's skull die as its O, DICER in fire
+  (`tools/art/scenery.py`, D-A20).
 - Buttons 140×24 centred (x 170 at base), gap 4: Continue y 104, New Run y 132, How to Play
   y 160, Settings y 188.
 - Footer y 258: version + seed of last run (`N5`). Everything anchors to the canvas centre.

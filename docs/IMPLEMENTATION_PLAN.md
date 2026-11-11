@@ -1,4 +1,4 @@
-# Implementation Plan — Roll the Bones (NecroDices)
+# Implementation Plan — Necrodicer (NecroDices)
 
 Status: **2026-10-23 — v2 (gameplay rework) implemented to playable** — see §11. v1 (M0–M7,
 2026-10-20) below is history: its rules were replaced by GAME_SPEC v2.0 after the first designer

@@ -2,7 +2,8 @@
 
 Status (2026-11-11): batch 0 (tooling) and the **UI kit are done and in `assets/ui`**. The
 pilot review cut the generated units: the designer draws units, legends, the shopkeeper and the
-banner by hand (§7). Left to do: batches 6–8.
+banner by hand (§7). The logo "Necrodicer" and the rename are done; the VFX proposal was rejected
+and nothing of it was kept (§7.2). Left to do: batches 6b, 7b, 8.
 Owner of the style: the designer.
 Scope: redo the sprites and UI art the designer has not touched, so they sit with the repainted
 ones. Files the designer edited are never written (§3, §6.1).
@@ -259,8 +260,10 @@ way as §2 and the rules above are corrected before the next batch.
 | 1 | Pilot: 3 units + primary / danger buttons, `panel_card`, `slot` | 12 | Reviewed: **UI accepted, units rejected** |
 | 2–4 | Units, legends, shopkeeper, banner | 24 | **Cut** — the designer draws them by hand |
 | 5 | UI kit: all buttons, panels, chip, tooltip, slots, Power / Count boxes, HP frame, two new frames, rings drawn in code, theme | 22 written (2 new) | **Done**, in `assets/ui` |
-| 6 | Dice extras (`die_body_wild`, `die_roll`, select / bound / shackle rings), small glyphs and pips, `grave_bell`, `death_knell`, VFX tone pass | ~30 | Not started |
-| 7 | Logo "Necrodicer" and the rename; `bg_map`; `shop_decor` | 3 + text | Not started |
+| 6a | VFX | 8 | **Cut** — the proposal (a rebuilt aura ring and flame crown, two-tone particles) was rejected as worse than the hand-placed frames; the recipes were restored unchanged (§7.2) |
+| 6b | Dice extras (`die_body_wild`, `die_roll`, select / bound / shackle rings), small glyphs and pips, `grave_bell`, `death_knell` | ~22 | Not started |
+| 7a | Logo "Necrodicer" (stacked: NECRO over DICER, the O is the skull die) and the rename (project name, Web zip, doc titles, D-A20) | 1 + text | **Done** |
+| 7b | `bg_map`; `shop_decor` | 2 | Not started |
 | 8 | Derived art: how-to pages, art sheets | ~6 | After 6 and 7 |
 
 Not redrawn in batch 5, on purpose: `rarity_stripe_*`, `divider`, `hp_fill`, `hp_preview` (already
@@ -343,3 +346,20 @@ Decided by the designer on 2026-11-11:
 - Captures: any preset shows the kit; `title_hover` and `title_press` show the button states;
   `shop`, `shop_tip`, `codex_trinkets`, `night_map`, `summon_relics`, `result` cover cards, trays,
   tooltip, chips, the selection frame, the HUD boxes and the HP bar.
+
+### 7.2 What the two rejected proposals have in common
+
+The generated units (pilot) and the VFX (batch 6a) were both rejected; the UI kit and the logo
+were accepted. The difference is not the subject but the method:
+
+- **Accepted:** geometric art (boxes, block letters) built from a construction the designer had
+  drawn themselves (the die body, the skull die). The reference existed; the work was applying it.
+- **Rejected:** organic art (characters, fire) for which the designer had drawn no sample of that
+  kind, produced from written rules. For the VFX the rules of §2.1 (fewer tones, chunky shapes,
+  no loose pixels) were measured on solid objects and do not hold for fire and glow, which need
+  thin irregular tips, loose sparks and a soft third tone; and hand-placed frames were replaced
+  by a ring plus triangles, which is the "primitives" failure the art skill warns about.
+
+Rule kept from this: redo by generator only where the designer has drawn the construction to
+copy; characters and effects wait for a designer sample or stay as they are.
+

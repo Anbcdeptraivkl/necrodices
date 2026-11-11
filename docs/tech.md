@@ -29,7 +29,7 @@ tools\ui_test.cmd                     :: UI smoke tests in the real game (autolo
 tools\screenshot.cmd encounter captures\x.png   :: capture a preset (scenes/dev/capture.gd PRESETS)
 tools\balance_sim.cmd --mode=baseline --trials=2000    :: Night 1 Mob with the starting dice: damage, win rate, combo mix
 tools\balance_sim.cmd --mode=runs --trials=1000        :: GAME_SPEC §12 bot: reach / win / deaths by rule
-tools\export_web.cmd                  :: Web release → build\web + build\roll_the_bones_web.zip (needs 4.6.3 templates)
+tools\export_web.cmd                  :: Web release → build\web + build\necrodicer_web.zip (needs 4.6.3 templates)
 tools\serve_web.cmd [port]            :: play the Web build at http://127.0.0.1:8060/ (opening index.html from disk fails: file:// blocks fetch)
 python tools\art\<units|legends|enemies_dice|dice_runes|icons|items|scenery|backgrounds|ui_kit|ui_buttons|howto>.py [--only id | --all] [--preview out.png]   :: art generators: no flag = create missing files only (hand edits are never overwritten); --only rewrites the named ids; --all rewrites every changed id; designer files are LOCKED whatever the flag (ART_SPEC §9.4)
 python tools\art\classify.py [--list | --dump <id>]   :: who owns each art file (designer / generator / pending); --dump prints a file as a palette-key grid

@@ -1,4 +1,4 @@
-# NecroDices — "Roll the Bones" — Agent Guide
+# NecroDices — "Necrodicer" — Agent Guide
 
 Halloween 2026 dice-summoning roguelike: roll elemental dice, bind them into monster groups,
 score `Power × Count` Balatro-style against human monster-hunters. Godot 4.6.3, GDScript,

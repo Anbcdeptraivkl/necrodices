@@ -4,7 +4,8 @@
     python tools/art/scenery.py --only logo             # rewrite named ids
     python tools/art/scenery.py --preview out.png       # x6 contact sheet, writes nothing
 
-Logo letters, the app icon, the stamp lettering and every VFX frame are hand-placed grids.
+The app icon, the stamp lettering and every VFX frame are hand-placed grids. The logo is built
+from block letters (stems and arms) and the skull die.
 Backgrounds are not here: bg_title / bg_battle are hand-drawn by the designer (no generator
 owns them) and bg_map / bg_shop come from tools/art/backgrounds.py (D-R11).
 """
@@ -16,7 +17,7 @@ import sys
 from pathlib import Path
 
 sys.path.insert(0, str(Path(__file__).resolve().parent))
-from pixelgrid import BASE_LEGEND, canvas, grid, rgba, run, sheet  # noqa: E402
+from pixelgrid import BASE_LEGEND, canvas, grid, outline, rgba, run, sheet  # noqa: E402
 
 W, H = 640, 300
 
@@ -129,302 +130,130 @@ class Pic:
 # ---------------------------------------------------------------------------------------------
 
 # ---------------------------------------------------------------------------------------------
-# logo — "ROLL THE BONES": hand-drawn bold letters (top light, mid body, dark underside),
-# a bone between the lines, the O of BONES is a skull-faced die. N0 outline + 1 px drop shadow.
+# logo — "NECRODICER" (D-A20): block capitals that stand on a lip like the designer's dice
+# (flat face, darker rows at the bottom, corner glint, N0 outline). NECRO in bone, DICER in fire;
+# the O is the skull die of the app icon.
 # ---------------------------------------------------------------------------------------------
 
-LETTERS = {
-    "R": [
-        "############..",
-        "#############.",
-        "##############",
-        "####......####",
-        "####......####",
-        "####......####",
-        "####.....#####",
-        "#############.",
-        "############..",
-        "##########....",
-        "####...####...",
-        "####....####..",
-        "####....####..",
-        "####.....####.",
-        "####.....####.",
-        "####......####",
-        "####......####",
-        "####......####",
-    ],
-    "A": [
-        "...########...",
-        "..##########..",
-        ".############.",
-        "#####....#####",
-        "####......####",
-        "####......####",
-        "####......####",
-        "####......####",
-        "##############",
-        "##############",
-        "##############",
-        "####......####",
-        "####......####",
-        "####......####",
-        "####......####",
-        "####......####",
-        "####......####",
-        "####......####",
-    ],
-    "T": [
-        "##############",
-        "##############",
-        "##############",
-        ".....####.....",
-        ".....####.....",
-        ".....####.....",
-        ".....####.....",
-        ".....####.....",
-        ".....####.....",
-        ".....####.....",
-        ".....####.....",
-        ".....####.....",
-        ".....####.....",
-        ".....####.....",
-        ".....####.....",
-        ".....####.....",
-        ".....####.....",
-        ".....####.....",
-    ],
-    "L": [
-        "####........",
-        "####........",
-        "####........",
-        "####........",
-        "####........",
-        "####........",
-        "####........",
-        "####........",
-        "####........",
-        "####........",
-        "####........",
-        "####........",
-        "####........",
-        "####........",
-        "####........",
-        "############",
-        "############",
-        "############",
-    ],
-    "E": [
-        "############",
-        "############",
-        "############",
-        "####........",
-        "####........",
-        "####........",
-        "####........",
-        "##########..",
-        "##########..",
-        "##########..",
-        "####........",
-        "####........",
-        "####........",
-        "####........",
-        "####........",
-        "############",
-        "############",
-        "############",
-    ],
-    "&": [
-        "....#####.....",
-        "...#######....",
-        "..####.####...",
-        "..###...###...",
-        "..###..####...",
-        "..########....",
-        "...######.....",
-        "..########.###",
-        ".####.####.###",
-        "####...######.",
-        "####....####..",
-        "####....#####.",
-        "####...#######",
-        ".############.",
-        "..#######..###",
-    ],
-}
+LOGO_STEM, LOGO_ARM = 5, 4
+BONE_INK = ("B2", ("B1", "B0", "B0"), "N7")   # face, lip rows top to bottom, glint
+FIRE_INK = ("F1", ("F0", "F0", "F0"), "F2")
 
-# skull-faced die (the O of ROLL): B2 face, B1 inner bevel, B0 side (matches dice/die_body)
-DIE_O = [
-    ".cccccccccccccccc.",
-    "ccccccccccccccccBc",
-    "ccccccccccccccccBc",
-    "cccc##cccccc##ccBc",
-    "ccc#7##cccc#7##cBc",
-    "ccc####cccc####cBc",
-    "ccc####cccc####cBc",
-    "cccc##cccccc##ccBc",
-    "ccccccccccccccccBc",
-    "ccccccc####cccccBc",
-    "cccccccc##ccccccBc",
-    "ccccccccccccccccBc",
-    "ccccc#######ccccBc",
-    "ccccc#c#c#c#ccccBc",
-    "cBBBBBBBBBBBBBBBBc",
-    "bbbbbbbbbbbbbbbbbb",
-    ".bbbbbbbbbbbbbbbb.",
-]
 
-BONE_END = [
-    ".##....",
-    "####...",
-    "#####..",
-    ".######",
-    "..#####",
-    "..#####",
-    ".######",
-    "#####..",
-    "####...",
-    ".##....",
+def _box(x0: int, y0: int, x1: int, y1: int) -> set[tuple[int, int]]:
+    return {(x, y) for x in range(x0, x1 + 1) for y in range(y0, y1 + 1)}
+
+
+def _letter(ch: str, h: int) -> tuple[set[tuple[int, int]], int]:
+    """Mask and width of a block capital `h` px tall: 5 px stems, 4 px arms, stepped corners."""
+    s, a, b = LOGO_STEM, LOGO_ARM, h - 1
+    mid = (h - a) // 2
+    stem = _box(0, 0, s - 1, b)
+    if ch == "I":
+        return stem, s
+    if ch == "N":
+        w = 14
+        m = stem | _box(w - s, 0, w - 1, b)
+        for y in range(h):
+            x = round(y * (w - s) / b)
+            m |= _box(x, y, x + s - 1, y)
+        return m, w
+    if ch == "E":
+        w = 13
+        return stem | _box(0, 0, w - 1, a - 1) | _box(0, mid, w - 3, mid + a - 1) | _box(0, h - a, w - 1, b), w
+    if ch == "C":
+        w = 13
+        m = stem | _box(0, 0, w - 1, a - 1) | _box(0, h - a, w - 1, b)
+        m |= _box(w - s, 0, w - 1, a + 2) | _box(w - s, b - a - 2, w - 1, b)
+        return m - {(0, 0), (1, 0), (0, 1), (0, b), (1, b), (0, b - 1)}, w
+    if ch == "D":
+        w = 14
+        return stem | _box(0, 0, w - 3, a - 1) | _box(0, h - a, w - 3, b) | _box(w - s, 2, w - 1, b - 2), w
+    if ch == "R":
+        w = 14
+        m = stem | _box(0, 0, w - 3, a - 1) | _box(w - s, 2, w - 1, mid + 1) | _box(0, mid, w - 3, mid + a - 1)
+        m |= _box(w - s - 1, mid + a, w - 2, mid + a + 1) | _box(w - s, mid + a + 2, w - 1, b)
+        return m, w
+    raise KeyError(ch)
+
+
+# The app icon's face on a 20 px wide die: slanted sockets, nose, a smirk with dashed teeth.
+SKULL_FACE = [
+    "....................",
+    "....................",
+    "....................",
+    "....................",
+    "....................",
+    "....................",
+    "....................",
+    "..######....######..",
+    "..######....######..",
+    "...####......####...",
+    "....##........##....",
+    "....................",
+    "........####........",
+    ".........##.........",
+    "...............#....",
+    "....#..........#....",
+    ".....##.###.###.....",
+    "....................",
+    "....................",
+    "....................",
 ]
 
 
-def _mask(rows: list[str]) -> set[tuple[int, int]]:
-    return {(x, y) for y, r in enumerate(rows) for x, ch in enumerate(r) if ch == "#"}
+def _skull_die(p: Pic, x0: int, y0: int, h: int, lip: int) -> int:
+    """The skull die as the letter O, 20 px wide; the caller's outline pass adds its N0 ring."""
+    w = 20
+    for y in range(h + lip):
+        cut = 1 if y in (0, h + lip - 1) else 0  # with the outline this is the 2 px chamfer
+        for x in range(cut, w - cut):
+            p.put(x0 + x, y0 + y, "B2" if y < h else ("B1" if y == h else "B0"))
+    for y in range(2, h - 1):
+        p.put(x0 + w - 2, y0 + y, "B1")
+    face_y = y0 + (h - len(SKULL_FACE)) // 2
+    for j, row in enumerate(SKULL_FACE):
+        for i, ch in enumerate(row):
+            if ch == "#":
+                p.put(x0 + i, face_y + j, "N0")
+    p.put(x0 + 1, y0, "N7")
+    p.put(x0, y0 + 1, "N7")
+    return w
 
 
-def _shade(p: Pic, mask: set, ox: int, oy: int, light: str, mid: str, dark: str) -> None:
-    """Top edge light, underside dark, rest mid (light from the top-left)."""
-    for (x, y) in mask:
-        k = mid
-        if (x, y - 1) not in mask:
-            k = light
-        elif (x, y + 1) not in mask:
-            k = dark
-        elif (x - 1, y) not in mask and (x, y - 2) not in mask:
-            k = light
-        p.put(ox + x, oy + y, k)
+def _logo_word(p: Pic, text: str, x: int, y: int, h: int, ink: tuple, gap: int = 2) -> int:
+    """Draws `text` ('O' = the skull die) from (x, y); returns the x after the last letter."""
+    face, lips, glint = ink
+    for ch in text:
+        if ch == "O":
+            x += _skull_die(p, x, y, h, len(lips)) + gap
+            continue
+        mask, w = _letter(ch, h)
+        for i, j in mask:
+            p.put(x + i, y + j, face)
+            if j == h - 1:  # the letter stands on its lip
+                for k, key in enumerate(lips):
+                    p.put(x + i, y + h + k, key)
+        top = min(i for i, j in mask if j == 0)
+        for i, j in ((top, 0), (top + 1, 0), (0, 1) if top else (0, 1)):
+            p.put(x + i, y + j, glint)
+        x += w + gap
+    return x - gap
 
 
-def _ring(p: Pic, painted: set, k: str = "N0", shadow: bool = True) -> None:
-    ring = {(x + dx, y + dy) for (x, y) in painted for dx in (-1, 0, 1) for dy in (-1, 0, 1)} - painted
-    for (x, y) in ring:
-        p.put(x, y, k)
-    if shadow:
-        body = painted | ring
-        for (x, y) in body:
-            if (x, y + 1) not in body:
-                p.put(x, y + 1, k)
-
-
-LETTERS.update({
-    "B": [
-        "###########...",
-        "############..",
-        "#############.",
-        "####.....####.",
-        "####......###.",
-        "####......###.",
-        "####.....####.",
-        "############..",
-        "###########...",
-        "############..",
-        "####.....####.",
-        "####......####",
-        "####......####",
-        "####......####",
-        "####.....#####",
-        "##############",
-        "#############.",
-        "############..",
-    ],
-    "N": [
-        "#####.....####",
-        "######....####",
-        "#######...####",
-        "########..####",
-        "####.###..####",
-        "####.####.####",
-        "####..###.####",
-        "####..########",
-        "####...#######",
-        "####...#######",
-        "####....######",
-        "####....######",
-        "####.....#####",
-        "####.....#####",
-        "####......####",
-        "####......####",
-        "####......####",
-        "####......####",
-    ],
-    "S": [
-        "..##########.",
-        ".############",
-        "#############",
-        "####.....####",
-        "####.........",
-        "####.........",
-        "#####........",
-        ".##########..",
-        "..##########.",
-        "...##########",
-        "........#####",
-        ".........####",
-        ".........####",
-        "####.....####",
-        "#############",
-        "#############",
-        ".############",
-        "..##########.",
-    ],
-})
-
-# small 7x10 bold letters for the "ROLL THE" line
-SMALL = {
-    "R": ["######.", "#######", "##...##", "##...##", "######.", "#####..", "##.##..", "##..##.", "##...##", "##...##"],
-    "O": [".#####.", "#######", "##...##", "##...##", "##...##", "##...##", "##...##", "##...##", "#######", ".#####."],
-    "L": ["##....."] * 8 + ["#######"] * 2,
-    "T": ["#######", "#######"] + ["..###.."] * 8,
-    "H": ["##...##"] * 4 + ["#######"] * 2 + ["##...##"] * 4,
-    "E": ["#######", "#######", "##.....", "##.....", "######.", "######.", "##.....", "##.....", "#######", "#######"],
-}
+def _logo_width(text: str, h: int, gap: int = 2) -> int:
+    return sum(20 if ch == "O" else _letter(ch, h)[1] for ch in text) + gap * (len(text) - 1)
 
 
 def logo():
-    """ROLL THE / BONES: small bone-white line over big fire letters; the O of BONES is a
-    skull-faced die; a long bone runs behind, between the lines. N0 ring + 1 px drop shadow."""
+    """NECRO over DICER, 18 px letters: NECRO in bone with the skull die as its O, DICER in fire;
+    the two lines share one outline row."""
     p = Pic(160, 48)
-    bone_y, bx0, bx1 = 13, 8, 151
-    bone = Pic(160, 48)
-    bone.stamp(BONE_END, bx0, bone_y)
-    bone.stamp([r[::-1] for r in BONE_END], bx1 - 6, bone_y)
-    bone.rect(bx0 + 7, bone_y + 3, bx1 - bx0 - 13, 4, "B1")
-    bmask = {(x, y) for y in range(48) for x in range(160) if bone.get(x, y)}
-    _ring(p, bmask, shadow=True)
-    _shade(p, bmask, 0, 0, "B2", "B1", "B0")
-    for x, y in ((28, 17), (29, 18), (30, 18), (130, 18), (131, 17), (132, 18)):  # nicks in the shaft
-        p.put(x, y, "B0")
-
-    def word(items: list[tuple], y0: int, glyphs: dict, ramp: tuple) -> None:
-        painted: set = set()
-        for kind, x, dy in items:
-            m = ({(i, j) for j, r in enumerate(DIE_O) for i, ch in enumerate(r) if ch != "."}
-                 if kind == "DIE" else _mask(glyphs[kind]))
-            painted |= {(x + i, y0 + dy + j) for (i, j) in m}
-        _ring(p, painted)
-        for kind, x, dy in items:
-            if kind == "DIE":
-                p.stamp(DIE_O, x, y0 + dy)
-            else:
-                _shade(p, _mask(glyphs[kind]), x, y0 + dy, *ramp)
-
-    # line 1: ROLL THE (bone ramp, small)
-    word([("R", 47, 0), ("O", 56, 0), ("L", 65, 0), ("L", 74, 0),
-          ("T", 88, 0), ("H", 97, 0), ("E", 106, 0)], 2, SMALL, ("B2", "B1", "B0"))
-    # line 2: BONES (fire ramp, big); the die-O sits higher, mid-roll, letters bounce ±1 px
-    word([("B", 38, 0), ("DIE", 55, -2), ("N", 76, 1), ("E", 93, 0), ("S", 108, -1)], 23, LETTERS,
-         ("F2", "F1", "F0"))
-    return p.image()
+    h = 18
+    y = (48 - 2 * (h + 3) - 1) // 2
+    _logo_word(p, "NECRO", (160 - _logo_width("NECRO", h)) // 2, y, h, BONE_INK)
+    _logo_word(p, "DICER", (160 - _logo_width("DICER", h)) // 2, y + h + 3 + 1, h, FIRE_INK)
+    return outline(p.image())
 
 
 # ---------------------------------------------------------------------------------------------
